@@ -21,7 +21,12 @@ def candle(day: int, close: str) -> PriceCandle:
     )
 
 
-def post(post_id: str, created: datetime, retrieved: datetime, score: float | None = 0.5) -> XPostRecord:
+def post(
+    post_id: str,
+    created: datetime,
+    retrieved: datetime,
+    score: float | None = 0.5,
+) -> XPostRecord:
     return XPostRecord(
         post_id=post_id, created_at=created, retrieved_at=retrieved,
         text=f"post {post_id}", sentiment_score=score, likes=10,
@@ -38,7 +43,12 @@ def test_post_rejects_naive_timestamp_and_invalid_sentiment() -> None:
 def test_deduplicate_posts_rejects_conflicting_duplicate_ids() -> None:
     timestamp = datetime(2026, 10, 20, tzinfo=UTC)
     with pytest.raises(ValueError, match="conflicting duplicate"):
-        deduplicate_posts([post("same", timestamp, timestamp), post("same", timestamp, timestamp, -0.5)])
+        deduplicate_posts(
+            [
+                post("same", timestamp, timestamp),
+                post("same", timestamp, timestamp, -0.5),
+            ]
+        )
 
 
 def test_point_in_time_features_exclude_late_arriving_and_future_posts() -> None:
@@ -60,7 +70,9 @@ def test_point_in_time_features_exclude_late_arriving_and_future_posts() -> None
 def test_features_do_not_treat_unscored_posts_as_zero_sentiment() -> None:
     candles = [candle(20, "100"), candle(21, "110")]
     cutoff = datetime(2026, 10, 21, tzinfo=UTC)
-    rows = build_point_in_time_features(candles, [post("unscored", cutoff - timedelta(hours=1), cutoff, None)])
+    rows = build_point_in_time_features(
+        candles, [post("unscored", cutoff - timedelta(hours=1), cutoff, None)]
+    )
     assert rows[1].post_count_24h == 1
     assert rows[1].scored_post_count_24h == 0
     assert rows[1].mean_sentiment_24h is None
