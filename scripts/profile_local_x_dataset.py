@@ -9,8 +9,8 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-from collections.abc import Iterable
 from collections import Counter
+from collections.abc import Iterable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
