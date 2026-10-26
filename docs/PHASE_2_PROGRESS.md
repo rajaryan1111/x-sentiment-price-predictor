@@ -91,3 +91,12 @@ See [Phase 2 no-cost data plan](PHASE_2_NO_COST_DATA_PLAN.md) for zero-budget pa
 - Confirm 180-day coverage or explicitly record the shortfall; do not imply a 30-day sample satisfies 180 days.
 - Validate real retrieval/availability timestamps before claiming leakage-safe historical features.
 - Re-run local lint/tests and GitHub CI after these changes.
+
+
+## Uploaded assessment-support files reviewed in this conversation
+
+The uploaded `date-tweet-id.tsv` and `Twitter-historical-20060321-20090731-sample.txt` contain dates/counts or tweet IDs, not recoverable post text. The uploaded `statistics-full_dataset.tsv` and `statistics-full_dataset-clean.tsv` are date/count summaries (headers `date` and `tweet_id`), not post-level rows. These files can help describe archive coverage but cannot by themselves provide sentiment text or fulfill post-level X ingestion.
+
+The user also uploaded `90-day-samples.zip` and `archive (2).zip`. The current execution environment could materialize these files but could not run archive inspection commands, and the file reader cannot parse ZIP contents. Their internal member names, schema, source platform, terms, and post-text coverage therefore remain **unverified**. Do not claim these archives were profiled or integrated.
+
+**Acceptance status remains open:** CI verifies the repository code, not the contents of these binary archives. To close this gate, inspect the ZIP member manifest and profile an actual post-level CSV/JSONL member (if present), then document the source/license and event-time coverage. If the archives contain only tweet IDs, full text cannot be reconstructed from IDs without an authorized hydration/source path.
