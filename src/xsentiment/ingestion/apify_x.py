@@ -76,14 +76,20 @@ class ApifyXAdapter:
         if not 60 <= timeout_seconds <= 3600:
             raise ValueError("timeout_seconds must be between 60 and 3600")
 
-        actor_id = quote(self.settings.apify_actor_id.strip(), safe="~")
-        launch_url = (
-            f"{APIFY_API_BASE}/acts/{actor_id}/runs"
-            f"?waitForFinish=60&maxItems={max_items}"
-            f"&maxTotalChargeUsd={max_total_charge_usd:g}&timeout={timeout_seconds}"
-        )
         headers = self._auth_headers()
-        run = await self._request_json("POST", launch_url, headers=headers, json_body=actor_input)
+        launch_url = f"{APIFY_API_BASE}/acts/{self.settings.apify_actor_id.strip()}/runs"
+        run = await self._request_json(
+            "POST",
+            launch_url,
+            headers=headers,
+            params={
+                "waitForFinish": "60",
+                "maxItems": str(max_items),
+                "maxTotalChargeUsd": f"{max_total_charge_usd:g}",
+                "timeout": str(timeout_seconds),
+            },
+            json_body=actor_input,
+        )
         if not isinstance(run, dict):
             raise ApifyRunError("Apify returned an invalid run object")
         run_id = run.get("id")
@@ -95,8 +101,13 @@ class ApifyXAdapter:
             if time.monotonic() >= deadline:
                 raise ApifyRunError("Apify run did not finish before the local wait deadline")
             await asyncio.sleep(1)
-            run_url = f"{APIFY_API_BASE}/actor-runs/{quote(run_id, safe='')}?waitForFinish=60"
-            run = await self._request_json("GET", run_url, headers=headers)
+            run_url = f"{APIFY_API_BASE}/actor-runs/{quote(run_id, safe='')}"
+            run = await self._request_json(
+                "GET",
+                run_url,
+                headers=headers,
+                params={"waitForFinish": "60"},
+            )
             if not isinstance(run, dict):
                 raise ApifyRunError("Apify returned an invalid run status object")
             status = run.get("status")
@@ -108,9 +119,13 @@ class ApifyXAdapter:
             raise ApifyRunError("Apify run did not return a default dataset ID")
         dataset_url = (
             f"{APIFY_API_BASE}/datasets/{quote(dataset_id, safe='')}/items"
-            f"?format=json&clean=true&limit={max_items}"
         )
-        items = await self._request_json("GET", dataset_url, headers=headers)
+        items = await self._request_json(
+            "GET",
+            dataset_url,
+            headers=headers,
+            params={"format": "json", "clean": "true", "limit": str(max_items)},
+        )
         if not isinstance(items, list):
             raise ApifyRunError("Apify dataset response must be a JSON array")
         if len(items) > max_items:
@@ -140,13 +155,14 @@ class ApifyXAdapter:
         *,
         headers: dict[str, str],
         json_body: dict[str, Any] | None = None,
+        params: dict[str, str] | None = None,
     ) -> Any:
         """Read a bounded JSON response; bearer tokens never appear in URLs."""
         chunks: list[bytes] = []
         size = 0
         try:
             async with self._client.stream(
-                method, url, headers=headers, json=json_body
+                method, url, headers=headers, json=json_body, params=params
             ) as response:
                 response.raise_for_status()
                 async for chunk in response.aiter_bytes():
