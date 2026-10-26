@@ -32,6 +32,12 @@ Excluded by default and by construction: current engagement/follower counts with
 historical snapshots, news features, future posts or prices, target columns in
 features, and any synthetic value presented as observed data.
 
+Reporting-only series (never a model feature): the R10 visual sentiment-change series
+is `mean_sentiment_24h(T) - mean_sentiment_24h(T-1 UTC day)`, emitted only for
+consecutive scored cutoffs; an unscored day leaves the change unavailable rather than
+zero. See `src/xsentiment/reporting/charts.py`.
+
+
 ## Sentiment scorer (implemented)
 VADER (`vaderSentiment` 3.3.x, MIT) through `xsentiment.features.sentiment`. It is
 deterministic, offline, needs no model download or GPU, and returns the canonical

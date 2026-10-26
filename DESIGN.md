@@ -45,7 +45,7 @@ The pipeline consumes this path offline: `xsentiment persist` upserts snapshot i
 Forecast: asset, issue cutoff, horizon, predicted close, model version, feature/data run IDs and uncertainty/limitations.
 Evaluation: chronological fold boundaries, sample counts, target/horizon, baseline/candidate metrics, exclusions and reproducible references.
 Current outlook: as-of UTC time, latest completed bar, data coverage, sentiment coverage, contextual news source/time, model output if available, uncertainty and limitations.
-Chart: price and sentiment panels sharing a time axis; the sentiment panel must show change over time and must be labelled as empty when no scored posts exist, never zero-filled. The current implementation plots mean sentiment level and is recorded as a gap in R10.
+Chart: price, sentiment-level and sentiment-change panels sharing a time axis; each sentiment panel shows its own availability state and is labelled as empty when no scored posts exist, never zero-filled. The change series is the day-over-day difference of the trailing-24h mean between consecutively scored UTC cutoffs, unavailable when either day is unscored; it is reporting-only and never a model feature. The R10 gap is closed in code and fixtures; real-data rendering remains blocked on accepted X text.
 
 ## Artefacts of one run
 A run directory contains `evaluation-report.md`, `outlook.md`, `sentiment-vs-price.svg`, `metrics.json`, `predictions.jsonl` and `manifest.json`. The manifest records the run ID, as-of time, dataset profile, fold boundaries, warnings, unavailable items, input hashes and library versions. Every record in `predictions.jsonl` is out-of-sample; in-sample predictions are never written into an evaluation artefact.

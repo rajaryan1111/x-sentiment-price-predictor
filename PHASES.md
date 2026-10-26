@@ -127,16 +127,24 @@ stays pending X data.
 
 ## Phase 7 — Visualization and outlook
 Status: implemented; the sentiment panel is empty until an accepted X source exists.
-- `sentiment-vs-price.svg` renders the observed close panel plus the sentiment panel and
+- `sentiment-vs-price.svg` renders the observed close panel plus the sentiment level and
+  sentiment-change panels, and
   states explicitly when no scored posts are available.
 - `outlook.md` reports the cutoff, last completed close, coverage counts, per-horizon
   model outputs, contextual news and its limitations.
 - News remains context-only and is supplied from an optional file; no Tavily or Exa call
   has been made and no news feature exists.
-- The implemented sentiment series is the mean level; the brief asks for sentiment change.
-  The missing change series is recorded as a gap in R10.
-Acceptance (unmet): sentiment and price charts derived from real permitted X data, with a
-sentiment-change series.
+- The R10 sentiment-change series is implemented as a third chart panel:
+  `sentiment_change_points` draws the day-over-day change
+  `mean_sentiment_24h(T) - mean_sentiment_24h(T-1 UTC day)` for consecutive scored
+  cutoffs. It stays unavailable when either day is unscored (a genuine zero change is
+  kept distinguishable from missing data, never zero-filled) and is a reporting-only
+  series that never enters model features. Acceptance tests cover positive and zero
+  change, missing prior/current days (level- and row-level absence), consecutive-day
+  eligibility and deterministic rendering.
+Acceptance (unmet): sentiment and price charts derived from real permitted X data; the
+change-series implementation is verified with fixtures only, and the panels stay empty
+and explicitly labelled until an accepted X source exists.
 
 ## Phase 8 — Reproducibility and submission
 Status: in progress.

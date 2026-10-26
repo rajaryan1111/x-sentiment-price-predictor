@@ -6,13 +6,14 @@ _Generated 2026-10-26T00:00:00+00:00 by the reproducible pipeline in this reposi
 
 ## Data and provenance
 
+- **input source:** file_snapshot
 - **price snapshot:** data/btc-usd-daily-2026-04-29_2026-10-25.json
 - **price snapshot sha256:** 09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75
 - **asset:** BTC-USD
 - **price candles supplied:** 180
 - **posts supplied:** 0
 - **sentiment scorer:** vader 3.3.2
-- **pipeline versions:** {'python': '3.12.3', 'platform': 'Linux-6.1.102-x86_64-with-glibc2.39', 'x-sentiment-price-predictor': '0.1.0', 'vaderSentiment': '3.3.2', 'pydantic': '2.14.1'}
+- **pipeline versions:** {'python': '3.11.15', 'platform': 'macOS-26.1-arm64-arm-64bit', 'x-sentiment-price-predictor': '0.1.0', 'vaderSentiment': '3.3.2', 'pydantic': '2.14.1'}
 
 ## Dataset profile
 

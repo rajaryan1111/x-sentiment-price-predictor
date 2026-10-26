@@ -4,15 +4,21 @@ Charts are rendered as plain SVG with no third-party plotting dependency, so the
 report is reproducible inside the project's default test environment and the file
 can be opened or diffed as text.
 
-The sentiment panel draws *observed* scored sentiment. When no permitted scored
-posts exist, the panel states that explicitly instead of drawing a fabricated or
-zero-filled curve, which would misrepresent missing data as neutral sentiment.
+The sentiment panels draw *observed* scored sentiment: the trailing-24h mean
+level and its day-over-day change (the R10 series). When no permitted scored
+posts exist, each panel states that explicitly instead of drawing a fabricated
+or zero-filled curve, which would misrepresent missing data as neutral
+sentiment or as zero change.
+
+The change series is defined as ``mean_sentiment_24h(T) - mean_sentiment_24h(T-1)``
+for consecutive scored UTC cutoffs; it stays unavailable when either day is
+unscored. It is reporting-only and is never a model feature.
 """
 from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from html import escape
 from pathlib import Path
 
@@ -34,6 +40,11 @@ SENTIMENT_COLOR = "#d62728"
 EMPTY_SENTIMENT_MESSAGE = (
     "No scored posts are available for this window, so no sentiment curve is drawn."
 )
+SENTIMENT_CHANGE_EMPTY_MESSAGE = (
+    "No day-over-day sentiment change is drawn because no two consecutive UTC "
+    "days in this window carry scored sentiment."
+)
+ONE_DAY = timedelta(days=1)
 
 ChartPoint = tuple[datetime, float]
 
@@ -66,6 +77,33 @@ def sentiment_points(rows: Sequence[SupervisedRow]) -> tuple[ChartPoint, ...]:
     return tuple(points)
 
 
+def sentiment_change_points(rows: Sequence[SupervisedRow]) -> tuple[ChartPoint, ...]:
+    """Day-over-day change of the trailing-24h mean sentiment (the R10 series).
+
+    The value at cutoff ``T`` is
+    ``mean_sentiment_24h(T) - mean_sentiment_24h(T - 1 UTC day)`` and is emitted
+    only when both cutoffs exist exactly one day apart and both means are
+    available. Anything else stays absent: an unscored day is missing data, not
+    neutral sentiment and not zero change, so a genuine zero change (both days
+    scored, equal means) remains distinguishable from unavailability.
+    Both means were already point-in-time at their own cutoffs, so a change
+    value never reads information beyond ``T``. Series values are reporting-only.
+    """
+    means = {row.cutoff: row.features.get("mean_sentiment_24h") for row in rows}
+    points: list[ChartPoint] = []
+    for row in sorted(rows, key=lambda item: item.cutoff):
+        if row.cutoff.tzinfo is None:
+            raise ValueError("supervised rows must carry timezone-aware cutoffs")
+        current = row.features.get("mean_sentiment_24h")
+        if current is None:
+            continue
+        previous = means.get(row.cutoff - ONE_DAY)
+        if previous is None:
+            continue
+        points.append((row.cutoff, float(current) - float(previous)))
+    return tuple(points)
+
+
 def render_sentiment_price_chart(
     candles: Sequence[PriceCandle],
     rows: Sequence[SupervisedRow],
@@ -75,7 +113,7 @@ def render_sentiment_price_chart(
     subtitle: str = "",
     now: datetime | None = None,
 ) -> Path:
-    """Write one SVG holding the observed close panel and the sentiment panel."""
+    """Write one SVG with the close panel plus level and change sentiment panels."""
     panels = (
         ChartPanel(
             title="Observed daily close (UTC bars)",
@@ -90,6 +128,14 @@ def render_sentiment_price_chart(
             color=SENTIMENT_COLOR,
             points=sentiment_points(rows),
             empty_message=EMPTY_SENTIMENT_MESSAGE,
+            baseline=0.0,
+        ),
+        ChartPanel(
+            title="Day-over-day change of the trailing-24h mean sentiment",
+            y_label="change",
+            color=SENTIMENT_COLOR,
+            points=sentiment_change_points(rows),
+            empty_message=SENTIMENT_CHANGE_EMPTY_MESSAGE,
             baseline=0.0,
         ),
     )
