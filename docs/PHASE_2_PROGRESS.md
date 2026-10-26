@@ -23,7 +23,7 @@ Official provider reference: https://docs.cdp.coinbase.com/api-reference/exchang
 
 `tests/unit/test_coinbase_prices.py` covers chronological sorting, decimal values, daily granularity, timezone-aware bounds, provider range limits, duplicate timestamps, malformed JSON, invalid OHLC values, and UTC normalization.
 
-These are mocked unit tests. They do **not** prove that the live endpoint currently accepts this product/range, that all expected candles are present, or that a real 180-day dataset has been obtained.
+These are mocked unit tests. They do **not** prove that the live endpoint currently accepts this product/range, that all expected candles are present, or that a real 180-day dataset has been obtained. A read-only local smoke-test command is available at `python scripts/smoke_test_coinbase.py`; it checks the latest seven completed UTC daily bars and prints a coverage summary without saving raw data.
 
 ## External gates still open
 
