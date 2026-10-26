@@ -1,4 +1,6 @@
 import asyncio
+import asyncio
+import json
 from datetime import UTC, datetime
 
 import httpx
@@ -130,9 +132,12 @@ def test_apify_run_uses_bearer_auth_cost_and_item_caps_and_fetches_dataset() -> 
     import asyncio
     records = asyncio.run(run())
     launch = next(request for request in requests if request.method == "POST")
-    assert "maxItems=25" in str(launch.url)
-    assert "maxTotalChargeUsd=0.75" in str(launch.url)
-    assert "timeout=120" in str(launch.url)
+    assert str(launch.url.params["maxItems"]) == "25"
+    assert str(launch.url.params["maxTotalChargeUsd"]) == "0.75"
+    assert str(launch.url.params["timeout"]) == "120"
+    assert json.loads(launch.content) == {
+        "searchTerms": ["BTC after:2026-04-29 before:2026-10-26"]
+    }
     assert "token=" not in str(launch.url)
     assert records[0].post_id == "p1"
 
@@ -154,5 +159,4 @@ def test_apify_rejects_bad_caps_before_network_activity() -> None:
         assert calls == []
         await adapter.aclose()
 
-    import asyncio
     asyncio.run(run())
