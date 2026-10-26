@@ -186,6 +186,13 @@ def build_close_targets(
     for index, candle in enumerate(ordered):
         if index + max_horizon >= len(ordered):
             continue
+        horizon = ordered[index : index + max_horizon + 1]
+        timestamps = [_utc(item.timestamp, "candle.timestamp") for item in horizon]
+        if any(
+            later - earlier != timedelta(days=1)
+            for earlier, later in zip(timestamps, timestamps[1:])
+        ):
+            continue
         result[_utc(candle.timestamp, "candle.timestamp")] = {
             f"n+{offset}": ordered[index + offset].close
             for offset in range(max_horizon + 1)
