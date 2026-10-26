@@ -192,7 +192,8 @@
       "limitations": [
         "Merged multi-source corpus: inspect source provenance, overlap and deduplication before analysis.",
         "Attribute the dataset and satisfy CC-BY-4.0 conditions if confirmed.",
-        "Date ranges are mixed across contributing sources."
+        "Date ranges are mixed across contributing sources.",
+        "The PDF's reported total (8.02M) conflicts with its component counts (2.62M stock + 5.75M crypto = 8.37M); verify the current dataset card before relying on record counts."
       ],
       "recommended_for_initial_run": true
     },
