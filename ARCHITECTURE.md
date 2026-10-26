@@ -13,7 +13,7 @@ Configuration/secrets -> source adapters (X/Apify, BTC prices, optional news con
 - Features: sentiment aggregation and lagged price features, with definitions governed by MODEL_PLAN.md.
 - Storage: project-owned schema/repository; raw social data only where terms permit.
 - Models: naive baseline, price-only model and candidate sentiment-plus-price model.
-- Validation: walk-forward splits, train-fold-only transforms and leakage guards.
+- Validation: deterministic expanding-window split generation exists on the walk-forward feature branch; fitting, evaluation and leakage verification remain to be implemented.
 - Backtesting: optional strategy simulation from out-of-sample forecasts only.
 - Reporting: metric tables, charts, one-page outlook and report assembly.
 - Dashboard: presentation only; authoritative metrics come from the pipeline.
@@ -30,5 +30,5 @@ Adapters normalize provider payloads without fabricating missing fields. Raw dat
 Secrets via environment/approved secret manager; raw/private data out of Git; retention follows source terms; avoid full-text logs. Record provider, query/window, retrieval timestamp, schema, non-secret run ID and hash where possible.
 
 ## Implementation status
-Implemented: Coinbase daily adapter; normalized X contract; configurable Apify adapter (mocked, not live verified); deduplication, coverage, point-in-time alignment and horizon-label primitives; local CSV/JSONL profiler; tests/CI.
-Not evidenced complete: real X collection, accepted license/coverage, sentiment scoring, trained forecasts, walk-forward evaluation, trading metrics, charts, current outlook and full report.
+Implemented: Coinbase daily adapter; normalized X contract; configurable Apify adapter (mocked, not live verified); deduplication, coverage, point-in-time alignment and horizon-label primitives; local CSV/JSONL profiler; deterministic walk-forward split generator on the feature branch; tests/CI.
+Not evidenced complete: real X collection, accepted license/coverage, sentiment scoring, trained forecasts, model walk-forward evaluation, trading metrics, charts, current outlook and full report.
