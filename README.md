@@ -2,7 +2,7 @@
 
 Research pipeline to evaluate whether timestamped X sentiment adds predictive value beyond price-only baselines for a selected asset.
 
-> **Current status:** Architecture scaffold and dataset registry are present. Phase 1 requirements are documented. The selected working assumptions are BTC-USD with daily (`1d`) bars; exact target semantics, price-provider details and historical-data rights remain open. This repository does not yet claim live ingestion, trained forecasts, backtest results, Sharpe ratio, Sortino ratio, or maximum drawdown.
+> **Current status:** Architecture scaffold and dataset registry are present. **Phase 1 requirements are closed as a documented baseline.** Working defaults: BTC-USD, daily (`1d`) UTC bars, forecasts of the closes at `n` through `n+5` made at the start of UTC day `n`, and Coinbase Exchange public BTC-USD candles as the price-source default. See [Phase 1 requirements](docs/PHASE_1_REQUIREMENTS.md) for the assumptions, source-backed limitations and Phase 2 readiness gates. The historical dataset Google Doc was not accessible during this session; its contents/rights remain unverified, and provider/Actor checks must pass before live ingestion or training. This repository does not yet claim live ingestion, trained forecasts, backtest results, Sharpe ratio, Sortino ratio, or maximum drawdown.
 
 ## Requirements first
 

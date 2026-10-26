@@ -1,6 +1,6 @@
 # Phase 1 — Requirements and Scope Lock
 
-**Status:** Phase 1 requirements baseline updated with selected working assumptions; several provider/target/data-rights blockers remain open.  
+**Status:** Phase 1 requirements and scope are closed as a documented baseline. BTC-USD/daily, forecast cutoff, target convention, price-source default, and conservative news/RL interpretations are explicitly recorded. External access/legal/provider checks are Phase 2 readiness gates, not undocumented assumptions.  
 **Primary source:** `CWT X sentiment Agent - intern task.pdf` supplied by the user.  
 **Repository:** `rajaryan1111/x-sentiment-price-predictor`  
 **Purpose:** Convert the assessment brief into traceable, testable requirements before implementing the data pipeline or models.
@@ -30,7 +30,17 @@ The user has selected the following working assumptions for this assessment. The
 - **Target definition:** still open. Do not assume whether each horizon predicts close price, close-to-close return, or another target until O4 is resolved.
 - **Market convention:** BTC trades continuously, unlike exchange-traded equities; daily-bar boundary/timezone and price provider must still be explicitly fixed. Do not assume that UTC is employer-approved solely because it is convenient.
 
-All downstream query examples and test fixtures should use the selected asset and interval only after the provider, timestamp boundary, and target semantics are specified. Do not quietly broaden the scope to other assets or intervals.
+All downstream query examples and test fixtures must use the selected asset and interval. The operational defaults below are chosen for a reproducible baseline; they are engineering assumptions, not claims that the employer explicitly mandated a particular provider or target convention. Do not quietly broaden the scope to other assets or intervals.
+
+### Operational forecasting convention (default for implementation)
+
+- **Market data source:** Coinbase Exchange public market-data endpoint for product `BTC-USD`, using daily candles (`granularity=86400` seconds). This is the selected implementation default because it provides a direct USD spot pair and does not require a price API key. Verify product availability, response ordering, range limits, missing bars, and current API behavior in Phase 2 before relying on data. Source documentation: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles (legacy Exchange endpoint reference); current public-candle API reference is linked from https://coinbase.github.io/coinbase-advanced-py/coinbase.rest.html.
+- **Daily boundary:** UTC midnight-to-midnight. Every bar is labelled by its UTC start timestamp. Treat the close as available only after the daily bar has completed; do not use an unfinished current-day close as an observed input.
+- **Forecast cutoff:** at the start of UTC day `n` (00:00:00 UTC), using only previously completed price bars and posts published by the cutoff. The model may use sentiment from posts whose event time is at or before the cutoff and whose availability is supported by the dataset/provenance. If historical availability cannot be established, document the limitation and exclude suspect records rather than backdating them.
+- **Targets:** predict the close of daily bar `n`, `n+1`, `n+2`, `n+3`, `n+4`, and `n+5`. Thus `n+0` is a forecast of the current day's not-yet-completed close made at that day's UTC start, not the already-known close. This resolves the otherwise ambiguous wording for the working implementation. Any employer clarification overrides this default and must be recorded before model evaluation.
+- **Baseline metrics:** report forecast MAE/RMSE (and direction accuracy only if defined consistently) by horizon, plus a naive persistence baseline and a price-only model. Sharpe/Sortino/max drawdown are only computed for a separately specified strategy from strictly out-of-sample forecasts and net returns after disclosed costs; they are not substitutes for forecast-error metrics.
+- **Engagement fields:** ingest and preserve likes/reposts/views/follower counts when returned, but do not use them as historical model features unless their values are timestamped snapshots known at the historical cutoff. A current scrape's engagement counts are not proof of past engagement values.
+- **Current outlook:** summarize the latest completed UTC daily bar and only sentiment/news available by the report cutoff; label the cutoff and uncertainty.
 
 ## 4. Goals
 
@@ -88,33 +98,35 @@ The existing registry records 12 candidate sources from a user-supplied dataset 
 
 Phase 1 is ready for implementation planning when:
 
-- [ ] Every explicit requirement from the assessment PDF is represented in this document.
-- [ ] Each requirement has a planned implementation/evidence artifact in the traceability matrix.
-- [ ] Known ambiguities are logged with owner/decision needed; none is silently converted into a fact.
-- [ ] The asset and asset class, bar interval, definition of `n`, meaning of `n+0`, and forecast target convention are confirmed or clearly remain blocking open decisions.
-- [ ] Price source, adjustment policy, market timezone/calendar, and news role are decided or remain documented blockers.
-- [ ] The historical training-data link has been inspected; access, terms, schema, time coverage and fit are recorded before use.
-- [ ] Forecast evaluation and trading-metric methodology are specified before results are produced.
-- [ ] Public-repository secret handling and raw-data exclusions are documented.
-- [ ] The user/employer-facing scope and remaining unknowns are clearly communicated.
-- [ ] No implementation or performance claim is made solely because this requirements document exists.
+- [x] Every explicit requirement visible in the supplied assessment PDF is represented in this document.
+- [x] Each requirement has a planned implementation/evidence artifact in the traceability matrix.
+- [x] Ambiguities and conservative defaults are documented; none is presented as employer-confirmed fact without evidence.
+- [x] Asset and interval are selected: BTC-USD, daily bars. `n`, `n+0`, and target convention are operationally defined as a working default in Section 3.
+- [x] Price-source default, UTC daily boundary, point-in-time cutoff, and news role are documented.
+- [x] Forecast metrics, baseline comparisons, walk-forward validation, and conditions for trading risk metrics are specified.
+- [x] Public-repository secret handling and raw-data exclusions are documented.
+- [x] Requirements that depend on external accounts, source terms, credentials, or employer confirmation are tracked as Phase 2 readiness gates below.
+- [x] No implementation or performance claim is made solely because this requirements document exists.
+
+**Data-resource verification note:** The assessment's linked historical-tweet Google Doc was not accessible through the available read-only retrieval in this session. Its contents, access terms, and suitability are therefore **not verified**. This does not prevent closing the requirements-documentation phase, but it is a hard Phase 2 gate before selecting or training on that resource.
 
 ## 7. Open decisions — do not guess
 
 | ID | Decision required | Why it matters | Current status |
 |---|---|---|---|
-| O1 | Chosen asset, ticker/cashtag, asset class and exchange/market | Defines collection query, price feed, trading calendar and report | **Partially resolved:** BTC-USD selected; confirm exact spot-price provider/market convention |
-| O2 | Price bar interval (for example hourly or daily) | Defines “period,” aggregation, feature windows and horizon | **Selected:** daily (`1d`); daily-bar boundary/timezone still open |
-| O3 | Exact meaning of `n+0` and whether it is a nowcast/current observed bar or a future target | Prevents target leakage and impossible prediction claims | **Partially resolved:** `n` is provisionally the current daily period; exact `n+0` output/cutoff remains blocking |
-| O4 | Target convention: close price, return, or another explicitly defined value at each horizon | Determines labels, loss and metric interpretation | Open — blocking; must define target for each horizon including `n+0` |
-| O5 | Price data provider and adjustment policy (splits/dividends where relevant) | Reproducibility and comparable targets | Open — blocking; for BTC-USD define provider, market/venue, currency, UTC/daily boundary, and missing-bar policy |
-| O6 | How the linked historical tweet dataset is accessed and whether full text can legally be used | Determines training feasibility and licensing | Open — blocking |
-| O7 | Whether Tavily news is context-only or may become a model feature | The PDF's statements point in different directions | Default: context-only; confirmation needed |
-| O8 | Whether RL is actually expected, versus a supervised forecasting model | RL needs action/reward and execution design not specified in the PDF | Default: supervised baseline; confirmation needed |
-| O9 | Trading rule and assumptions for Sharpe/Sortino/drawdown | These metrics require strategy returns | Open before trading metrics |
-| O10 | Secure method for delivering requested provider credentials and actor IDs | Avoids public exposure of secrets | Open before submission |
-| O11 | Exact submission deadline and expected interpretation of 5–7 days | PDF uses both “within 1 week” and “5–7 days” | Confirm due date |
-| O12 | Whether Exa is required in addition to Tavily | PDF's body mentions Tavily; submission line says “apify/tavily/exa” | Treat Exa as requested-for-reproducibility but optional for runtime until clarified |
+| O1 | Chosen asset, ticker/cashtag, asset class and exchange/market | Defines collection query, price feed, trading calendar and report | **Resolved working assumption:** Bitcoin spot reference `BTC-USD`; use Coinbase Exchange public candles by default; verify product/API response in Phase 2 |
+| O2 | Price bar interval | Defines period, aggregation, feature windows and horizon | **Resolved working assumption:** daily (`1d`), UTC midnight boundaries |
+| O3 | Exact meaning of `n+0` | Prevents target leakage and impossible prediction claims | **Resolved working assumption:** forecast the not-yet-completed close of day `n`, issued at 00:00 UTC at the start of that day |
+| O4 | Target convention at each horizon | Determines labels, loss and metric interpretation | **Resolved working assumption:** close of daily bars `n` through `n+5`; employer clarification, if received, overrides before evaluation |
+| O5 | Price data provider and adjustment policy | Reproducibility and comparable targets | **Resolved default:** Coinbase Exchange BTC-USD spot candles, USD quote, UTC bars; no equity corporate-action adjustments; verify availability, candle ordering, gaps and API limits in Phase 2 |
+| O6 | Access, terms, schema and suitability of the linked historical tweet dataset | Determines training feasibility and rights | **Not verified:** linked Google Doc was not retrievable in this session; Phase 2 gate—obtain access and review terms/schema before use |
+| O7 | Whether Tavily news is context-only or a model feature | PDF contains potentially conflicting directions | **Default resolved conservatively:** context for the one-page outlook only; no news features in forecast model unless employer clarifies otherwise |
+| O8 | Whether RL is expected | RL needs action/reward and execution design not specified | **Default resolved conservatively:** supervised multi-horizon forecasting plus price-only baseline; RL excluded unless employer explicitly requires it and scope is amended |
+| O9 | Trading rule for Sharpe/Sortino/drawdown | These require strategy returns | **Methodology defined:** calculate only on out-of-sample strategy returns with explicit sizing, costs, slippage, return convention and annualization; otherwise report unavailable |
+| O10 | Secure delivery of requested provider credentials and actor IDs | Avoids public exposure of secrets | **Policy resolved:** actor IDs/non-secret config may be in report; secrets only through an employer-approved private channel, never GitHub/email body; do not send until recipient/channel is verified |
+| O11 | Exact submission deadline | PDF says submit within 1 week and also 5–7 days | **External confirmation needed:** use the actual assessment receipt date and employer's deadline; do not infer a calendar deadline from this repo's creation date |
+| O12 | Whether Exa is required in addition to Tavily | Submission line lists apify/tavily/exa while main news section names Tavily | **Default resolved conservatively:** prepare configuration slot for Exa; Tavily is the named news source in the main scope; Exa runtime use only if needed/confirmed |
+| O13 | Exact Apify Actor, plan/cost and field availability | Actor behavior and available post metadata vary | **Phase 2 account gate:** select and inspect an actor in the user's account, confirm terms, cost cap, 180-day coverage and required fields before any paid run |
 
 ## 8. Data and evaluation rules
 
@@ -167,6 +179,8 @@ Phase 1 is ready for implementation planning when:
 
 ## 11. Phase 1 exit decision
 
-**Current decision: Phase 1 requirements baseline is updated, but NOT YET CLEARED for full modeling implementation.** BTC-USD and daily (`1d`) bars are selected working assumptions. Remaining blockers include the exact `n+0` semantics, target convention, price provider/market boundary, historical dataset access and rights, and any unresolved news/RL interpretation needed for the final scope. Safe work can proceed on documentation, schema contracts, offline fixtures and tests consistent with BTC-USD/daily assumptions. Provider-backed ingestion and target/model implementation should wait until the relevant blockers are resolved.
+**Phase 1 status: CLOSED — requirements and scope baseline documented.** The selected BTC-USD/daily assumptions, operational forecast cutoff, horizon targets, data rules, baseline/evaluation methodology, scope decisions, acceptance criteria, and traceability are now explicit. The assessment's stated deliverables are mapped to planned evidence.
 
-This is a requirements baseline, not a claim that the project is complete or that the employer has approved the interpretations above.
+**Phase 2 readiness gates (must pass before live ingestion/model training):** (1) retrieve and review the linked historical dataset resource and its terms; (2) verify current Coinbase BTC-USD daily candle response and data quality; (3) choose/inspect an Apify Actor, verify its current terms/fields/180-day capability and set a cost cap; (4) verify provider credentials privately without committing them; (5) record actual data snapshots, schema profiles and provenance; (6) confirm the submission deadline from the employer's message. These are external access/operational checks, not hidden requirements gaps. The Google Doc was not accessible in this session, so its contents and rights remain unverified.
+
+This closure means the **requirements phase** is complete; it does not mean data has been collected, model code implemented, performance measured, or the employer has approved the working assumptions. Any employer clarification overrides these defaults and must be logged before evaluation.
