@@ -136,8 +136,10 @@ def profile(args: argparse.Namespace) -> dict[str, Any]:
         max_time = stamp if max_time is None or stamp > max_time else max_time
         if window_start <= stamp <= now:
             counts["rows_in_last_window"] += 1
-            in_window_min = stamp if in_window_min is None or stamp < in_window_min else in_window_min
-            in_window_max = stamp if in_window_max is None or stamp > in_window_max else in_window_max
+            if in_window_min is None or stamp < in_window_min:
+                in_window_min = stamp
+            if in_window_max is None or stamp > in_window_max:
+                in_window_max = stamp
         elif stamp > now:
             counts["future_timestamp_rows"] += 1
         else:
