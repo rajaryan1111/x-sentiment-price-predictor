@@ -32,7 +32,7 @@ class PriceCandle:
             raise ValueError("candle timestamp must be timezone-aware")
         if self.timestamp.utcoffset() is None:
             raise ValueError("candle timestamp must be timezone-aware")
-        if self.timestamp.astimezone(UTC) != self.timestamp:
+        if self.timestamp.utcoffset() != UTC.utcoffset(self.timestamp):
             raise ValueError("candle timestamp must be normalized to UTC")
         if min(self.low, self.high, self.open, self.close) <= 0:
             raise ValueError("OHLC prices must be positive")
