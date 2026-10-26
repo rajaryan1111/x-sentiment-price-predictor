@@ -1,6 +1,6 @@
 """Async SQLAlchemy lifecycle inspired by GraphOne; optional until storage is selected."""
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
@@ -15,8 +15,11 @@ def build_engine(database_url: str | None = None) -> AsyncEngine:
     url = database_url or settings.database_url
     options: dict[str, int] = {}
     if url.startswith("postgresql"):
-        options.update(pool_size=settings.db_pool_size, max_overflow=settings.db_max_overflow,
-                       pool_timeout=settings.db_pool_timeout_seconds)
+        options.update(
+            pool_size=settings.db_pool_size,
+            max_overflow=settings.db_max_overflow,
+            pool_timeout=settings.db_pool_timeout_seconds,
+        )
     return create_async_engine(url, **options)
 
 
