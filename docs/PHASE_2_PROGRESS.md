@@ -2,7 +2,7 @@
 
 > Naming note: this file belongs to the repository's historical "Phase 2 data quality/alignment" workstream, which maps to canonical Phase 3 in [PHASES.md](../PHASES.md). It is not canonical documentation Phase 2.
 
-**Status: partially implemented; external data-access gates remain open.** This document distinguishes code and test evidence from provider/account verification. Live X ingestion and a verified 180-day X dataset are not yet complete, so the sentiment-versus-price comparison remains blocked. Price-only models, walk-forward evaluation and reporting are implemented on `feat/sentiment-features-and-forecasting`.
+**Status: partially implemented; external data-access gates remain open.** This document distinguishes code and test evidence from provider/account verification. Live X ingestion and a verified 180-day X dataset are not yet complete, so the sentiment-versus-price comparison remains blocked. Price-only models, walk-forward evaluation and reporting are implemented on `feat/sentiment-features-and-forecasting`. The current offline suite is 120 tests.
 
 ## Implemented and locally verified
 
@@ -19,7 +19,7 @@
 
 Implemented in src/xsentiment/pipeline/phase2.py:
 
-- Canonical XPostRecord keeps event time and retrieval/availability time distinct and validates timestamps and optional fields.
+- Canonical XPostRecord keeps event time and retrieval/availability time distinct and validates timestamps and optional fields. It also preserves the raw provider timestamp, supplied UTC offset, payload hash, author ID, query mode/query, schema version and non-fatal warnings. The JSONL loader round-trips these audit fields.
 - Stable-ID deduplication fails closed on conflicting duplicate IDs.
 - Daily price coverage report enumerates missing UTC days, duplicate timestamps, out-of-range records and possible incomplete current-day candles. It never fills missing candles.
 - Point-in-time feature builder uses prior completed closes and only posts published and retrieved by each cutoff; current engagement counts are deliberately excluded as historical features.
@@ -35,11 +35,24 @@ These are the data-quality primitives. The sentiment branch now adds VADER scori
 - Requires a caller-supplied Actor input JSON object and explicit max-items, max-total-charge and timeout caps.
 - Uses a Bearer authorization header rather than a token query parameter; bounds response size; does not auto-retry the non-idempotent Actor launch request.
 - Unwraps the documented `data` envelope on Actor run responses; dataset items remain a JSON array.
-- Normalizes ID, text, timezone-aware creation time, optional engagement counts and provenance URL. Unknown/missing fields stay null; it does not fabricate sentiment.
+- Normalizes ID, text, timezone-aware creation time, optional engagement counts and provenance URL. It preserves the raw timestamp/offset and records ticker/cashtag/keyword query provenance. Unknown/missing fields stay null; it does not fabricate sentiment.
+- Pages dataset items with the documented `offset`/`limit` parameters and stops at the caller's item cap. Apify's documented `maxItems` run option caps charges for pay-per-result Actors but does not itself guarantee the returned row count, so the adapter enforces the returned-row cap.
 - Adds an explicit small-run schema smoke-test CLI and setup instructions. The script can incur cost only when a user explicitly runs it.
 - Unit tests use mocked HTTP; CI does not run the Actor or incur Apify costs.
 
 **Live Apify remains unverified.** No particular Actor has been selected or run in this session. The Actor's exact input/output schema, terms, 180-day reach and actual account pricing must be checked in the user's Apify account before the smoke-test CLI is executed.
+
+### Local dataset profiler
+
+The profiler now reports deterministic reference windows (`--as-of`), daily expected/observed/missing UTC dates and per-day counts, schema drift, duplicate/missing IDs, missing/invalid event and retrieval timestamps, invalid engagement counts, and rows with quality issues. It never prints post text, never writes the source file and always leaves `point_in_time_backtest_ready=false` because a downloaded snapshot cannot establish historical availability. Tests cover CSV/JSONL, duplicate/missing IDs, invalid counts, daily gaps, retrieval-time coverage, schema drift and deterministic output.
+
+### Dataset registry
+
+`validate_registry` now enforces the documented platform and text-availability vocabulary, ISO verification dates, date ordering, positive record counts, ID-only hydration caveats, and a recommendation only for X/Twitter sources with post text. The registry carries an explicit `independent_verification` object with status `not-reverified`; structural validity is not evidence of current provider access or legal approval.
+
+### Persistent storage and join (R15 partial)
+
+`src/xsentiment/storage/models.py` defines `price_bars` (composite key product/timestamp, one bar per product/UTC day) and `x_posts` (stable post ID, event/retrieval times, provenance, nullable engagement counts, warnings). `repositories.py` provides idempotent upserts and two joins: a descriptive same-UTC-day SQL join for reporting and a leakage-safe cutoff join that uses only posts published and retrieved by the cutoff plus the last completed prior close. `tests/unit/test_storage_join.py` verifies idempotency, earliest-retrieval retention, counts and late/future exclusion against in-memory SQLite. `scripts/persist_and_join.py` exposes the same path locally without network access and prints no post text. The end-to-end `run` CLI still reads file snapshots, so R15 remains partial.
 
 ## External gates still open
 
@@ -79,13 +92,15 @@ This verifies code quality only. It does not close the external X-data access, l
 A local CSV/JSONL profiler is available at `scripts/profile_local_x_dataset.py`. It reports field detection, timestamp coverage, duplicate/missing IDs, missing text/time, engagement-field presence and rows in the last N days. It never prints post text or persists the source file. Example:
 
 ```bash
-python scripts/profile_local_x_dataset.py /absolute/path/to/local_dataset.csv --days 180
+python scripts/profile_local_x_dataset.py /absolute/path/to/local_dataset.csv \
+  --days 180 --as-of 2026-10-26T00:00:00+00:00
 # If automatic field detection does not match the source schema:
 python scripts/profile_local_x_dataset.py /absolute/path/to/local_dataset.csv \
-  --id-column tweet_id --text-column full_text --timestamp-column created_at --days 180
+  --id-column tweet_id --text-column full_text --timestamp-column created_at \
+  --retrieved-column collected_at --days 180 --as-of 2026-10-26T00:00:00+00:00
 ```
 
-This is an inspection utility, not an ingestion or licensing approval. The profiler intentionally reports `point_in_time_backtest_ready=false`: downloading an old dataset today does not establish what was observable at historical forecast cutoffs. Do not backdate retrieval times.
+This is an inspection utility, not an ingestion or licensing approval. The profiler intentionally reports `point_in_time_backtest_ready=false`: downloading an old dataset today does not establish what was observable at historical forecast cutoffs. A retrieval column is reported for coverage but is not assumed to be a defensible historical availability record. Do not backdate retrieval times.
 
 See [Phase 2 no-cost data plan](PHASE_2_NO_COST_DATA_PLAN.md) for zero-budget paths and limitations. Most historical candidates in the registry end by 2023; two rolling sources have no verified coverage end. None can alone prove the required recent 180-day window without live verification. A free rolling crypto-X dataset listing may cover only the last month; verify current availability, terms and any infrastructure costs before relying on it.
 

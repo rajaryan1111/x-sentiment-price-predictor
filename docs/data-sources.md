@@ -1,6 +1,6 @@
 # Historical social-text dataset sources
 
-This registry is transcribed from the user-provided **Historical Twitter/X Datasets — Verified Download Links** PDF (compiled 21 October 2026). The PDF says its entries were checked against live pages on that date. We have captured the PDF's links and claims, but have **not independently re-verified the current provider pages, current availability, or license terms**.
+This registry is transcribed from the user-provided **Historical Twitter/X Datasets — Verified Download Links** PDF (compiled 21 October 2026). The PDF says its entries were checked against live pages on that date. We have captured the PDF's links and claims, but have **not independently re-verified the current provider pages, current availability, or license terms**. The machine-readable registry records this explicitly as `independent_verification.status = not-reverified` with a checked date and next action; the validator rejects a missing or unknown verification record.
 
 The assessment-linked Google Doc was retrieved on 2026-10-26; its exported text matches the PDF's 12 entries. The document is a dataset-link compilation, not a tweet corpus. Uploaded local files were also inspected: the 90-day samples are numeric tweet IDs only; the date/count files are summaries; the available archives are an air-quality CSV and MQTT sensor JSON; `Manuscript.pdf` is a StockTwits paper. No uploaded file contains X post text.
 
@@ -35,4 +35,4 @@ pytest
 ruff check src tests scripts
 ```
 
-The validator checks registry structure and consistency only. It does not download files or certify provider claims.
+The validator checks registry structure and consistency only: platform and text-availability vocabulary, ISO verification dates, date ordering, positive record counts, ID-only hydration caveats, a sane "recommended" flag, and the explicit independent-verification record. It does not download files or certify provider claims.

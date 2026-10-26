@@ -6,6 +6,12 @@
     "compiled_date": "2026-10-21",
     "note": "Dataset facts and license/access descriptions are transcribed from the user-provided PDF. The assessment-linked Google Doc was retrieved on 2026-10-26 and its exported text matches this list. The PDF says entries were verified against live pages on its compilation date; this project has not independently re-verified each provider page."
   },
+  "independent_verification": {
+    "status": "not-reverified",
+    "checked_date": "2026-10-26",
+    "scope": "The source PDF and linked Google Doc were inspected. No provider page, download link, license, schema or coverage claim has been independently re-checked by this project.",
+    "next_action": "Re-check the selected candidate's provider page, current terms and schema before downloading or using it."
+  },
   "usage_policy": {
     "download_policy": "Do not download datasets automatically as part of normal setup or CI. Review the provider page, license, terms, schema, and size first.",
     "repository_policy": "Never commit raw datasets, hydrated tweet text, credentials, or generated model artifacts. Keep data in ignored local storage or approved external storage.",

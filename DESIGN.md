@@ -8,6 +8,7 @@ When the caller supplies the current time, the unfinished UTC day is dropped bef
 ## Normalized X post
 Required: post_id (non-empty stable source ID), created_at (timezone-aware event time), retrieved_at (first observed time, never inferred from created_at), source/platform/provider provenance, and non-empty text. Text is stored only if returned and permitted; a record without recoverable text is rejected at the adapter boundary instead of being admitted with empty or fabricated text (D-022), so post-volume counts only describe posts that were actually observed with text.
 Optional nullable fields: sentiment_score in [-1,1], likes, reposts, views, author_followers. Counts are non-negative integers when present. Null means unknown/unavailable/unscored, not zero or neutral.
+Audit fields: source_created_at_raw preserves the provider timestamp string, source_utc_offset records the supplied offset, author_id is a pseudonymous stable reference when present, query_mode/query record ticker/cashtag/keyword provenance, source_record_hash is a SHA-256 of the provider item, schema_version identifies the normalization contract, and warnings records non-fatal data-quality notes. These fields are persisted with the post; raw text stays in the local ignored database.
 Reject/quarantine invalid core timestamps, malformed IDs and negative counts with explicit reasons. Deduplicate by stable ID; conflicting duplicate payloads fail closed. Do not print text in profiler summaries.
 
 ## Price bar
@@ -32,8 +33,13 @@ The strategy uses the `n+0` close as its entry price and the `n+1` close as its 
 ## Adapter contract
 Explicit config, timeouts and bounded response/run controls. Validate Actor input against the chosen Actor's current schema before a real run. Common field aliases do not prove Actor compatibility. The brief requires ticker, cashtag and keyword searches for the chosen asset; because the adapter accepts a caller-supplied input, the selected Actor's schema must map all three query modes explicitly and the non-secret query configuration must be recorded. No universal payload is assumed. Live Apify calls are opt-in and may cost money; never run them in CI. Sanitize errors and never print credentials.
 
-## Persistence (target)
-The brief requires joining the datasets in a database. The target schema stores normalized posts keyed by source post ID and price bars keyed by product and timestamp, with idempotent upserts and a join query keyed by asset and cutoff. This is **not implemented** (R15): the current pipeline reads file snapshots and joins in memory, and `src/xsentiment/storage/` is scaffolding. Raw post text and private data stay out of Git.
+## Persistence
+`src/xsentiment/storage/models.py` defines versioned `price_bars` and `x_posts` tables. Price bars are keyed by `(product_id, timestamp)` and constrained to one row per `(product_id, UTC bar_date)`; posts use the stable source `post_id` as primary key and keep `created_at`, `retrieved_at`, provenance, nullable engagement counts and a JSON warnings column. `repositories.py` provides idempotent upserts and two joins:
+
+- `daily_post_price_join` is a descriptive SQL join by UTC event date. It must not feed a historical model because the same-day close is not known at that day's cutoff.
+- `cutoff_post_price_join` aggregates only posts in `(cutoff - 24h, cutoff]` with `retrieved_at <= cutoff`, and joins the last completed bar strictly before the cutoff. This is the leakage-safe shape.
+
+The end-to-end `run` CLI still reads file snapshots and joins in memory, so R15 remains partially complete. Raw post text and private data stay out of Git; the database is a local ignored artefact.
 
 ## Output contracts
 Forecast: asset, issue cutoff, horizon, predicted close, model version, feature/data run IDs and uncertainty/limitations.

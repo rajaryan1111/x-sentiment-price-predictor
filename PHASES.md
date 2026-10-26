@@ -36,12 +36,13 @@ not a tweet corpus.
 (A1, D-014); provider access, credentials and the private transfer channel remain external
 (R2, A2, O10); dataset/Actor selection remains open (O6, O13); a Tavily key is needed for
 live news context (A4); and the n+0 convention still needs employer confirmation (O3/O4).
-R15 (database join) is a later-phase implementation gap. This does not mean X data has been
-collected or any sentiment result measured.
+R15 (database join) now has a tested storage layer but is not yet consumed by the run CLI.
+This does not mean X data has been collected or any sentiment result measured.
 
 ## Phase 2 — Canonical documentation
-Status: in progress until the documentation review completes. The canonical documents were
-reconciled with the verified assignment source on 2026-10-26.
+Status: complete for the current verified baseline. The canonical documents were reconciled
+with the verified assignment source on 2026-10-26 and again with the Phase 3 storage,
+contract and profiler changes on the same date.
 - Maintain all nine root-level files: PRD, ARCHITECTURE, DESIGN, DATA_POLICY,
   MODEL_PLAN, TEST_PLAN, RULES, PHASES, DECISIONS.
 - Keep docs/REQUIREMENTS_TRACEABILITY.md and docs/PHASE_1_REQUIREMENTS.md aligned.
@@ -59,10 +60,19 @@ Status: in progress; X data externally blocked. Price ingestion is complete and 
   2026-10-26: `90-day-samples.zip` contains numeric tweet IDs only; the available archives
   are an air-quality CSV and MQTT sensor JSON, unrelated to X; `archive (2).zip` is absent.
   No uploaded file contains X post text.
-- Database join (R15): not implemented. The pipeline joins file snapshots in memory and
-  `src/xsentiment/storage/` has only engine/session lifecycle and an abstract repository.
-Acceptance (unmet): accepted source, sanitized coverage evidence, time alignment, a
-bounded end-to-end X ingestion test and a persisted price/post join.
+- Data contract: the normalized record preserves the raw provider timestamp, supplied UTC
+  offset, payload hash, author reference, query mode/query and warnings; the JSONL loader
+  round-trips these fields. The profiler detects retrieval-time columns, reports daily
+  coverage gaps and invalid engagement counts, and accepts `--as-of` for reproducible
+  windows. The Apify adapter unwraps the documented `data` envelope, pages dataset items
+  with `offset`/`limit`, and records query provenance; it remains mocked-only.
+- Registry: 12 source records validate structurally, with an explicit
+  `independent_verification.status = not-reverified` and no implied legal approval.
+- Database join (R15): versioned `price_bars`/`x_posts` tables, idempotent repositories and
+  tested descriptive/cutoff joins exist in `src/xsentiment/storage/`. The run CLI still
+  reads file snapshots, so R15 is partial.
+Acceptance (unmet): accepted source, sanitized coverage evidence, a bounded end-to-end X
+ingestion test, pipeline integration of the persisted join, and licensing/terms.
 
 ## Phase 4 — Sentiment and features
 Status: implemented and unit-verified; real-data acceptance blocked on accepted X text.
@@ -113,7 +123,7 @@ sentiment-change series.
 ## Phase 8 — Reproducibility and submission
 Status: in progress.
 - Done: offline reproducible CLI (`fetch-prices`, `run`), run manifest with input hashes,
-  commit-able report/chart/outlook artefacts, 104 offline tests, lint, registry and
+  commit-able report/chart/outlook artefacts, 120 offline tests, lint, registry and
   documentation validation.
 - Remaining: clean-environment run on a fresh clone, security/licence audit of any future
   X source, the secure credential route, confirmation of the actual submission deadline

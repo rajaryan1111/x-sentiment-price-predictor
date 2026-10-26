@@ -16,6 +16,20 @@ The first implementation target is BTC-USD with UTC daily bars. This contract de
 | text | non-empty string | Required for an admitted post; original text, subject to source terms and storage policy. A record without recoverable text is rejected at the adapter boundary rather than admitted with empty text, so post-volume counts only describe posts observed with text (see DESIGN.md and DECISIONS.md D-022) |
 | sentiment_score | float or null | Optional model output in [-1, 1]; null means unscored, not neutral |
 | likes/reposts/views/author_followers | non-negative integer or null | Preserve missingness; exclude from historical features without point-in-time snapshots |
+| source_name / source_platform | non-empty string | Provider and platform identity; StockTwits must not be labelled X |
+| source_created_at_raw | string or null | Original provider timestamp string retained for audit; never substituted for normalized time |
+| source_utc_offset | string or null | Supplied UTC offset in `±HH:MM`; normalized event time is still UTC |
+| author_id | string or null | Pseudonymous stable author reference when the source permits it |
+| query_mode / query | enum or null / string or null | Ticker, cashtag, keyword or mixed search provenance; null when the source did not record it |
+| source_record_hash | 64-char hex or null | SHA-256 of the provider item for reproducibility; contains no text in the clear |
+| schema_version | non-empty string | Normalization contract version |
+| warnings | tuple/list of strings | Non-fatal data-quality notes; missing remains missing |
+
+The JSONL loader round-trips these fields and rejects malformed timestamps or an unknown query mode. The profiler can separately report a source's retrieval-time column, but a supplied retrieval field is not assumed to establish historical observability.
+
+## Persistence keys
+
+`price_bars` is keyed by `(product_id, timestamp)` with one row per `(product_id, UTC bar_date)`. `x_posts` is keyed by stable `post_id`; a later snapshot updates content/counts but retains the earliest `retrieved_at`. See DESIGN.md §Persistence and DECISIONS.md D-026.
 
 ## Price bars
 

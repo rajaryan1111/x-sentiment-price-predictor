@@ -7,13 +7,13 @@ close forecasts at horizons `n+0` through `n+5`.
 > **Status: prices, features, models, evaluation and reporting are implemented and
 > verified on real public Coinbase data. X data access remains an open external
 > gate.** No live X corpus has been accepted, no Apify Actor has been run, and no
-> sentiment result is claimed. The database join required by the brief is **not
-> implemented** (R15); the pipeline currently joins file snapshots in memory. The
-> two assessment PDFs were read in full on 2026-10-26; the linked Google Doc is a
-> 12-entry dataset-link compilation, not a tweet corpus. The pipeline runs end to
-> end today with zero posts and reports sentiment as unavailable rather than
-> inventing it. CI passing is not evidence of data access, model quality or
-> profitability.
+> sentiment result is claimed. The database schema, idempotent repositories and
+> cutoff join now exist and are unit-tested (R15 partial); the `run` CLI still
+> joins file snapshots in memory. The two assessment PDFs were read in full on
+> 2026-10-26; the linked Google Doc is a 12-entry dataset-link compilation, not a
+> tweet corpus. The pipeline runs end to end today with zero posts and reports
+> sentiment as unavailable rather than inventing it. CI passing is not evidence of
+> data access, model quality or profitability.
 
 ## Canonical engineering documents
 
@@ -36,8 +36,8 @@ Phase 1 deliverable: the authoritative [requirements traceability matrix](docs/R
 (every requirement with its acceptance criterion, verification method, evidence, status,
 gap and external blocker, checked by `python scripts/validate_docs.py`). The matrix also
 records the verified assignment PDFs (page counts and SHA-256), the 12 dataset candidates,
-and the requirements that are not yet implemented, including the database join (R15) and
-the email submission packet (A7).
+and the requirements that remain partial, including the database pipeline integration
+(R15) and the email submission packet (A7).
 
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
 [Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),
@@ -79,6 +79,34 @@ python -m xsentiment run \
 
 Add `--posts posts.jsonl` (normalized post records) to include sentiment, and
 `--news-file news.jsonl` for contextual news lines that never enter the features.
+
+Profile a local candidate corpus without printing post text or uploading it:
+
+```bash
+python scripts/profile_local_x_dataset.py /absolute/path/to/posts.csv --days 180 \
+  --as-of 2026-10-26T00:00:00+00:00
+# For non-standard field names, add --id-column, --text-column and --timestamp-column.
+# Add --retrieved-column when the source has a first-observed/retrieval timestamp.
+```
+
+The profiler reports schema drift, duplicate/missing IDs, missing/invalid timestamps,
+engagement-column coverage, malformed counts, daily gaps and whether the requested
+calendar window is complete. A complete window is still not proof of point-in-time
+availability, licensing or X platform identity.
+
+Persist local snapshots and inspect the leakage-safe cutoff join (the database file is
+ignored by Git and post text is never printed):
+
+```bash
+python scripts/persist_and_join.py \
+  --prices data/btc-usd-daily-2026-04-29_2026-10-25.json \
+  --posts posts.jsonl \
+  --database-url sqlite+aiosqlite:///./data/xsentiment.db \
+  --start 2026-04-30 --end 2026-10-25 --out data/cutoff-join.json
+```
+
+This exercises the schema and join but does not make the `run` CLI consume persisted
+data; R15 remains partial.
 
 Each run writes `evaluation-report.md`, `outlook.md`, `sentiment-vs-price.svg`,
 `metrics.json`, `predictions.jsonl` and `manifest.json` (code revision, config,
@@ -149,11 +177,14 @@ dataset has been accepted, licensed or profiled for 180-day text coverage.
 - `src/xsentiment/backtesting/` — forecast/risk metrics and the long/flat strategy.
 - `src/xsentiment/reporting/` — SVG charts, one-page outlook, evaluation report.
 - `src/xsentiment/pipeline/forecast_run.py` — offline end-to-end run and artefacts.
-- `src/xsentiment/storage/` — scaffolding only (async engine/session and an abstract
-  repository); database persistence and the price/post join are not implemented (R15).
+- `src/xsentiment/storage/` — versioned `price_bars`/`x_posts` tables, idempotent
+  upserts and descriptive/cutoff joins, tested with in-memory SQLite; the run CLI
+  still uses file snapshots (R15 partial).
 - `src/xsentiment/main.py` — `fetch-prices` and `run` CLI entry points.
 - `scripts/validate_docs.py` — Phase 1 documentation validator: link resolution,
   unique requirement IDs, matrix completeness and status-summary consistency.
+- `scripts/persist_and_join.py` — optional local persistence and cutoff-join report;
+  requires the `storage` extra, makes no network call and prints no post text.
 - `tests/` — offline unit tests; live provider calls are never made in CI.
 
 ## Data, security and evaluation rules

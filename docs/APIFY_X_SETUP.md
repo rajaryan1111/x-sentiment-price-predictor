@@ -29,11 +29,20 @@ The adapter:
 - applies explicit run item, cost and timeout options;
 - caps response-body size and result item count;
 - unwraps the documented `data` envelope for run responses while reading dataset items as the documented JSON array;
+- pages the dataset-items endpoint with `offset` and `limit`, and stops at the caller's item cap;
 - normalizes common tweet ID/text/date/engagement field names;
 - requires real ID, text and timezone-aware event timestamp;
+- preserves the raw provider timestamp, supplied UTC offset, payload hash, author reference and ticker/cashtag/keyword query provenance;
 - preserves engagement fields as null when the Actor did not return them;
 - records retrieval time separately from event time;
 - leaves sentiment unscored (null) until a separately specified sentiment model is configured;
 - does not persist raw posts automatically.
+
+Apify's official API documentation describes the run response as a `data` object
+(https://docs.apify.com/api/v2/actors-runs-post) and the dataset endpoint as supporting
+`offset`/`limit` with a JSON-array response (https://docs.apify.com/api/v2/dataset-items-get).
+The documented `maxItems` run option caps charges for pay-per-result Actors; it does **not**
+by itself guarantee how many rows the Actor returns. The adapter therefore enforces its
+own returned-row cap and never trusts the provider to honour it.
 
 No live Apify run is included in CI. Tests use mocked HTTP responses and incur no provider costs. A green test suite does not certify the Actor's current availability, legal terms, historical reach, or actual output schema.

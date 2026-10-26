@@ -1,5 +1,5 @@
 # Test Plan
-A passing suite proves only the cases it actually exercises. 104 offline tests pass
+A passing suite proves only the cases it actually exercises. 120 offline tests pass
 locally (`pytest`), and CI runs lint, registry validation, documentation validation and
 pytest on Python 3.11 with only the `dev` and `storage` extras installed.
 
@@ -9,7 +9,7 @@ pytest on Python 3.11 with only the `dev` and `storage` extras installed.
   evaluation, chart/outlook/report rendering, input loaders.
 - Adapter contracts: mocked provider responses, pagination, timeout/error behaviour,
   normalization and secret redaction; no billing and no live provider call.
-- Integration: the current pipeline is exercised end to end in memory with synthetic snapshots. There is no storage/database integration test because R15 is not implemented; do not claim database coverage.
+- Integration: the pipeline is exercised end to end in memory with synthetic snapshots. Storage tests use an in-memory SQLite database and exercise idempotent upserts plus both joins; they do not prove a production PostgreSQL deployment or the run CLI's use of persisted data.
 - End-to-end: the offline `run` CLI on a clearly labelled synthetic snapshot, plus a
   separately documented real-data run using public Coinbase candles.
 - CI: Ruff, registry structural validation, documentation validation (`scripts/validate_docs.py`)
@@ -59,12 +59,16 @@ pytest on Python 3.11 with only the `dev` and `storage` extras installed.
   writes every documented artefact, manifest hashes match the inputs, prediction records
   match the manifest count, a zero-post run still completes, and CLI errors exit non-zero.
 - Apify: mocked run/status/dataset with the documented `data` envelope, auth header,
-  bounds, timeouts/errors, no launch retry and no real Actor in CI.
-- Registry: source/platform identity and structural fields, ID-only hydration caveats, and
-  that a rolling source without a coverage end must carry a coverage/cutoff limitation;
-  validation does not imply live access or legal approval.
-- Storage/persistence: not covered until R15 implements a schema, repositories and a
-  persisted price/post join. The absence of tests must not be presented as coverage.
+  bounds, timeouts/errors, no launch retry, and dataset offset/limit parameters;
+  no real Actor in CI.
+- Registry: source/platform identity, text-availability vocabulary, ISO dates, date order,
+  ID-only hydration caveats, recommended-source sanity, and that a rolling source without
+  a coverage end must carry a coverage/cutoff limitation; validation does not imply live
+  access or legal approval.
+- Storage/persistence: in-memory SQLite tests cover one bar per product/UTC day,
+  idempotent price/post upserts, earliest-retrieval retention, the descriptive same-day
+  join's counts, and a cutoff join that excludes late-arriving and future posts and uses
+  the prior completed close. They do not cover a production database or CLI integration.
 - Documentation: every relative Markdown link resolves; requirement IDs are unique and
   complete across the `R`, `NFR` and `A` namespaces; every matrix row has an acceptance
   criterion, an evidence pointer, a vocabulary status and a blocker entry.
@@ -93,8 +97,8 @@ documented, bounded end-to-end X ingest passes. **Unmet: no accepted X source ye
 Model/report: baselines and sentiment model run; walk-forward is leakage-safe;
 charts/outlook/report derive from actual outputs; risk metrics only from valid strategy
 returns. **Met for prices; the sentiment comparison is blocked on X data.**
-Storage: R15 (database persistence and join) is not implemented and has no acceptance
-test. **Unmet.**
+Storage: R15 schema, idempotent repositories and both joins have acceptance tests, but
+the run CLI still reads file snapshots. **Partially met; pipeline integration remains.**
 
 ## Commands
 From repo root:

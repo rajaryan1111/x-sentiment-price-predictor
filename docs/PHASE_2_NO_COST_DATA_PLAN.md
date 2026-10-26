@@ -9,8 +9,9 @@ Keep the data workstream moving without requiring the project owner to purchase 
 ## Current status
 
 - **Price history:** user-run profile verified 180/180 complete daily BTC-USD bars for 2026-04-29 through 2026-10-25 UTC (half-open end 2026-10-26), with no missing or duplicate timestamps in that checked range.
-- **Provider-neutral contracts and point-in-time alignment:** implemented and covered by unit tests.
-- **Apify adapter:** implemented and mocked in tests; no Actor is selected or run. Do not assume its free allowance will cover an Actor or 180-day search.
+- **Provider-neutral contracts, profiler and point-in-time alignment:** implemented and covered by unit tests. The profiler supports deterministic `--as-of` windows, daily coverage gaps, retrieval-column coverage, schema drift and invalid engagement counts.
+- **Apify adapter:** implemented and mocked in tests, including the documented `data` envelope and dataset offset/limit paging; no Actor is selected or run. Do not assume its free allowance will cover an Actor or 180-day search.
+- **Storage:** a versioned price/post schema and leakage-safe cutoff join are implemented and tested against in-memory SQLite; the run CLI still uses file snapshots (R15 partial).
 - **Historical X collection:** not complete. The assessment-linked Google Doc was retrieved on 2026-10-26 and is a 12-entry dataset-link compilation, not a tweet corpus. No candidate dataset has been downloaded, profiled, or accepted for use. Uploaded local files contain IDs, date/count summaries, unrelated air-quality/MQTT data or a StockTwits paper; none contains X post text.
 
 ## Zero-budget options to investigate
@@ -43,4 +44,4 @@ Before calling X ingestion complete, produce a sanitized profile containing:
 - counts of available engagement fields and their missingness;
 - explicit statement whether the source covers the entire required 180-day period and whether retrieval-time/point-in-time availability is known.
 
-Keep raw post text, cookies, API tokens and downloaded datasets out of Git. Do not claim a sentiment forecast, Sharpe ratio, Sortino ratio or drawdown until the corresponding model/backtest has actually run on valid out-of-sample data.
+Keep raw post text, cookies, API tokens and downloaded datasets out of Git. Do not claim a sentiment forecast, Sharpe ratio, Sortino ratio or drawdown until the corresponding model/backtest has actually run on valid out-of-sample data. The registry's `independent_verification.status` is `not-reverified`: selecting a link from the PDF or Google Doc is not independent confirmation of current access, schema, coverage or license.
