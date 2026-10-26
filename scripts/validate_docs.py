@@ -8,7 +8,15 @@ Checks performed:
 4. every row has a non-empty requirement, acceptance criterion, evidence pointer and
    status, and the status comes from the fixed vocabulary;
 5. the status summary in the document matches the rows, both in counts and in the
-   exact requirement IDs listed for each status.
+   exact requirement IDs listed for each status;
+6. every test-count claim is attributable: a bare "N tests pass" sentence is only
+   allowed in the authoritative test plan, and anywhere else it must be qualified as a
+   historical result (a date, a commit reference or an explicit historical marker).
+
+Check 6 deliberately does not hardcode the current number of tests. Hardcoding it
+would break on every legitimate new test; instead it catches the actual defect seen in
+this repository, which was several documents each asserting a *different* current test
+count with nothing to say which one was live and which was history.
 
 No network access is used.
 """
@@ -54,6 +62,27 @@ SKIP_DIRECTORIES = {".git", ".venv", ".venv-ci", "node_modules", "build", "dist"
 LINK_PATTERN = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 SKIP_LINK_PREFIXES = ("http://", "https://", "mailto:", "#", "tel:")
 
+# The single document allowed to state the current test count without qualification.
+TEST_PLAN_PATH = Path("TEST_PLAN.md")
+
+# "149 offline tests pass", "passed the 130 offline tests", "127 passed", "suite is 120 tests".
+# Only the plural "tests" counts, so fold configuration such as "20 test rows per fold"
+# is not mistaken for a suite size.
+TEST_COUNT_PATTERN = re.compile(
+    r"\b(\d{2,4})\s+(?:offline\s+)?tests\b|\b(\d{2,4})\s+passed\b",
+    re.IGNORECASE,
+)
+
+# Markers that make a count attributable: either self-evidently historical, or
+# explicitly deferring to the authoritative test plan.
+QUALIFYING_MARKERS = re.compile(
+    r"\b(19|20)\d{2}-\d{2}-\d{2}\b"  # an ISO date
+    r"|\bcommit\b|\bhistorical\b|\bat that revision\b|\bthat existed\b"
+    r"|\bpreviously\b|\bprior\b|\bpre-\w+\b|\bearlier\b|\bas of\b|\bat the time\b"
+    r"|TEST_PLAN\.md",
+    re.IGNORECASE,
+)
+
 
 def markdown_files(root: Path) -> list[Path]:
     """All Markdown files under ``root``, ignoring generated and vendor directories."""
@@ -90,6 +119,45 @@ def check_links(root: Path, files: list[Path]) -> tuple[list[str], int]:
             if not resolved.exists():
                 errors.append(f"{path}: broken link target: {raw_target}")
     return errors, checked
+
+
+def _sentences(text: str) -> list[str]:
+    """Split Markdown prose into rough sentences, flattening wrapped lines.
+
+    Table rows are split on the cell separator too, so a stale count inside one
+    matrix cell is not excused by a date living in a neighbouring cell.
+    """
+    flattened = re.sub(r"\s+", " ", text.replace("|", ". "))
+    return [part for part in re.split(r"(?<=[.;!?])\s+", flattened) if part.strip()]
+
+
+def check_test_count_claims(root: Path, files: list[Path]) -> tuple[list[str], int]:
+    """Flag unqualified test-count claims outside the authoritative test plan.
+
+    Returns the errors plus the number of test-count claims inspected. The current
+    count is never hardcoded: a claim passes when it either lives in
+    ``TEST_PLAN.md`` or carries a date/commit/historical marker in the same sentence.
+    """
+    errors: list[str] = []
+    inspected = 0
+    plan = (root / TEST_PLAN_PATH).resolve()
+    for path in files:
+        if path.resolve() == plan:
+            continue
+        for sentence in _sentences(path.read_text(encoding="utf-8")):
+            for match in TEST_COUNT_PATTERN.finditer(sentence):
+                inspected += 1
+                if QUALIFYING_MARKERS.search(sentence):
+                    continue
+                count = match.group(1) or match.group(2)
+                relative = path.relative_to(root) if path.is_relative_to(root) else path
+                errors.append(
+                    f"{relative}: unqualified test-count claim '{count}'. Only "
+                    f"{TEST_PLAN_PATH} may state the current count; elsewhere cite a date, "
+                    "a commit or mark the figure historical: "
+                    f"{sentence.strip()[:120]!r}"
+                )
+    return errors, inspected
 
 
 def _cells(line: str) -> list[str]:
@@ -227,11 +295,14 @@ def main() -> int:
     args = parser.parse_args()
     root = args.root.resolve()
 
-    link_errors, checked = check_links(root, markdown_files(root))
+    files = markdown_files(root)
+    link_errors, checked = check_links(root, files)
     matrix_errors, counts = check_matrix(root / MATRIX_PATH)
-    errors = link_errors + matrix_errors
+    claim_errors, claims = check_test_count_claims(root, files)
+    errors = link_errors + matrix_errors + claim_errors
 
     print(f"Checked {checked} relative Markdown links across the repository.")
+    print(f"Checked {claims} test-count claims outside {TEST_PLAN_PATH}.")
     if counts:
         print("Requirement status counts from the matrix:")
         total = sum(counts.values())

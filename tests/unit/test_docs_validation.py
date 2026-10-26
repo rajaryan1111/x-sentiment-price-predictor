@@ -2,6 +2,8 @@
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[2]
 MATRIX = ROOT / "docs" / "REQUIREMENTS_TRACEABILITY.md"
 
@@ -90,6 +92,82 @@ def test_validator_flags_a_broken_link_and_a_bad_status(tmp_path: Path) -> None:
 
     assert any("outside the allowed vocabulary" in error for error in matrix_errors)
     assert any("requirement IDs missing" in error for error in matrix_errors)
+
+
+def test_repository_has_no_unqualified_test_count_claims() -> None:
+    """Regression: several documents once asserted different 'current' test counts."""
+    errors, inspected = validate_docs.check_test_count_claims(
+        ROOT, validate_docs.markdown_files(ROOT)
+    )
+
+    assert errors == []
+    assert inspected > 0, "the claim scanner must actually be matching sentences"
+
+
+def test_test_plan_states_the_current_count_and_the_suite_agrees() -> None:
+    """The authoritative count in TEST_PLAN.md must match what pytest actually collects.
+
+    The expected number is read from the document instead of being hardcoded here, so
+    adding a test means updating the one authoritative place rather than editing this
+    assertion. Collection runs in a subprocess so the result is the size of the whole
+    suite even when this module is executed on its own.
+    """
+    import re
+    import subprocess
+    import sys
+
+    text = (ROOT / "TEST_PLAN.md").read_text(encoding="utf-8")
+    claimed = {int(match) for match in re.findall(r"\b(\d{2,4})\s+offline tests\b", text)}
+    assert claimed, "TEST_PLAN.md must state the current offline test count"
+
+    completed = subprocess.run(
+        [sys.executable, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:  # pragma: no cover - collection is green in CI
+        pytest.skip(f"suite collection unavailable: {completed.stdout[-300:]}")
+    match = re.search(r"(\d+)\s+tests? collected", completed.stdout)
+    assert match, f"could not read the collected count from: {completed.stdout[-300:]}"
+
+    actual = int(match.group(1))
+    assert actual in claimed, (
+        f"TEST_PLAN.md claims {sorted(claimed)} offline tests but pytest collected {actual}"
+    )
+
+
+def test_validator_flags_an_unqualified_count_but_allows_a_historical_one(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "TEST_PLAN.md").write_text("The suite is 999 offline tests.\n", encoding="utf-8")
+
+    stale = tmp_path / "STALE.md"
+    stale.write_text("The project has 42 offline tests.\n", encoding="utf-8")
+    errors, inspected = validate_docs.check_test_count_claims(tmp_path, [stale])
+    assert inspected == 1
+    assert any("unqualified test-count claim '42'" in error for error in errors)
+
+    dated = tmp_path / "DATED.md"
+    dated.write_text("On 2026-10-26 the suite was 42 offline tests.\n", encoding="utf-8")
+    dated_errors, _ = validate_docs.check_test_count_claims(tmp_path, [dated])
+    assert dated_errors == []
+
+    by_commit = tmp_path / "COMMIT.md"
+    by_commit.write_text("Commit `abc1234` passed 42 offline tests.\n", encoding="utf-8")
+    commit_errors, _ = validate_docs.check_test_count_claims(tmp_path, [by_commit])
+    assert commit_errors == []
+
+    # The authoritative plan itself is exempt and fold configuration is not a suite size.
+    plan_errors, _ = validate_docs.check_test_count_claims(
+        tmp_path, [tmp_path / "TEST_PLAN.md"]
+    )
+    assert plan_errors == []
+
+    folds = tmp_path / "FOLDS.md"
+    folds.write_text("Defaults are 60 training and 20 test rows per fold.\n", encoding="utf-8")
+    fold_errors, fold_inspected = validate_docs.check_test_count_claims(tmp_path, [folds])
+    assert fold_errors == [] and fold_inspected == 0
 
 
 def test_validator_flags_duplicate_and_unexpected_requirement_ids(tmp_path: Path) -> None:

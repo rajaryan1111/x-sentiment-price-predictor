@@ -162,7 +162,9 @@ From `reports/btc-usd-180d/`, computed by the commands above:
   reported unavailable and the candidate model is flagged as not identifiable.
 - **Verified fresh-clone reproduction (2026-10-27):** a clean checkout of this branch,
   installed strictly from the committed `pyproject.toml` on Python 3.12.4, ran the 130
-  offline tests, both validators and the documented commands above after refetching the
+  offline tests that existed at that revision (commit `ed2c5a4`; the suite is 149 tests at
+  the current branch head — see [TEST_PLAN.md](TEST_PLAN.md) for the authoritative current
+  count), both validators and the documented commands above after refetching the
   public snapshot — whose SHA-256 matched the committed provenance exactly — and
   reproduced every metric within 5e-13 (platform float noise only). No credentials,
   paid services or network X calls are needed for this offline reproduction.

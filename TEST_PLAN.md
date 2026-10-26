@@ -1,7 +1,23 @@
 # Test Plan
-A passing suite proves only the cases it actually exercises. 147 offline tests pass
-locally (`pytest`), and CI runs lint, registry validation, documentation validation and
-pytest on Python 3.11 with only the `dev` and `storage` extras installed.
+A passing suite proves only the cases it actually exercises. The current suite is
+**152 offline tests, all passing** (`pytest` -> `152 passed`, 0 failed, 0 skipped,
+0 xfailed), last run on 2026-10-26 UTC from a clean virtual environment installed
+with `pip install -e '.[dev,storage]'`. That run used Python 3.13 because that was the
+only interpreter available in the verification environment; CI runs the same command
+set on Python 3.11, which is the supported baseline in `pyproject.toml`. CI runs lint,
+registry validation, documentation validation and pytest with only the `dev` and
+`storage` extras installed.
+
+The suite collects 152 cases from 150 test functions across 20 modules in
+`tests/unit/`: one function is parametrized into three cases. The immediately preceding
+revision (commit `2448ef8`) had 149 tests; the three added here cover the test-count
+regression check described below.
+
+**This file is the single authoritative source for the current count.** Counts quoted
+elsewhere in the repository must be tied to a date or a commit and are historical
+results for that revision. `scripts/validate_docs.py` enforces that rule, and
+`tests/unit/test_docs_validation.py` asserts that the number stated above equals what
+`pytest` actually collects, so the two can no longer drift apart silently.
 
 ## Layers
 - Unit: validation, timestamps, deduplication, price coverage, sentiment scoring,
@@ -9,7 +25,16 @@ pytest on Python 3.11 with only the `dev` and `storage` extras installed.
   evaluation, chart/outlook/report rendering, input loaders.
 - Adapter contracts: mocked provider responses, pagination, timeout/error behaviour,
   normalization and secret redaction; no billing and no live provider call.
-- Integration: the pipeline is exercised end to end in memory with synthetic snapshots. Storage tests use an in-memory SQLite database and exercise idempotent upserts plus both joins; they do not prove a production PostgreSQL deployment or the run CLI's use of persisted data.
+- Integration: the pipeline is exercised end to end in memory with synthetic snapshots.
+  `tests/unit/test_storage_join.py` uses an in-memory SQLite database and exercises
+  idempotent upserts plus both joins. The run CLI's use of persisted data **is** covered,
+  in `tests/unit/test_phase3_ingestion_e2e.py`: `test_bounded_end_to_end_ingestion_persists_and_joins`
+  drives a mocked Apify adapter through normalization into a real on-disk SQLite file and
+  then through the leakage-safe cutoff join, and `test_run_cli_consumes_the_persisted_inputs`
+  runs `xsentiment run --database-url` to completion on those persisted rows and asserts the
+  manifest records `input_source = persisted_storage`. These remain fixture/mock based: they
+  do not prove a production PostgreSQL deployment, and they do not prove acceptance of any
+  real X corpus.
 - End-to-end: the offline `run` CLI on a clearly labelled synthetic snapshot, plus a
   separately documented real-data run using public Coinbase candles.
 - CI: Ruff, registry structural validation, documentation validation (`scripts/validate_docs.py`)

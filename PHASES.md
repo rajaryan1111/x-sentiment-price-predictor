@@ -91,7 +91,8 @@ Status: implemented and unit-verified; real-data acceptance blocked on accepted 
   with nulls preserved and no target leakage.
 - 180 price cutoffs were feature-built with zero posts, and sentiment correctly stayed
   unavailable instead of being zero-filled.
-- Phase 4 audit additions (127 offline tests): the exact half-open 24-hour window boundary is
+- Phase 4 audit additions (127 offline tests at that revision, commit `79b295f`): the exact
+  half-open 24-hour window boundary is
   unit-verified (a post created at `cutoff - 24h` is excluded; a post created or retrieved
   exactly at the cutoff is included), scoring is deterministic across repeat runs, the
   manifest records the versioned scorer, and unicode/non-string text are exercised without
@@ -151,11 +152,12 @@ and explicitly labelled until an accepted X source exists.
 ## Phase 8 — Reproducibility and submission
 Status: in progress; offline reproducibility verified on a fresh clone.
 - Done: offline reproducible CLI (`fetch-prices`, `run`), run manifest with input hashes,
-  commit-able report/chart/outlook artefacts, 130 offline tests, lint, registry and
-  documentation validation.
+  commit-able report/chart/outlook artefacts, 149 offline tests (current head; see
+  [TEST_PLAN.md](TEST_PLAN.md)), lint, registry and documentation validation.
 - Fresh-clone verification (2026-10-27): a clean checkout of this branch from GitHub,
   installed strictly from the committed `pyproject.toml` on Python 3.12.4, passed the 130
-  offline tests, `ruff`, the documentation validator, the registry validator and the
+  offline tests that existed at that revision (commit `ed2c5a4`), `ruff`, the documentation
+  validator, the registry validator and the
   documented CLI entry points. Refetching the public price snapshot reproduced the
   committed SHA-256 exactly, and the full price-only run reproduced every metric within
   5e-13 (cross-platform float noise only; no credentials, paid services or network X
