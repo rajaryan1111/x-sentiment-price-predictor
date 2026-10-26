@@ -143,8 +143,13 @@ def profile(args: argparse.Namespace) -> dict[str, Any]:
         else:
             counts["rows_older_than_window"] += 1
 
-        for field_name, aliases in (("likes", ALIASES["likes"]), ("reposts", ALIASES["reposts"]),
-                                    ("views", ALIASES["views"]), ("followers", ALIASES["followers"])):
+        engagement_aliases = (
+            ("likes", ALIASES["likes"]),
+            ("reposts", ALIASES["reposts"]),
+            ("views", ALIASES["views"]),
+            ("followers", ALIASES["followers"]),
+        )
+        for field_name, aliases in engagement_aliases:
             actual = next((alias for alias in aliases if alias in row), None)
             if actual and row.get(actual) not in (None, ""):
                 counts[f"rows_with_{field_name}"] += 1
@@ -186,8 +191,12 @@ def profile(args: argparse.Namespace) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("file", type=Path, help="Local CSV or JSONL/NDJSON file; keep it outside Git")
-    parser.add_argument("--days", type=int, default=180, help="Lookback window in days (default: 180)")
+    parser.add_argument(
+        "file", type=Path, help="Local CSV or JSONL/NDJSON file; keep it outside Git"
+    )
+    parser.add_argument(
+        "--days", type=int, default=180, help="Lookback window in days (default: 180)"
+    )
     parser.add_argument("--id-column")
     parser.add_argument("--text-column")
     parser.add_argument("--timestamp-column")
