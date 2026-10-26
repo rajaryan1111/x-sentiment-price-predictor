@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
@@ -100,9 +100,7 @@ def test_price_candle_rejects_non_utc_timestamp() -> None:
     with pytest.raises(ValueError, match="normalized to UTC"):
         PriceCandle(
             "BTC-USD",
-            datetime(2026, 10, 23, 5, tzinfo=__import__("datetime").timezone(
-                __import__("datetime").timedelta(hours=5)
-            )),
+            datetime(2026, 10, 23, 5, tzinfo=timezone(timedelta(hours=5))),
             Decimal("90"),
             Decimal("102"),
             Decimal("95"),
