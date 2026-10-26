@@ -1,60 +1,64 @@
 # X Sentiment Price Predictor
 
-Research project for reproducible asset-price forecasting that evaluates whether timestamped X sentiment adds predictive value beyond price-only baselines.
+Research pipeline to evaluate whether timestamped X sentiment adds predictive value beyond price-only baselines for a selected asset.
 
-> **Status:** Architecture scaffold only. No live ingestion, trained model, forecast, backtest, Sharpe ratio, Sortino ratio, or drawdown result is claimed yet.
+> **Current status:** Architecture scaffold only. This repository does not yet claim live ingestion, trained forecasts, backtest results, Sharpe ratio, Sortino ratio, or maximum drawdown.
 
-## Design principles
+## Architecture
 
-- Separate ingestion, normalization, feature engineering, forecasting, validation, backtesting, and presentation.
-- Preserve source identifiers, timestamps, retrieval time, and provenance for every external record.
-- Enforce point-in-time feature availability and chronological/walk-forward evaluation to avoid leakage.
-- Compare against transparent price-only baselines before claiming sentiment adds value.
-- Keep credentials and private/raw datasets out of version control.
-- Keep provider-specific APIs behind replaceable adapters.
-
-## Planned package layout
-
-- `src/xsentiment/config/`: environment-backed settings.
-- `src/xsentiment/ingestion/`: provider interfaces and X, prices, and news adapters.
-- `src/xsentiment/storage/`: database lifecycle, schema and repositories.
+- `src/xsentiment/config/`: validated environment-backed settings.
+- `src/xsentiment/ingestion/`: provider-neutral data contracts, shared bounded async HTTP/retry boundary, and replaceable X, price and optional news adapters.
+- `src/xsentiment/storage/`: database lifecycle, project-owned schema base and repository interface.
 - `src/xsentiment/features/`: sentiment aggregation and price features.
-- `src/xsentiment/models/`: baseline and forecast interfaces.
-- `src/xsentiment/validation/`: time-aware split and leakage checks.
-- `src/xsentiment/backtesting/`: strategy simulation and risk metrics.
-- `src/xsentiment/reporting/`: output contracts and report assembly.
-- `dashboard/`: future visualization application.
-- `tests/`: offline unit tests and contract tests.
-- `reports/`: generated reports (no secrets or private data).
+- `src/xsentiment/models/`: price-only baseline and candidate forecasting interfaces.
+- `src/xsentiment/validation/`: temporal validation and leakage guards.
+- `src/xsentiment/backtesting/`: backtesting and risk metrics.
+- `src/xsentiment/reporting/`: report payloads and report assembly.
+- `dashboard/`: future presentation layer.
+- `tests/`: offline unit tests and later provider/database contract tests.
 
-## Quick start
+## Shared infrastructure patterns adapted from GraphOne
 
-Python 3.11+ is the initial target. The scaffold and dependencies will be finalized in the project setup phase.
+The following patterns are being reused/adapted: replaceable source adapters; single HTTP boundary with bounded concurrency and response-size caps; transient-only retries with jitter; environment-backed validated settings; async SQLAlchemy engine/session lifecycle; project-separated model and repository layers; and tests that can run without live providers.
+
+GraphOne's AI-news orchestration, business-domain ORM entities, storage tables, and application runtime are deliberately **not** copied. The source-specific adapter implementations will be written against this project's actual X and price provider contracts.
+
+## Setup
+
+Python 3.11+ is targeted. Create a virtual environment, then install the package with development and storage dependencies:
 
 ```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[dev,storage]"
 cp .env.example .env
-# Fill only credentials you are authorized to use.
-python -m pip install -e ".[dev]"
 pytest
+ruff check src tests
 ```
 
-The commands above describe the intended workflow; execution and provider integration will be enabled in subsequent implementation phases.
+These setup commands are scaffold-level; external provider ingestion and full application execution are not implemented yet.
 
-## Branching
+## Data integrity and evaluation rules
 
-- `main`: stable integration branch.
-- `setup/project-scaffold`: repository structure, shared infrastructure patterns, and tooling.
-- `feat/ingestion`: provider adapters and data contracts.
-- `feat/modeling`: features, baselines, and forecasting.
-- `feat/evaluation`: walk-forward validation and backtesting.
-- `feat/dashboard-reporting`: charts, outlook, and reports.
+- Retain source IDs, event timestamps, retrieval timestamps, and provenance.
+- Keep credentials, raw private X exports, and large generated datasets out of Git.
+- Enforce point-in-time availability; use chronological/walk-forward evaluation, never random train/test splits for time series.
+- Compare sentiment-augmented models against simple price-only baselines.
+- Only publish performance metrics derived from out-of-sample strategy returns with disclosed transaction costs, annualization, return convention, and trading assumptions.
+- Treat Tavily/Exa results as context/provenance unless the approved specification explicitly allows them as model features.
+- Never label fixtures or synthetic examples as live provider data.
 
-Feature branches should be based on `main` and merged through pull requests after tests pass.
+## Branch strategy
 
-## Data and research integrity
+- `main`: stable integration.
+- `setup/project-scaffold`: skeleton and reusable infrastructure.
+- `feat/ingestion`: provider adapters and ingestion contracts.
+- `feat/modeling`: features and forecast models.
+- `feat/evaluation`: walk-forward evaluation and backtesting.
+- `feat/dashboard-reporting`: charts and assessment report.
 
-Never commit API credentials, access tokens, raw X exports, proprietary datasets, or large generated artifacts. Do not label fixture/demo data as live data. Forecast horizons and return definitions must be explicitly documented. Backtest performance metrics must be calculated from timestamped out-of-sample strategy returns and disclose costs and assumptions.
+Feature work should be merged through review after offline tests pass.
 
-## GraphOne reuse note
+## Scope boundary
 
-This project adapts architectural patterns from `rajaryan1111/graphone-intelligence-pipeline` (adapter interfaces, bounded HTTP/retry behavior, environment configuration, async database lifecycle, repositories, validation, and tests). It does not copy GraphOne's unrelated business entities, AI-news orchestration, or domain-specific runtime.
+The ten canonical requirements/architecture files are intentionally not created in this scaffold commit. They will be added in the next step and treated as the source of truth for implementation decisions.
