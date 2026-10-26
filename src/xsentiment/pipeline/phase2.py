@@ -5,11 +5,11 @@ source timestamps, retrieval timestamps, and sentiment scores from a configured 
 """
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from statistics import fmean
-from collections.abc import Iterable, Sequence
 
 from xsentiment.ingestion.prices import PriceCandle
 
