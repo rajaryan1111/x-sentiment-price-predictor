@@ -10,7 +10,7 @@ Read [docs/PHASE_1_REQUIREMENTS.md](docs/PHASE_1_REQUIREMENTS.md) before impleme
 
 ## Phase 2 data-ingestion status
 
-The Coinbase adapter and point-in-time data primitives are implemented. The user-run UTC 180-day BTC-USD profile returned 180/180 daily bars with no missing or duplicate bars in the checked range. A configurable Apify adapter and mocked tests are present, but no live Apify Actor has been selected or run. Before collection, review [Apify X setup and run caps](docs/APIFY_X_SETUP.md) and [Phase 2 progress](docs/PHASE_2_PROGRESS.md). The adapter does not score sentiment or train forecasting models; those remain downstream work. The latest phase-2 implementation is tracked in [draft PR #10](https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/10).
+The Coinbase adapter and point-in-time data primitives are implemented. The user-run UTC 180-day BTC-USD profile returned 180/180 daily bars with no missing or duplicate bars in the checked range. A configurable Apify adapter and mocked tests are present, but no live Actor has been selected or run. For a no-cost path, see [Phase 2 no-cost data plan](docs/PHASE_2_NO_COST_DATA_PLAN.md) and use [the local X dataset profiler](scripts/profile_local_x_dataset.py) on an accessible local CSV/JSONL file. The profiler prints schema/coverage metadata only and deliberately does not certify point-in-time backtest readiness. Phase 2 remains partial until a real, permitted X dataset is profiled and coverage is evidenced. See [Phase 2 progress](docs/PHASE_2_PROGRESS.md) and [Apify X setup and run caps](docs/APIFY_X_SETUP.md). The latest implementation is tracked in [draft PR #10](https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/10).
 
 ## Historical dataset registry
 
