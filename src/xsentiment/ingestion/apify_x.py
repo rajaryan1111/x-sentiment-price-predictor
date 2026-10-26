@@ -77,7 +77,8 @@ class ApifyXAdapter:
             raise ValueError("timeout_seconds must be between 60 and 3600")
 
         headers = self._auth_headers()
-        launch_url = f"{APIFY_API_BASE}/acts/{self.settings.apify_actor_id.strip()}/runs"
+        actor_id = quote(self.settings.apify_actor_id.strip(), safe="~")
+        launch_url = f"{APIFY_API_BASE}/actors/{actor_id}/runs"
         run = await self._request_json(
             "POST",
             launch_url,
