@@ -44,3 +44,10 @@ def test_validator_reports_duplicate_ids(tmp_path: Path) -> None:
     registry_path = tmp_path / "registry.json"
     registry_path.write_text(json.dumps(document), encoding="utf-8")
     assert any("Duplicate dataset id" in error for error in validate_registry(registry_path))
+
+
+def test_source_pdf_count_mismatch_is_flagged() -> None:
+    document = json.loads(DEFAULT_REGISTRY.read_text(encoding="utf-8"))
+    dataset = next(item for item in document["datasets"] if item["id"] == "crypto-stock-tweets-hf")
+    assert dataset["approximate_records"] == 8_020_000
+    assert any("conflicts with its component counts" in item for item in dataset["limitations"])
