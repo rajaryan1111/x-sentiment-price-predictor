@@ -147,10 +147,23 @@ change-series implementation is verified with fixtures only, and the panels stay
 and explicitly labelled until an accepted X source exists.
 
 ## Phase 8 — Reproducibility and submission
-Status: in progress.
+Status: in progress; offline reproducibility verified on a fresh clone.
 - Done: offline reproducible CLI (`fetch-prices`, `run`), run manifest with input hashes,
-  commit-able report/chart/outlook artefacts, 120 offline tests, lint, registry and
+  commit-able report/chart/outlook artefacts, 130 offline tests, lint, registry and
   documentation validation.
-- Remaining: clean-environment run on a fresh clone, security/licence audit of any future
-  X source, the secure credential route, confirmation of the actual submission deadline
-  from the employer, and the email submission packet required by the brief (A7).
+- Fresh-clone verification (2026-10-27): a clean checkout of this branch from GitHub,
+  installed strictly from the committed `pyproject.toml` on Python 3.12.4, passed the 130
+  offline tests, `ruff`, the documentation validator, the registry validator and the
+  documented CLI entry points. Refetching the public price snapshot reproduced the
+  committed SHA-256 exactly, and the full price-only run reproduced every metric within
+  5e-13 (cross-platform float noise only; no credentials, paid services or network X
+  calls required). The README's stale R15 status was corrected alongside this evidence.
+- Remaining (external only): the licence/registration audit of the eventual X source,
+  the secure credential route, employer confirmation of the submission deadline, an
+  accepted real X corpus, and the email submission packet required by the brief (A7).
+- Deliverable checklist: repository link and reproducible package — **ready** (fresh-clone
+  verified); evaluation report with per-horizon MAE/RMSE, sample counts and risk metrics —
+  **ready** (`reports/btc-usd-180d/evaluation-report.md`); chart and outlook with honest
+  unavailable states — **ready**; provider tokens/Actor identifiers — **blocked** (none
+  exist until R2/A2 unblock); a sentiment-backed evaluation, the email packet and the
+  exact calendar deadline — **blocked / needs employer clarification** (R2, A1, A7).

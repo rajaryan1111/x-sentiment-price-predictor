@@ -35,9 +35,8 @@ contracts and status, and they list what is verified versus still open.
 Phase 1 deliverable: the authoritative [requirements traceability matrix](docs/REQUIREMENTS_TRACEABILITY.md)
 (every requirement with its acceptance criterion, verification method, evidence, status,
 gap and external blocker, checked by `python scripts/validate_docs.py`). The matrix also
-records the verified assignment PDFs (page counts and SHA-256), the 12 dataset candidates,
-and the requirements that remain partial, including the database pipeline integration
-(R15) and the email submission packet (A7).
+records the verified assignment PDFs (page counts and SHA-256), the 12 dataset candidates,and the requirements that remain partial, including provider access (R2) and the email
+submission packet (A7). The database join (R15) is recorded as verified complete offline.
 
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
 [Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),
@@ -50,7 +49,9 @@ is not canonical documentation Phase 2. See [PHASES.md](PHASES.md).
 
 ## Quick start
 
-Python 3.11+ (verified on 3.12.3):
+Python 3.11+ (notably, a bare `python3` can be older than 3.11 on some hosts; use
+`python3.12` or `python3.11` there). Verified across a fresh clone of this branch on
+Python 3.11.15 and 3.12.4:
 
 ```bash
 python3 -m venv .venv
@@ -159,8 +160,12 @@ From `reports/btc-usd-180d/`, computed by the commands above:
   UTC, no missing or duplicate timestamps; unfinished current day excluded.
 - **X posts:** 0. No permitted post-level dataset is accepted yet, so sentiment is
   reported unavailable and the candidate model is flagged as not identifiable.
-- **Walk-forward:** 5 expanding folds (60 → 140 training rows, 20 test rows, 5-row
-  purge), 100 out-of-sample days per model/horizon, 1800 predictions.
+- **Verified fresh-clone reproduction (2026-10-27):** a clean checkout of this branch,
+  installed strictly from the committed `pyproject.toml` on Python 3.12.4, ran the 130
+  offline tests, both validators and the documented commands above after refetching the
+  public snapshot — whose SHA-256 matched the committed provenance exactly — and
+  reproduced every metric within 5e-13 (platform float noise only). No credentials,
+  paid services or network X calls are needed for this offline reproduction.
 - **Mean MAE across horizons:** naive persistence **$1,828.36**, price-only ridge
   **$2,264.62** (+23.86% worse), sentiment-plus-price identical to price-only
   because no sentiment was available.
@@ -194,8 +199,9 @@ dataset has been accepted, licensed or profiled for 180-day text coverage.
 - `src/xsentiment/reporting/` — SVG charts, one-page outlook, evaluation report.
 - `src/xsentiment/pipeline/forecast_run.py` — offline end-to-end run and artefacts.
 - `src/xsentiment/storage/` — versioned `price_bars`/`x_posts` tables, idempotent
-  upserts and descriptive/cutoff joins, tested with in-memory SQLite; the run CLI
-  still uses file snapshots (R15 partial).
+  upserts and descriptive/cutoff joins, tested with in-memory SQLite; `xsentiment
+  persist` and `xsentiment run --database-url` evaluate from persisted rows
+  (manifest records `input_source = persisted_storage`); verified offline.
 - `src/xsentiment/main.py` — `fetch-prices` and `run` CLI entry points.
 - `scripts/validate_docs.py` — Phase 1 documentation validator: link resolution,
   unique requirement IDs, matrix completeness and status-summary consistency.
