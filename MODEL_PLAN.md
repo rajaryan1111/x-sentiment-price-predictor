@@ -16,7 +16,8 @@ Exclude by default: current engagement/follower counts without historical snapsh
 Choose model family after profiling actual sample size and missingness. Start with simple, reproducible models. RL is out of initial scope unless explicitly required and its action space, reward, execution/cost model and evaluation are specified.
 
 ## Validation
-Use expanding-window or rolling walk-forward splits. Define train/validation/test boundaries before tuning. Fit scaling, imputation, selection and hyperparameters using training/validation folds only. Keep final holdout untouched until choices are frozen. Compare models on identical cutoffs and folds. Record boundaries, sample counts and exclusions. Use deterministic seeds where possible.
+The repository now includes a deterministic expanding-window split helper in src/xsentiment/validation/walk_forward.py. It creates positional train/test indices only; it is not a model evaluator and does not itself prevent target-label leakage.
+Use expanding-window or rolling walk-forward splits. Define train/validation/test boundaries before tuning. Choose a gap sufficient for the maximum target horizon where label windows could overlap test periods. Fit scaling, imputation, selection and hyperparameters using training/validation folds only. Keep final holdout untouched until choices are frozen. Compare models on identical cutoffs and folds. Record boundaries, sample counts and exclusions. Use deterministic seeds where possible.
 
 ## Forecast metrics
 Report MAE and RMSE in USD by horizon. Directional accuracy is optional only with a predeclared definition and consistent handling. Include naive and price-only comparisons, sample counts and fold variability where feasible. Never report metrics from invalid targets or leakage-prone splits.
@@ -27,4 +28,4 @@ Sharpe, Sortino and max drawdown require a defined trading strategy, not merely 
 ## Robustness and go/no-go
 Possible predeclared comparisons include horizons, naive/price-only/sentiment models and coverage subsets. Do not repeatedly tune on final holdout.
 Do not train until source terms/access, post-level text/time coverage, point-in-time semantics, sentiment scoring/null policy, matching prices, targets and chronological splits are validated.
-Current state: alignment/target primitives exist, but no accepted real X dataset, implemented sentiment scoring, trained forecast, walk-forward metrics or valid trading metrics are evidenced.
+Current state: alignment/target primitives and a split-boundary helper exist, but no accepted real X dataset, implemented sentiment scoring, trained forecast, walk-forward model evaluation, charts, current outlook or valid trading metrics are evidenced.
