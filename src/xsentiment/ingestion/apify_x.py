@@ -7,9 +7,10 @@ that you have reviewed for current terms, output schema, historical reach, and c
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import time
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
 from typing import Any
 from urllib.parse import quote
@@ -59,6 +60,8 @@ class ApifyXAdapter:
         max_items: int = 100,
         max_total_charge_usd: float = 1.0,
         timeout_seconds: int = 900,
+        query_mode: str | None = None,
+        query: str | None = None,
     ) -> list[XPostRecord]:
         """Start one Actor run and fetch its default dataset under caller-approved caps.
 
@@ -122,21 +125,19 @@ class ApifyXAdapter:
         dataset_id = run.get("defaultDatasetId")
         if not isinstance(dataset_id, str) or not dataset_id:
             raise ApifyRunError("Apify run did not return a default dataset ID")
-        dataset_url = (
-            f"{APIFY_API_BASE}/datasets/{quote(dataset_id, safe='')}/items"
+        items = await self._fetch_dataset_items(
+            dataset_id, headers=headers, max_items=max_items
         )
-        items = await self._request_json(
-            "GET",
-            dataset_url,
-            headers=headers,
-            params={"format": "json", "clean": "true", "limit": str(max_items)},
-        )
-        if not isinstance(items, list):
-            raise ApifyRunError("Apify dataset response must be a JSON array")
-        if len(items) > max_items:
-            raise ApifyRunError("Apify returned more items than the configured result cap")
         retrieved_at = datetime.now(UTC)
-        records = [normalize_apify_post(item, retrieved_at=retrieved_at) for item in items]
+        records = [
+            normalize_apify_post(
+                item,
+                retrieved_at=retrieved_at,
+                query_mode=query_mode,
+                query=query,
+            )
+            for item in items
+        ]
         seen: dict[str, XPostRecord] = {}
         for record in records:
             existing = seen.get(record.post_id)
@@ -146,6 +147,43 @@ class ApifyXAdapter:
                 )
             seen[record.post_id] = record
         return sorted(seen.values(), key=lambda record: (record.created_at, record.post_id))
+
+    async def _fetch_dataset_items(
+        self, dataset_id: str, *, headers: dict[str, str], max_items: int
+    ) -> list[Any]:
+        """Read one dataset in offset pages, never beyond the caller's item cap.
+
+        Apify supports ``offset``/``limit`` on the dataset-items endpoint. Paging is
+        bounded by ``max_items`` and by detecting a non-advancing page, so a provider
+        response cannot silently return more rows than the caller approved.
+        """
+        dataset_url = f"{APIFY_API_BASE}/datasets/{quote(dataset_id, safe='')}/items"
+        items: list[Any] = []
+        while len(items) < max_items:
+            remaining = max_items - len(items)
+            page = await self._request_json(
+                "GET",
+                dataset_url,
+                headers=headers,
+                params={
+                    "format": "json",
+                    "clean": "true",
+                    "limit": str(min(1000, remaining)),
+                    "offset": str(len(items)),
+                },
+            )
+            if not isinstance(page, list):
+                raise ApifyRunError("Apify dataset response must be a JSON array")
+            if len(page) > remaining:
+                raise ApifyRunError(
+                    "Apify returned more items than the configured result cap"
+                )
+            if not page:
+                break
+            items.extend(page)
+            if len(page) < min(1000, remaining):
+                break
+        return items
 
     def _auth_headers(self) -> dict[str, str]:
         token = self.settings.apify_api_token
@@ -210,7 +248,11 @@ def _unwrap_run(payload: Any) -> Any:
 
 
 def normalize_apify_post(
-    item: object, *, retrieved_at: datetime | None = None
+    item: object,
+    *,
+    retrieved_at: datetime | None = None,
+    query_mode: str | None = None,
+    query: str | None = None,
 ) -> XPostRecord:
     """Normalize common tweet fields without fabricating missing IDs, text or event time."""
     if not isinstance(item, dict):
@@ -222,10 +264,22 @@ def normalize_apify_post(
         raise ValueError("Apify item is missing a stable post ID")
     if text is None:
         raise ValueError(f"Apify item {post_id!r} is missing post text")
-    created_at = _parse_datetime(created_raw)
+    created_at, offset = _parse_datetime_parts(created_raw)
     author = item.get("author")
     if not isinstance(author, dict):
         author = {}
+    item_query = _first_text(
+        item, ("query", "searchTerm", "search_term", "keyword", "ticker", "cashtag")
+    )
+    resolved_query = query or item_query
+    resolved_mode = query_mode
+    if resolved_mode is None:
+        if _first_text(item, ("ticker", "symbol")):
+            resolved_mode = "ticker"
+        elif _first_text(item, ("cashtag",)):
+            resolved_mode = "cashtag"
+        elif item_query:
+            resolved_mode = "keyword"
     return XPostRecord(
         post_id=post_id,
         created_at=created_at,
@@ -244,6 +298,16 @@ def normalize_apify_post(
         provenance_url=_first_text(item, ("url", "twitterUrl", "tweetUrl", "permalink")),
         sentiment_score=None,
         source_name="apify_x",
+        source_platform="x",
+        source_created_at_raw=created_raw if isinstance(created_raw, str) else None,
+        source_utc_offset=offset,
+        author_id=_first_text(
+            author, ("id", "id_str", "user_id", "userId")
+        ) or _first_text(item, ("author_id", "authorId", "user_id", "userId")),
+        query_mode=resolved_mode,
+        query=resolved_query,
+        source_record_hash=_payload_hash(item),
+        schema_version="apify-x-post-v1",
     )
 
 
@@ -263,6 +327,10 @@ def _first_text(item: dict[str, Any], keys: tuple[str, ...]) -> str | None:
 
 
 def _parse_datetime(value: Any) -> datetime:
+    return _parse_datetime_parts(value)[0]
+
+
+def _parse_datetime_parts(value: Any) -> tuple[datetime, str]:
     if not isinstance(value, str) or not value.strip():
         raise ValueError("Apify item is missing a valid creation timestamp")
     text = value.strip()
@@ -275,7 +343,22 @@ def _parse_datetime(value: Any) -> datetime:
             raise ValueError("Apify item has an unrecognized creation timestamp") from exc
     if parsed.tzinfo is None or parsed.utcoffset() is None:
         raise ValueError("Apify creation timestamp must include a timezone")
-    return parsed.astimezone(UTC)
+    offset = parsed.utcoffset()
+    assert offset is not None
+    return parsed.astimezone(UTC), _format_offset(offset)
+
+
+def _format_offset(offset: timedelta) -> str:
+    total = int(offset.total_seconds())
+    sign = "+" if total >= 0 else "-"
+    total = abs(total)
+    return f"{sign}{total // 3600:02d}:{(total % 3600) // 60:02d}"
+
+
+def _payload_hash(item: dict[str, Any]) -> str:
+    """Stable hash of the provider item for provenance; no text is stored in it."""
+    encoded = json.dumps(item, sort_keys=True, default=str, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
 def _optional_count(

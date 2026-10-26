@@ -116,6 +116,9 @@ def load_posts(path: str | Path) -> list[XPostRecord]:
             raise ValueError(f"posts line {number} is not valid JSON") from exc
         if not isinstance(payload, dict):
             raise ValueError(f"posts line {number} must be a JSON object")
+        warnings = payload.get("warnings") or ()
+        if not isinstance(warnings, (list, tuple)):
+            raise ValueError(f"posts line {number} warnings must be a list")
         try:
             posts.append(
                 XPostRecord(
@@ -129,7 +132,16 @@ def load_posts(path: str | Path) -> list[XPostRecord]:
                     views=_optional_int(payload.get("views")),
                     author_followers=_optional_int(payload.get("author_followers")),
                     provenance_url=payload.get("provenance_url"),
-                    source_name=str(payload.get("source_name", "supplied_file")),
+                    source_name=str(payload.get("source_name") or "supplied_file"),
+                    source_platform=str(payload.get("source_platform") or "x"),
+                    source_created_at_raw=payload.get("source_created_at_raw"),
+                    source_utc_offset=payload.get("source_utc_offset"),
+                    author_id=payload.get("author_id"),
+                    query_mode=payload.get("query_mode"),
+                    query=payload.get("query"),
+                    source_record_hash=payload.get("source_record_hash"),
+                    schema_version=str(payload.get("schema_version") or "x-post-v1"),
+                    warnings=tuple(warnings),
                 )
             )
         except KeyError as exc:

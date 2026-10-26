@@ -46,6 +46,13 @@ def test_normalize_apify_post_supports_common_schema_and_preserves_nulls() -> No
     assert record.author_followers == 500
     assert record.provenance_url == "https://x.com/example/status/123"
     assert record.sentiment_score is None
+    assert record.source_platform == "x"
+    assert record.source_created_at_raw == "2026-10-25T12:30:00.000Z"
+    assert record.source_utc_offset == "+00:00"
+    assert record.schema_version == "apify-x-post-v1"
+    assert record.source_record_hash is not None
+    assert len(record.source_record_hash) == 64
+    assert record.author_id is None
 
 
 def test_normalize_apify_post_supports_rfc822_timestamp_and_missing_engagement() -> None:
@@ -57,6 +64,25 @@ def test_normalize_apify_post_supports_rfc822_timestamp_and_missing_engagement()
     assert record.reposts is None
     assert record.views is None
     assert record.author_followers is None
+    assert record.source_created_at_raw == "Sun Oct 25 12:30:00 +0000 2026"
+    assert record.source_utc_offset == "+00:00"
+
+
+def test_normalize_apify_post_preserves_non_utc_offset_and_author_and_query() -> None:
+    record = normalize_apify_post(
+        {
+            "id": "x-2",
+            "text": "Bitcoin update",
+            "createdAt": "2026-10-25T07:30:00-05:00",
+            "author": {"id": "author-9", "followers_count": 10},
+            "ticker": "BTC",
+        }
+    )
+    assert record.created_at == datetime(2026, 10, 25, 12, 30, tzinfo=UTC)
+    assert record.source_utc_offset == "-05:00"
+    assert record.author_id == "author-9"
+    assert record.query_mode == "ticker"
+    assert record.query == "BTC"
 
 
 @pytest.mark.parametrize(
@@ -140,6 +166,8 @@ def test_apify_run_uses_bearer_auth_cost_and_item_caps_and_fetches_dataset() -> 
                     max_items=25,
                     max_total_charge_usd=0.75,
                     timeout_seconds=120,
+                    query_mode="cashtag",
+                    query="$BTC",
                 )
 
     import asyncio
@@ -153,6 +181,8 @@ def test_apify_run_uses_bearer_auth_cost_and_item_caps_and_fetches_dataset() -> 
     }
     assert "token=" not in str(launch.url)
     assert records[0].post_id == "p1"
+    assert records[0].query_mode == "cashtag"
+    assert records[0].query == "$BTC"
 
 
 def test_apify_rejects_bad_caps_before_network_activity() -> None:

@@ -108,6 +108,42 @@ def test_posts_loader_reports_the_offending_line(tmp_path: Path) -> None:
         load_posts(naive)
 
 
+def test_posts_loader_preserves_utc_provenance_and_warnings(tmp_path: Path) -> None:
+    path = tmp_path / "provenance.jsonl"
+    path.write_text(
+        json.dumps(
+            {
+                "post_id": "p1",
+                "created_at": "2026-01-01T07:30:00-05:00",
+                "retrieved_at": "2026-01-01T13:00:00+00:00",
+                "text": "synthetic post",
+                "source_name": "apify_x",
+                "source_platform": "x",
+                "source_created_at_raw": "2026-01-01T07:30:00-05:00",
+                "source_utc_offset": "-05:00",
+                "author_id": "author-1",
+                "query_mode": "cashtag",
+                "query": "$BTC",
+                "source_record_hash": "a" * 64,
+                "warnings": ["engagement counts were not available"],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    record = load_posts(path)[0]
+
+    assert record.created_at == datetime(2026, 1, 1, 12, 30, tzinfo=UTC)
+    assert record.source_created_at_raw == "2026-01-01T07:30:00-05:00"
+    assert record.source_utc_offset == "-05:00"
+    assert record.author_id == "author-1"
+    assert record.query_mode == "cashtag"
+    assert record.query == "$BTC"
+    assert record.source_record_hash == "a" * 64
+    assert record.warnings == ("engagement counts were not available",)
+
+
 def test_news_context_is_optional_and_validated(tmp_path: Path) -> None:
     path = tmp_path / "news.jsonl"
     path.write_text(
