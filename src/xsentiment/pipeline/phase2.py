@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from statistics import fmean
-from typing import Iterable, Sequence
+from collections.abc import Iterable, Sequence
 
 from xsentiment.ingestion.prices import PriceCandle
 
