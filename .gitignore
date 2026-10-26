@@ -31,6 +31,8 @@ htmlcov/
 # Data and model artifacts
 /data/*
 !/data/.gitkeep
+!/data/registry/
+!/data/registry/**
 *.parquet
 *.feather
 *.pkl

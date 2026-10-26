@@ -4,6 +4,10 @@ Research pipeline to evaluate whether timestamped X sentiment adds predictive va
 
 > **Current status:** Architecture scaffold only. This repository does not yet claim live ingestion, trained forecasts, backtest results, Sharpe ratio, Sortino ratio, or maximum drawdown.
 
+## Historical dataset registry
+
+The curated inventory from the supplied historical Twitter/X dataset PDF is recorded in [`data/registry/historical_twitter_x_datasets.json`](data/registry/historical_twitter_x_datasets.json), with selection, licensing, provenance, point-in-time, and hydration caveats in [`docs/data-sources.md`](docs/data-sources.md). These are source references only: no corpus is bundled or automatically downloaded. Validate the inventory offline with `python scripts/validate_dataset_registry.py`.
+
 ## Architecture
 
 - `src/xsentiment/config/`: validated environment-backed settings.
