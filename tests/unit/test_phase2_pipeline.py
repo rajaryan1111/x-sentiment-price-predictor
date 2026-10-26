@@ -86,3 +86,14 @@ def test_price_coverage_reports_missing_days_without_filling_them() -> None:
     assert report.observed_daily_bars == 2
     assert report.missing_utc_days == ("2026-10-21",)
     assert not report.is_complete
+
+
+def test_close_targets_omit_horizons_crossing_missing_daily_bars() -> None:
+    candles = [
+        candle(1, "101"), candle(2, "102"), candle(4, "104"),
+        candle(5, "105"), candle(6, "106"), candle(7, "107"),
+        candle(8, "108"), candle(9, "109"),
+    ]
+    targets = build_close_targets(candles, max_horizon=2)
+    assert datetime(2026, 10, 1, tzinfo=UTC) not in targets
+    assert datetime(2026, 10, 4, tzinfo=UTC) in targets
