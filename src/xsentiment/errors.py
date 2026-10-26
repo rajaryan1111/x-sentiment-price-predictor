@@ -1,5 +1,6 @@
 """Typed errors used across ingestion and storage boundaries."""
 
+
 class PipelineError(Exception):
     """Base class for expected pipeline failures."""
 
