@@ -2,11 +2,15 @@
 
 Research pipeline to evaluate whether timestamped X sentiment adds predictive value beyond price-only baselines for a selected asset.
 
-> **Current status:** Architecture scaffold only. This repository does not yet claim live ingestion, trained forecasts, backtest results, Sharpe ratio, Sortino ratio, or maximum drawdown.
+> **Current status:** Architecture scaffold and dataset registry are present. Phase 1 requirements are documented. The selected working assumptions are BTC-USD with daily (`1d`) bars; exact target semantics, price-provider details and historical-data rights remain open. This repository does not yet claim live ingestion, trained forecasts, backtest results, Sharpe ratio, Sortino ratio, or maximum drawdown.
+
+## Requirements first
+
+Read [docs/PHASE_1_REQUIREMENTS.md](docs/PHASE_1_REQUIREMENTS.md) before implementation. It maps the assessment brief to requirements, acceptance criteria, open decisions, scope boundaries, data-integrity rules and a traceability matrix. The document deliberately marks unresolved choices instead of guessing. Full modeling implementation is not cleared until the blocking asset, timeframe, target and data-access questions are resolved.
 
 ## Historical dataset registry
 
-The curated inventory from the supplied historical Twitter/X dataset PDF is recorded in [`data/registry/historical_twitter_x_datasets.json`](data/registry/historical_twitter_x_datasets.json), with selection, licensing, provenance, point-in-time, and hydration caveats in [`docs/data-sources.md`](docs/data-sources.md). These are source references only: no corpus is bundled or automatically downloaded. Validate the inventory offline with `python scripts/validate_dataset_registry.py`.
+The curated inventory from the supplied historical Twitter/X dataset PDF is recorded in [data/registry/historical_twitter_x_datasets.json](data/registry/historical_twitter_x_datasets.json), with selection, licensing, provenance, point-in-time, and hydration caveats in [docs/data-sources.md](docs/data-sources.md). These are source references only: no corpus is bundled or automatically downloaded. Validate the inventory offline with `python scripts/validate_dataset_registry.py`.
 
 ## Architecture
 
@@ -62,7 +66,3 @@ These setup commands are scaffold-level; external provider ingestion and full ap
 - `feat/dashboard-reporting`: charts and assessment report.
 
 Feature work should be merged through review after offline tests pass.
-
-## Scope boundary
-
-The ten canonical requirements/architecture files are intentionally not created in this scaffold commit. They will be added in the next step and treated as the source of truth for implementation decisions.
