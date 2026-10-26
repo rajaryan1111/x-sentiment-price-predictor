@@ -99,6 +99,11 @@ class CoinbasePriceAdapter:
         if not isinstance(rows, list):
             raise ValueError("Coinbase candle response must be a list")
         candles = [self._parse_row(product_id, row) for row in rows]
+        # Coinbase may include candles preceding the requested start; enforce our
+        # UTC [start, end) convention locally and exclude the end-boundary candle.
+        candles = [
+            candle for candle in candles if start_utc <= candle.timestamp < end_utc
+        ]
         candles.sort(key=lambda candle: candle.timestamp)
 
         timestamps = [candle.timestamp for candle in candles]
