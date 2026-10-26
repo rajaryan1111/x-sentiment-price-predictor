@@ -90,7 +90,7 @@ to out-of-sample signal predictions:
   least 30 out-of-sample days exist, and are reported as undefined when the return
   series has zero dispersion.
 
-## Measured state (2026-10-26, real public data)
+## Measured state (2026-10-26, real public data; reproduced identically 2026-10-27)
 180 public Coinbase `BTC-USD` daily bars (2026-04-29 to 2026-10-25 UTC), 5 folds,
 100 out-of-sample days per model and horizon, 1800 predictions, zero posts:
 mean MAE across horizons was $1,828.36 for naive persistence and $2,264.62 for the
@@ -99,6 +99,12 @@ forecast error, and the candidate model was identical to price-only because no
 sentiment was available. No claim is made that any model adds predictive value.
 Strategy statistics from the same run are short-sample research numbers on one asset
 and period, not evidence of tradability.
+
+Re-verification evidence: on 2026-10-27 the window was re-fetched from the
+free public Coinbase endpoint and evaluated with the default CLI settings; every
+metric matched to the cent, with 180 candles, 5 folds and 1800 predictions, and the
+fresh snapshot's SHA-256 equals the committed report's input hash
+(`09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`).
 
 ## Robustness and go/no-go
 Possible predeclared comparisons include horizons, naive/price-only/sentiment models

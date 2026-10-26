@@ -106,6 +106,10 @@ Status: implemented and verified on real price data; the sentiment comparison is
 - 5 folds, 100 out-of-sample days per model and horizon, 1800 stored predictions.
 - Measured: price-only mean MAE $2,264.62 versus naive $1,828.36 (23.86% worse).
   No claim that any model beats the baseline is made.
+- Independently reproduced on 2026-10-27 from a refetch of the same public window:
+  every metric matched to the cent (5 folds, 1800 predictions, 100 out-of-sample
+  days per model and horizon) and the snapshot SHA-256 identically equals the
+  committed report's input hash.
 Acceptance: met for prices; unmet for the sentiment-vs-price comparison, which requires
 an accepted X source.
 
