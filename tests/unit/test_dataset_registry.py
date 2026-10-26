@@ -1,11 +1,12 @@
 """Offline tests for the historical dataset registry."""
 import json
+from pathlib import Path
 
-from scripts.validate_dataset_registry import DEFAULT_REGISTRY, validate_registry
+from xsentiment.ingestion.dataset_registry import DEFAULT_REGISTRY, validate_registry
 
 
 def test_curated_registry_is_structurally_valid() -> None:
-    assert validate_registry(DEFAULT_REGISTRY) == []
+    assert validate_registry() == []
 
 
 def test_registry_contains_all_pdf_entries() -> None:
@@ -35,3 +36,11 @@ def test_sentiment140_license_is_not_assumed() -> None:
     dataset = next(item for item in document["datasets"] if item["id"] == "sentiment140")
     assert dataset["license_identifier"] is None
     assert "Other" in dataset["license_access"]
+
+
+def test_validator_reports_duplicate_ids(tmp_path: Path) -> None:
+    document = json.loads(DEFAULT_REGISTRY.read_text(encoding="utf-8"))
+    document["datasets"][1]["id"] = document["datasets"][0]["id"]
+    registry_path = tmp_path / "registry.json"
+    registry_path.write_text(json.dumps(document), encoding="utf-8")
+    assert any("Duplicate dataset id" in error for error in validate_registry(registry_path))
