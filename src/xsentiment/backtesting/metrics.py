@@ -11,7 +11,10 @@ Conventions used here, and repeated in the evaluation report:
 * ``periods_per_year`` defaults to 365 because BTC-USD trades every day,
 * the risk-free rate and the Sortino minimum acceptable return are annualised and
   converted to a per-period rate before use,
-* sample standard deviation is used, so at least two observations are required,
+* sample standard deviation is used, so the Sharpe ratio needs at least two
+  observations and returns ``None`` below that; the Sortino downside deviation is
+  a root-mean-square and is defined for a single observation (the strategy's
+  30-day gate withholds both ratios on short samples regardless),
 * a degenerate series (zero dispersion) returns ``None`` instead of an infinite
   ratio.
 """

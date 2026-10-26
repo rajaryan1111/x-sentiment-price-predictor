@@ -90,6 +90,13 @@ to out-of-sample signal predictions:
   least 30 out-of-sample days exist, and are reported as undefined when the return
   series has zero dispersion.
 
+Evidence (2026-10-27): the reproduced run's strategy metrics were re-derived
+independently of the project code by replaying the recorded `n+1` predictions against
+the raw snapshot closes with hand-written formulas: 32 long days, Sharpe 1.80682,
+Sortino 3.97922, maximum drawdown 0.040838 — matching the pipeline outputs to within
+1e-9. These are research statistics for one asset and one 100-day out-of-sample
+sample, not evidence of tradability.
+
 ## Measured state (2026-10-26, real public data; reproduced identically 2026-10-27)
 180 public Coinbase `BTC-USD` daily bars (2026-04-29 to 2026-10-25 UTC), 5 folds,
 100 out-of-sample days per model and horizon, 1800 predictions, zero posts:
