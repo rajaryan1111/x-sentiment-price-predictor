@@ -1,6 +1,6 @@
 # Phase 1 — Requirements and Scope Lock
 
-**Status:** Phase 1 requirements baseline drafted; approval-dependent decisions remain explicitly open.  
+**Status:** Phase 1 requirements baseline updated with selected working assumptions; several provider/target/data-rights blockers remain open.  
 **Primary source:** `CWT X sentiment Agent - intern task.pdf` supplied by the user.  
 **Repository:** `rajaryan1111/x-sentiment-price-predictor`  
 **Purpose:** Convert the assessment brief into traceable, testable requirements before implementing the data pipeline or models.
@@ -20,7 +20,19 @@ The assessment asks for a Python-based machine-learning / reinforcement-learning
 
 The linked historical-tweet resource is referenced by the PDF as a potential learning/training dataset. Its exact contents, availability, rights, schema, and suitability must be verified before it is relied on.
 
-## 3. Goals
+## 3. Selected working assumptions (user-confirmed)
+
+The user has selected the following working assumptions for this assessment. These are project choices, **not claims that the employer specified them**:
+
+- **Asset:** Bitcoin spot reference symbol `BTC-USD`.
+- **Bar interval:** daily (`1d`).
+- **Working horizon interpretation:** `n` denotes the current daily period and `n+1` through `n+5` denote the next one through five daily periods. This is provisional until the target cutoff is clarified; `n+0` must not use future information and is not yet defined as a deployable forecast target.
+- **Target definition:** still open. Do not assume whether each horizon predicts close price, close-to-close return, or another target until O4 is resolved.
+- **Market convention:** BTC trades continuously, unlike exchange-traded equities; daily-bar boundary/timezone and price provider must still be explicitly fixed. Do not assume that UTC is employer-approved solely because it is convenient.
+
+All downstream query examples and test fixtures should use the selected asset and interval only after the provider, timestamp boundary, and target semantics are specified. Do not quietly broaden the scope to other assets or intervals.
+
+## 4. Goals
 
 ### Required outcomes
 
@@ -50,7 +62,7 @@ The linked historical-tweet resource is referenced by the PDF as a potential lea
 - Do not add news-derived variables to the predictive model unless the specification is clarified and the feature policy is deliberately revised.
 - Do not introduce reinforcement learning merely to satisfy terminology; its role must be justified by a clearly defined action/reward and evaluated without leakage if it is used.
 
-## 4. Scope boundaries and interpretation
+## 5. Scope boundaries and interpretation
 
 ### Predictive inputs versus news context
 
@@ -72,7 +84,7 @@ The assessment requests provider tokens and actor IDs for reproducibility. Actor
 
 The existing registry records 12 candidate sources from a user-supplied dataset list. It does not mean all sources should be downloaded. Some entries are StockTwits (not X), some are tweet-ID-only and require rehydration, some have licensing/count/schema caveats, and some may be too large for the assessment window. Select one primary training dataset only after checking relevance, access, rights, text availability, timestamp coverage, schema and feasible size. Keep source platform identity explicit; do not relabel StockTwits as X.
 
-## 5. Acceptance criteria
+## 6. Acceptance criteria
 
 Phase 1 is ready for implementation planning when:
 
@@ -87,15 +99,15 @@ Phase 1 is ready for implementation planning when:
 - [ ] The user/employer-facing scope and remaining unknowns are clearly communicated.
 - [ ] No implementation or performance claim is made solely because this requirements document exists.
 
-## 6. Open decisions — do not guess
+## 7. Open decisions — do not guess
 
 | ID | Decision required | Why it matters | Current status |
 |---|---|---|---|
-| O1 | Chosen asset, ticker/cashtag, asset class and exchange/market | Defines collection query, price feed, trading calendar and report | Open — blocking |
-| O2 | Price bar interval (for example hourly or daily) | Defines “period,” aggregation, feature windows and horizon | Open — blocking |
-| O3 | Exact meaning of `n+0` and whether it is a nowcast/current observed bar or a future target | Prevents target leakage and impossible prediction claims | Open — blocking |
-| O4 | Target convention: close price, return, or another explicitly defined value at each horizon | Determines labels, loss and metric interpretation | Open — blocking |
-| O5 | Price data provider and adjustment policy (splits/dividends where relevant) | Reproducibility and comparable targets | Open — blocking |
+| O1 | Chosen asset, ticker/cashtag, asset class and exchange/market | Defines collection query, price feed, trading calendar and report | **Partially resolved:** BTC-USD selected; confirm exact spot-price provider/market convention |
+| O2 | Price bar interval (for example hourly or daily) | Defines “period,” aggregation, feature windows and horizon | **Selected:** daily (`1d`); daily-bar boundary/timezone still open |
+| O3 | Exact meaning of `n+0` and whether it is a nowcast/current observed bar or a future target | Prevents target leakage and impossible prediction claims | **Partially resolved:** `n` is provisionally the current daily period; exact `n+0` output/cutoff remains blocking |
+| O4 | Target convention: close price, return, or another explicitly defined value at each horizon | Determines labels, loss and metric interpretation | Open — blocking; must define target for each horizon including `n+0` |
+| O5 | Price data provider and adjustment policy (splits/dividends where relevant) | Reproducibility and comparable targets | Open — blocking; for BTC-USD define provider, market/venue, currency, UTC/daily boundary, and missing-bar policy |
 | O6 | How the linked historical tweet dataset is accessed and whether full text can legally be used | Determines training feasibility and licensing | Open — blocking |
 | O7 | Whether Tavily news is context-only or may become a model feature | The PDF's statements point in different directions | Default: context-only; confirmation needed |
 | O8 | Whether RL is actually expected, versus a supervised forecasting model | RL needs action/reward and execution design not specified in the PDF | Default: supervised baseline; confirmation needed |
@@ -104,7 +116,7 @@ Phase 1 is ready for implementation planning when:
 | O11 | Exact submission deadline and expected interpretation of 5–7 days | PDF uses both “within 1 week” and “5–7 days” | Confirm due date |
 | O12 | Whether Exa is required in addition to Tavily | PDF's body mentions Tavily; submission line says “apify/tavily/exa” | Treat Exa as requested-for-reproducibility but optional for runtime until clarified |
 
-## 7. Data and evaluation rules
+## 8. Data and evaluation rules
 
 1. Store all timestamps as timezone-aware values; preserve source timestamp and normalized UTC timestamp.
 2. Preserve both `event_time` and `retrieved_at`; never backdate data to pretend it was available earlier.
@@ -119,9 +131,9 @@ Phase 1 is ready for implementation planning when:
 11. Pin source dataset versions/revisions when possible; record retrieval date, license/terms review, file hashes and schema profile.
 12. Clearly label historical backtests as simulations, disclose limitations and transaction costs, and avoid causal claims without evidence.
 
-## 8. Proposed end-to-end workflow
+## 9. Proposed end-to-end workflow
 
-1. Confirm O1–O5 to define the forecasting problem.
+1. Use the selected BTC-USD and daily-bar assumptions; resolve remaining O1/O3/O4/O5 details to define the forecasting problem.
 2. Verify candidate historical dataset(s) and provider access/terms; select the smallest suitable reproducible sample for schema/prototype checks.
 3. Define canonical schemas and timestamp/availability rules.
 4. Ingest the 180-day X window and matching price window through bounded, logged provider adapters.
@@ -134,7 +146,7 @@ Phase 1 is ready for implementation planning when:
 11. Generate charts, the one-page contextual sentiment outlook and the evaluation report.
 12. Re-run the pipeline from documented commands, verify outputs, and prepare the secure submission package.
 
-## 9. Traceability matrix
+## 10. Traceability matrix
 
 | Requirement | Evidence expected | Planned component / report |
 |---|---|---|
@@ -153,8 +165,8 @@ Phase 1 is ready for implementation planning when:
 | R13 | Provider/actor IDs, environment guide, secure secret procedure | README and submission checklist |
 | R14 | CI plus deterministic unit/integration tests | Tests and GitHub Actions |
 
-## 10. Phase 1 exit decision
+## 11. Phase 1 exit decision
 
-**Current decision: NOT YET CLEARED for full modeling implementation.** The requirement inventory and default interpretations are documented, but O1–O6 are blocking decisions/data checks. Safe work can proceed on documentation, schema contracts, offline fixtures and tests that do not depend on an unconfirmed asset or target definition. Provider-backed ingestion and target/model implementation should wait until those blockers are resolved.
+**Current decision: Phase 1 requirements baseline is updated, but NOT YET CLEARED for full modeling implementation.** BTC-USD and daily (`1d`) bars are selected working assumptions. Remaining blockers include the exact `n+0` semantics, target convention, price provider/market boundary, historical dataset access and rights, and any unresolved news/RL interpretation needed for the final scope. Safe work can proceed on documentation, schema contracts, offline fixtures and tests consistent with BTC-USD/daily assumptions. Provider-backed ingestion and target/model implementation should wait until the relevant blockers are resolved.
 
 This is a requirements baseline, not a claim that the project is complete or that the employer has approved the interpretations above.
