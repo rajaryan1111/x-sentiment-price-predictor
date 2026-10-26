@@ -24,6 +24,45 @@ _NOT_ADVICE = (
     "investment advice, and no accuracy or profit is claimed or implied."
 )
 
+# R11 structural contract for the one-page outlook, checked by tests so the page
+# cannot silently grow into a multi-page report or lose its honesty sections.
+REQUIRED_OUTLOOK_SECTIONS = (
+    "# ",
+    "**As of:**",
+    "**Forecast cutoff:**",
+    "## Data coverage",
+    "## Model outputs at the cutoff",
+    "## Contextual news (not a model input)",
+    "## Uncertainty and limitations",
+)
+# A page holds roughly 50 lines of dense text; 90 lines is a generous ceiling that
+# only trips when the outlook degenerates into a full report.
+MAX_OUTLOOK_LINES = 90
+
+
+def check_outlook_page(markdown: str) -> list[str]:
+    """Return the R11 contract violations of a rendered outlook page, if any.
+
+    The structural checks are: every required section heading is present, the page
+    stays within the documented line ceiling, the disclaimer appears, and an
+    empty-prediction page says so instead of inventing values.
+    """
+    violations: list[str] = []
+    for section in REQUIRED_OUTLOOK_SECTIONS:
+        if section not in markdown:
+            violations.append(f"missing required section: {section!r}")
+    line_count = len(markdown.splitlines())
+    if line_count > MAX_OUTLOOK_LINES:
+        violations.append(
+            f"outlook is {line_count} lines, beyond the one-page ceiling of "
+            f"{MAX_OUTLOOK_LINES}"
+        )
+    if "not investment advice" not in markdown:
+        violations.append("missing the not-investment-advice disclaimer")
+    if "No model predictions are available" in markdown and "unavailable" not in markdown:
+        violations.append("an empty prediction block must keep the explicit unavailable state")
+    return violations
+
 
 @dataclass(frozen=True, slots=True)
 class OutlookPrediction:

@@ -1,5 +1,5 @@
 # Test Plan
-A passing suite proves only the cases it actually exercises. 127 offline tests pass
+A passing suite proves only the cases it actually exercises. 147 offline tests pass
 locally (`pytest`), and CI runs lint, registry validation, documentation validation and
 pytest on Python 3.11 with only the `dev` and `storage` extras installed.
 
@@ -57,22 +57,40 @@ pytest on Python 3.11 with only the `dev` and `storage` extras installed.
   own training block, warnings when sentiment is unidentifiable, and a stated reason when
   history is too short.
 - Reporting: both chart panels render, an empty sentiment panel says so instead of
-  drawing a fabricated curve, outlook coverage and limitations appear, and the report
+  drawing a fabricated curve, outlook coverage and limitations appear, the rendered
+  outlook page meets the machine-checked one-page contract
+  (`check_outlook_page`: required sections, line ceiling, disclaimer, explicit
+  unavailable state on an empty prediction block), and the report
   separates measured tables from unavailable items and withheld metrics.
 - Pipeline/CLI: input loaders reject malformed snapshots with line references, the run
   writes every documented artefact, manifest hashes match the inputs, prediction records
   match the manifest count, a zero-post run still completes, and CLI errors exit non-zero.
+- Manifest provenance (NFR1): the run records the actual checked-out git revision
+  automatically; missing git metadata records an explicit unavailable state with a
+  reason; caller-supplied provenance is never silently overwritten; no secret is
+  emitted.
 - Apify: mocked run/status/dataset with the documented `data` envelope, auth header,
   bounds, timeouts/errors, no launch retry, and dataset offset/limit parameters;
   no real Actor in CI.
+- Tavily news adapter: normalized headline/url/publication/retrieval/source plus
+  payload hash under a strict response contract; empty results; malformed items
+  excluded with reasons; duplicates removed; timeout and HTTP-error fail-closed;
+  oversized bodies rejected; a missing API key raises an explicit, graceful error;
+  error messages never contain the key or query secret. Mocked only: no live call,
+  no billing, no network dependence in the suite.
 - Registry: source/platform identity, text-availability vocabulary, ISO dates, date order,
   ID-only hydration caveats, recommended-source sanity, and that a rolling source without
   a coverage end must carry a coverage/cutoff limitation; validation does not imply live
   access or legal approval.
-- Storage/persistence: in-memory SQLite tests cover one bar per product/UTC day,
+- Storage: in-memory SQLite tests cover one bar per product/UTC day,
   idempotent price/post upserts, earliest-retrieval retention, the descriptive same-day
   join's counts, and a cutoff join that excludes late-arriving and future posts and uses
-  the prior completed close. They do not cover a production database or CLI integration.
+  the prior completed close. `tests/unit/test_phase3_ingestion_e2e.py` additionally
+  covers the persisted-input CLI integration: a bounded end-to-end ingest into a real
+  SQLite file, the leakage-safe cutoff join over those rows, and a complete
+  `xsentiment run --database-url` whose manifest records
+  `input_source = persisted_storage`. They do not cover a production PostgreSQL
+  deployment.
 - Documentation: every relative Markdown link resolves; requirement IDs are unique and
   complete across the `R`, `NFR` and `A` namespaces; every matrix row has an acceptance
   criterion, an evidence pointer, a vocabulary status and a blocker entry.

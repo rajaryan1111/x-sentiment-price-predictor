@@ -16,7 +16,11 @@ from xsentiment.reporting.charts import (
     sentiment_change_points,
     sentiment_points,
 )
-from xsentiment.reporting.outlook import build_outlook, render_outlook_markdown
+from xsentiment.reporting.outlook import (
+    build_outlook,
+    check_outlook_page,
+    render_outlook_markdown,
+)
 from xsentiment.reporting.report import render_evaluation_report
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
@@ -186,6 +190,33 @@ def test_outlook_reports_coverage_predictions_and_limitations() -> None:
     assert "Example headline" in rendered
     assert "not investment advice" in rendered
     assert "Data coverage" in rendered
+
+
+def test_outlook_page_meets_the_documented_one_page_contract() -> None:
+    """R11: the one-page constraint is checked structurally, not guessed."""
+    candles = synthetic_candles(90)
+    posts = synthetic_posts(candles)
+    rows = build_supervised_dataset(candles, posts)
+    summary = summarize(rows, posts, candles=candles)
+    outlook = build_outlook(
+        rows, summary, asset="BTC-USD", as_of=START + timedelta(days=91)
+    )
+
+    rendered = render_outlook_markdown(outlook)
+
+    assert check_outlook_page(rendered) == []
+
+
+def test_outlook_page_checker_flags_a_degenerate_report() -> None:
+    missing = "only a title\n"
+    assert any("missing required section" in issue for issue in check_outlook_page(missing))
+
+    bloated = "# x\n" + "\n".join(
+        f"filler line {index}" for index in range(1, 400)
+    )
+    issues = check_outlook_page(bloated)
+    assert any("one-page ceiling" in issue for issue in issues)
+    assert any("disclaimer" in issue for issue in issues)
 
 
 def test_outlook_states_that_sentiment_is_unavailable() -> None:

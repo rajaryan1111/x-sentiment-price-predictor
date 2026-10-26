@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import platform
+import subprocess
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -198,6 +199,55 @@ def _optional_float(value: object) -> float | None:
     return None if value is None else float(str(value))
 
 
+# Editable installs and CI checkouts share the src/ layout, so the repository root
+# is three parents above this module directory. Recorded per run as NFR1 provenance:
+# the revision is read from the real checkout or explicitly marked unavailable —
+# it is never inferred from a branch name or invented.
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+_HASH_CHARS = frozenset("0123456789abcdef")
+
+
+def _code_revision(root: Path | None = None) -> dict[str, str]:
+    """Resolve the checked-out revision for the run manifest (NFR1).
+
+    Returns ``{"code_revision": <40-hex sha>}`` when the repository metadata is
+    actually available. Otherwise it returns ``{"code_revision": "unavailable",
+    "code_revision_reason": <why>}`` — an explicit state, never an invented or
+    inferred value. Failures (missing git executable, timeouts, non-repositories,
+    source archives) are caught and reported, not raised.
+    """
+    checked_root = Path(root) if root is not None else _REPO_ROOT
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--verify", "HEAD^{commit}"],
+            cwd=str(checked_root),
+            capture_output=True,
+            text=True,
+            timeout=2.0,
+            check=False,
+        )
+    except FileNotFoundError:
+        return {
+            "code_revision": "unavailable",
+            "code_revision_reason": "git executable is not available",
+        }
+    except (OSError, subprocess.SubprocessError) as exc:
+        return {
+            "code_revision": "unavailable",
+            "code_revision_reason": f"git rev-parse failed: {exc.__class__.__name__}",
+        }
+    revision = result.stdout.strip()
+    if result.returncode == 0 and len(revision) == 40 and set(revision) <= _HASH_CHARS:
+        return {"code_revision": revision}
+    if not checked_root.is_dir():
+        reason = "project directory does not exist"
+    elif (checked_root / ".git").exists():
+        reason = "git rev-parse returned no usable commit"
+    else:
+        reason = "not a git repository (source archive or imported install)"
+    return {"code_revision": "unavailable", "code_revision_reason": reason}
+
+
 def _installed_versions() -> dict[str, str]:
     versions = {"python": sys.version.split()[0], "platform": platform.platform()}
     for package in (PROJECT_NAME, "vaderSentiment", "pydantic"):
@@ -256,6 +306,8 @@ def run_forecast_pipeline(
     )
 
     run_provenance: dict[str, object] = dict(provenance or {})
+    if "code_revision" not in run_provenance:
+        run_provenance.update(_code_revision())
     run_provenance.setdefault("asset", asset)
     run_provenance.setdefault("price_candles_supplied", len(candles))
     run_provenance.setdefault("posts_supplied", len(posts))

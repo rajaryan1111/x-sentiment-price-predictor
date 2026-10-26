@@ -2,19 +2,26 @@
 
 import json
 import math
+import subprocess
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
 from xsentiment.main import main
+from xsentiment.pipeline import forecast_run
 from xsentiment.pipeline.forecast_run import (
+    _code_revision,
     load_candles,
     load_news_context,
     load_posts,
     run_forecast_pipeline,
     sha256_file,
 )
+
+
+def repo_root() -> Path:
+    return forecast_run._REPO_ROOT
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -191,9 +198,6 @@ def test_pipeline_writes_every_documented_artefact(tmp_path: Path) -> None:
 
     manifest = json.loads(artifacts.manifest_path.read_text())
     metrics = json.loads(artifacts.metrics_path.read_text())
-    predictions = [
-        line for line in artifacts.predictions_path.read_text().splitlines() if line.strip()
-    ]
 
     assert manifest["asset"] == "BTC-USD"
     assert manifest["dataset"]["rows_with_sentiment"] > 0
@@ -202,6 +206,83 @@ def test_pipeline_writes_every_documented_artefact(tmp_path: Path) -> None:
     assert manifest["provenance"]["sentiment_scorer"].startswith("vader ")
     assert set(metrics["mean_mae_by_model"]) == {"naive", "price_only", "sentiment_price"}
     assert metrics["strategies"]["price_only"]["assumptions"]["fee_rate"] == 0.001
+
+
+def test_run_manifest_records_the_actual_checkout_revision(tmp_path: Path) -> None:
+    """NFR1: the revision comes from the real repository, never an inference."""
+    prices = write_prices(tmp_path / "prices.json", 90)
+
+    artifacts = run_forecast_pipeline(
+        candles=load_candles(prices),
+        output_dir=tmp_path / "run",
+        now=START + timedelta(days=91),
+    )
+    manifest = json.loads(artifacts.manifest_path.read_text())
+    expected = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        cwd=repo_root(),
+        check=True,
+    ).stdout.strip()
+
+    assert manifest["provenance"]["code_revision"] == expected
+    assert set(manifest["provenance"]["code_revision"]) <= set("0123456789abcdef")
+    assert "code_revision_reason" not in manifest["provenance"]
+
+
+def test_code_revision_fails_closed_outside_a_repository(tmp_path: Path) -> None:
+    result = _code_revision(root=tmp_path)
+
+    assert result == {
+        "code_revision": "unavailable",
+        "code_revision_reason": "not a git repository (source archive or imported install)",
+    }
+
+
+def test_code_revision_reports_a_missing_git_executable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def explode(*args: object, **kwargs: object) -> object:
+        raise FileNotFoundError("no git on this host")
+
+    monkeypatch.setattr(forecast_run.subprocess, "run", explode)
+
+    assert _code_revision(root=tmp_path) == {
+        "code_revision": "unavailable",
+        "code_revision_reason": "git executable is not available",
+    }
+
+
+def test_caller_supplied_revision_is_never_silently_overwritten(tmp_path: Path) -> None:
+    prices = write_prices(tmp_path / "prices.json", 90)
+
+    artifacts = run_forecast_pipeline(
+        candles=load_candles(prices),
+        output_dir=tmp_path / "run",
+        now=START + timedelta(days=91),
+        provenance={"code_revision": "explicitly-supplied"},
+    )
+    manifest = json.loads(artifacts.manifest_path.read_text())
+
+    assert manifest["provenance"]["code_revision"] == "explicitly-supplied"
+
+
+def test_pipeline_report_and_manifest_content(tmp_path: Path) -> None:
+    prices = write_prices(tmp_path / "prices.json", 120)
+    posts = write_posts(tmp_path / "posts.jsonl", snapshot_candles(120))
+
+    artifacts = run_forecast_pipeline(
+        candles=load_candles(prices),
+        posts=load_posts(posts),
+        output_dir=tmp_path / "run",
+        now=START + timedelta(days=121),
+    )
+    manifest = json.loads(artifacts.manifest_path.read_text())
+    predictions = [
+        line for line in artifacts.predictions_path.read_text().splitlines() if line.strip()
+    ]
+
     assert len(predictions) == manifest["evaluation"]["predictions"]
     assert "Out-of-sample forecast metrics" in artifacts.report_path.read_text()
     assert "current sentiment outlook" in artifacts.outlook_path.read_text()

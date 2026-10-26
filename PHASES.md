@@ -132,8 +132,10 @@ Status: implemented; the sentiment panel is empty until an accepted X source exi
   states explicitly when no scored posts are available.
 - `outlook.md` reports the cutoff, last completed close, coverage counts, per-horizon
   model outputs, contextual news and its limitations.
-- News remains context-only and is supplied from an optional file; no Tavily or Exa call
-  has been made and no news feature exists.
+- News remains context-only and is supplied from an optional file (`--news-file`); a
+  bounded, opt-in Tavily adapter exists in `src/xsentiment/ingestion/tavily_news.py`
+  with mocked-contract tests only — no Tavily or Exa call has been made and no news
+  feature exists.
 - The R10 sentiment-change series is implemented as a third chart panel:
   `sentiment_change_points` draws the day-over-day change
   `mean_sentiment_24h(T) - mean_sentiment_24h(T-1 UTC day)` for consecutive scored

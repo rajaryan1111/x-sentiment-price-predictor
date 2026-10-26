@@ -223,7 +223,11 @@ dataset has been accepted, licensed or profiled for 180-day text coverage.
 - Compare against naive and price-only baselines before claiming any value from
   sentiment, and report risk metrics only from out-of-sample strategy returns.
 - News (Tavily/Exa) stays context for the outlook unless a clarification changes the
-  feature policy; see [DECISIONS.md](DECISIONS.md) D-005.
+  feature policy; see [DECISIONS.md](DECISIONS.md) D-005. A bounded Tavily adapter
+  exists (`src/xsentiment/ingestion/tavily_news.py`, opt-in with `TAVILY_API_KEY`,
+  context-only, never a model feature, no automatic retry) and is verified against
+  mocked responses only; no live call has been made, so live provider behaviour is
+  unverified.
 
 ## Branch strategy
 
