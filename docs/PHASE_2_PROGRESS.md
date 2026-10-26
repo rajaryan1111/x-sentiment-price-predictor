@@ -10,7 +10,8 @@
 - UTC-aware bounds, daily granularity, provider range limit, Decimal OHLCV parsing, sorting, malformed-row and duplicate checks.
 - Local smoke script checks seven completed daily bars without saving raw market data.
 - User-run live smoke test succeeded for 2026-10-19 through 2026-10-25: 7 candles, no missing bars in that seven-day window.
-- User-run local verification reported Ruff passing and 18 tests passing before the new Phase 2 tests in this branch.
+- User-run 180-day live coverage profile succeeded for the half-open UTC range 2026-04-29 through 2026-10-26: 180 observed bars, no missing dates, duplicate timestamps, or out-of-range timestamps; current-day candle excluded; raw data not saved.
+- User-run test output on the pre-Apify state showed 25 tests passing. Latest GitHub CI after the Apify adapter addition passed lint, registry validation and pytest.
 
 ### Data-quality and point-in-time primitives
 
@@ -23,11 +24,23 @@ Implemented in src/xsentiment/pipeline/phase2.py:
 - Close-target builder creates n+0 through n+5 labels only where the full horizon exists; target labels remain separate from features.
 - Unit tests cover late-arriving/future-post exclusion, missing sentiment, duplicate IDs, missing price bars and horizon tails.
 
-These are deterministic primitives, not a complete collection or forecasting system. They do not scrape X or calculate sentiment themselves; sentiment scores must come from an explicitly configured sentiment model.
+These are deterministic primitives, not a forecasting system. Sentiment scores remain null until a separately specified sentiment model is configured.
+
+### Configurable Apify X adapter
+
+- `src/xsentiment/ingestion/apify_x.py` now has an explicit Actor-run flow and normalization for common tweet field aliases.
+- Requires a configured token and Actor ID; a run is never initiated by importing the module.
+- Requires a caller-supplied Actor input JSON object and explicit max-items, max-total-charge and timeout caps.
+- Uses a Bearer authorization header rather than a token query parameter; bounds response size; does not auto-retry the non-idempotent Actor launch request.
+- Normalizes ID, text, timezone-aware creation time, optional engagement counts and provenance URL. Unknown/missing fields stay null; it does not fabricate sentiment.
+- Adds an explicit small-run schema smoke-test CLI and setup instructions. The script can incur cost only when a user explicitly runs it.
+- Unit tests use mocked HTTP; CI does not run the Actor or incur Apify costs.
+
+**Live Apify remains unverified.** No particular Actor has been selected or run in this session. The Actor's exact input/output schema, terms, 180-day reach and actual account pricing must be checked in the user's Apify account before the smoke-test CLI is executed.
 
 ## External gates still open
 
-1. 180-day live price profile: collect in chunks no larger than the Coinbase endpoint limit, excluding the incomplete current UTC day. Record sanitized coverage metadata; do not commit raw market data by default.
+1. **180-day Coinbase live price profile — verified by user-run check:** 180/180 daily bars for 2026-04-29 to 2026-10-26 UTC, no missing or duplicate dates and no out-of-range rows. Re-run at assessment time if newer coverage is needed; do not commit raw price data by default.
 2. Historical X dataset: retrieve the assessment's linked resource and review contents, access permissions, terms/license, schema, event-time coverage, text availability and source platform before use.
 3. Apify: inspect available Actors and account pricing/terms; verify query strategy, output fields, plan rate, 180-day coverage and strict run cost cap before any paid run. No actor selected and no paid run initiated.
 4. Credentials: verify provider configuration privately; never add tokens, cookies or credentials to Git.
@@ -38,7 +51,7 @@ These are deterministic primitives, not a complete collection or forecasting sys
 1. Run CI and local lint/tests on this branch.
 2. Execute a bounded 180-day Coinbase price profile in chunks and inspect missing UTC days and boundary behavior.
 3. Review historical dataset contents/terms and inspect the actual Apify actor schema before implementing a provider-specific X adapter.
-4. Add the approved X adapter and storage/export format, then run schema and point-in-time quality checks on a permitted sample.
+4. Select/review the permitted Actor in the user's account, then run the bounded Apify schema smoke test and inspect its sanitized output before any larger collection.
 5. Add an explicit sentiment model, train/evaluate baselines chronologically, and report only evidence-backed metrics.
 
 ## Guardrails
