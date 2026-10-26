@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.profile_local_x_dataset import parse_timestamp, profile
+from xsentiment.ingestion.local_dataset_profile import parse_timestamp, profile
 
 
 def test_parse_timestamp_requires_timezone() -> None:
