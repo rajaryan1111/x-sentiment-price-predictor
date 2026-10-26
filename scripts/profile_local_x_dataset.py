@@ -9,10 +9,11 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+from collections.abc import Iterable
 from collections import Counter
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 ALIASES = {
     "id": ("post_id", "tweet_id", "id", "id_str", "status_id"),
