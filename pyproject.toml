@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "x-sentiment-price-predictor"
+version = "0.1.0"
+description = "Research pipeline for point-in-time X sentiment and asset-price forecasting"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary assessment project; confirm license before public reuse" }
+dependencies = [
+  "httpx>=0.27,<1",
+  "pydantic>=2.7,<3",
+  "pydantic-settings>=2.2,<3",
+  "python-dotenv>=1.0,<2",
+  "tenacity>=8.2,<10",
+]
+
+[project.optional-dependencies]
+analysis = [
+  "numpy>=1.26,<3",
+  "pandas>=2.2,<4",
+  "scikit-learn>=1.4,<2",
+  "statsmodels>=0.14,<1",
+  "yfinance>=0.2,<2",
+  "plotly>=5.20,<7",
+]
+storage = [
+  "sqlalchemy[asyncio]>=2.0,<3",
+  "aiosqlite>=0.20,<1",
+  "asyncpg>=0.29,<1",
+]
+dev = [
+  "pytest>=8,<9",
+  "pytest-asyncio>=0.23,<2",
+  "ruff>=0.5,<1",
+  "mypy>=1.10,<2",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]

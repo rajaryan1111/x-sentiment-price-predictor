@@ -1,0 +1,1 @@
+"""Temporal validation and data-quality gates."""

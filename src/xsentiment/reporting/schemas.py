@@ -1,0 +1,1 @@
+"""Stable report payload contracts will be defined after the assessment requirements are canonicalized."""
