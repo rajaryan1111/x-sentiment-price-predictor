@@ -1,11 +1,14 @@
 """Command-line entry points.
 
-Two commands are provided:
+Three commands are provided:
 
 * ``fetch-prices`` downloads bounded, public Coinbase Exchange BTC-USD daily candles
   into a JSON snapshot. It uses no credentials, costs nothing and never trades.
+* ``persist`` upserts snapshot inputs into the local storage database so the same
+  rows feed every later run; re-running the same snapshots is idempotent.
 * ``run`` executes the whole offline pipeline on a price snapshot plus optional
-  JSONL posts and writes the evaluation report, outlook, chart and manifest.
+  JSONL posts, or on the persisted storage rows via ``--database-url``, and writes
+  the evaluation report, outlook, chart and manifest.
 
 Neither command launches a paid provider run. X ingestion requires an approved
 Apify Actor and an explicit spend decision, so it stays a separate opt-in step.
@@ -27,9 +30,11 @@ from xsentiment.ingestion.prices import MAX_CANDLES_PER_REQUEST, CoinbasePriceAd
 from xsentiment.pipeline.forecast_run import (
     load_candles,
     load_news_context,
-    load_posts,
     run_forecast_pipeline,
     sha256_file,
+)
+from xsentiment.pipeline.forecast_run import (
+    load_posts as load_posts_jsonl,
 )
 
 
@@ -116,20 +121,122 @@ def _command_fetch_prices(args: argparse.Namespace) -> int:
     return 0
 
 
+def _storage_stack():
+    """Import the optional storage stack on demand for persisted-input paths.
+
+    Returns ``(OperationalError, database, repositories)``: the error class needed
+    to map a missing-table failure, the lazily loaded engine module and the
+    repository helpers. The offline pipeline never needs the database, so
+    ``pip install -e .`` keeps working without the storage extras; a persisted run
+    imports them here and fails with the setup command instead of a stack trace.
+    """
+    try:
+        from sqlalchemy.exc import OperationalError
+
+        from xsentiment.storage import database, repositories
+    except ImportError as exc:
+        raise RuntimeError(
+            "the persisted-input path needs the storage extras; install them with: "
+            "pip install -e '.[storage]'"
+        ) from exc
+    return OperationalError, database, repositories
+
+
+async def _persist_inputs(args: argparse.Namespace) -> dict[str, int]:
+    """Upsert the supplied snapshots into the local storage database."""
+    _, database, repositories = _storage_stack()
+    candles = load_candles(args.prices)
+    posts = load_posts_jsonl(args.posts) if args.posts is not None else []
+    engine = database.build_engine(args.database_url)
+    try:
+        await repositories.create_schema(engine)
+        factory = repositories.session_factory(engine)
+        async with factory() as session:
+            price_rows = await repositories.upsert_price_bars(
+                session, candles, source_snapshot_id=args.prices.name
+            )
+            post_rows = 0
+            if posts:
+                post_rows = await repositories.upsert_posts(
+                    session, posts, source_snapshot_id=args.posts.name
+                )
+            await session.commit()
+    finally:
+        await engine.dispose()
+    return {"price_rows": price_rows, "post_rows": post_rows}
+
+
+async def _load_persisted_inputs(args: argparse.Namespace):
+    """Read candles and posts from the local storage database for a run."""
+    OperationalError, database, repositories = _storage_stack()
+    engine = database.build_engine(args.database_url)
+    try:
+        factory = repositories.session_factory(engine)
+        async with factory() as session:
+            try:
+                candles = await repositories.load_price_candles(
+                    session, product_id=args.asset
+                )
+                posts = await repositories.load_posts(session)
+                snapshot_ids = await repositories.storage_snapshot_ids(session)
+            except OperationalError as exc:
+                raise RuntimeError(
+                    f"database {args.database_url} has no xsentiment tables yet; "
+                    "populate it first with xsentiment persist --prices ..."
+                ) from exc
+    finally:
+        await engine.dispose()
+    if not candles:
+        raise ValueError(
+            f"no candle rows for {args.asset} in {args.database_url}; "
+            "populate the database first with xsentiment persist --prices ..."
+        )
+    return candles, posts, snapshot_ids
+
+
+def _command_persist(args: argparse.Namespace) -> int:
+    try:
+        counts = asyncio.run(_persist_inputs(args))
+    except (OSError, ValueError, RuntimeError) as exc:
+        print(f"persist failed: {exc}", file=sys.stderr)
+        return 1
+    if counts["post_rows"]:
+        print(
+            f"upserted {counts['price_rows']} price bars and {counts['post_rows']} posts "
+            f"into {args.database_url}; repeating this command is idempotent"
+        )
+    else:
+        print(
+            f"upserted {counts['price_rows']} price bars into {args.database_url}; "
+            "repeating this command is idempotent"
+        )
+    return 0
+
+
 def _command_run(args: argparse.Namespace) -> int:
     try:
-        provenance: dict[str, object] = {
-            "price_snapshot": str(args.prices),
-            "price_snapshot_sha256": sha256_file(args.prices),
-        }
-        if args.posts is not None:
-            provenance["posts_snapshot"] = str(args.posts)
-            provenance["posts_snapshot_sha256"] = sha256_file(args.posts)
+        provenance: dict[str, object] = {}
+        if args.database_url is not None:
+            if args.prices is not None or args.posts is not None:
+                raise ValueError("--database-url cannot be combined with --prices/--posts")
+            candles, posts, snapshot_ids = asyncio.run(_load_persisted_inputs(args))
+            provenance["input_source"] = "persisted_storage"
+            provenance["database_url"] = args.database_url
+            provenance["storage_snapshot_ids"] = snapshot_ids
+        else:
+            if args.prices is None:
+                raise ValueError("usage: xsentiment run --prices SNAPSHOT or --database-url URL")
+            provenance["input_source"] = "file_snapshot"
+            provenance["price_snapshot"] = str(args.prices)
+            provenance["price_snapshot_sha256"] = sha256_file(args.prices)
+            if args.posts is not None:
+                provenance["posts_snapshot"] = str(args.posts)
+                provenance["posts_snapshot_sha256"] = sha256_file(args.posts)
+            candles = load_candles(args.prices)
+            posts = load_posts_jsonl(args.posts) if args.posts is not None else []
+        news = load_news_context(args.news_file) if args.news_file is not None else []
         if args.news_file is not None:
             provenance["news_snapshot"] = str(args.news_file)
-        candles = load_candles(args.prices)
-        posts = load_posts(args.posts) if args.posts is not None else []
-        news = load_news_context(args.news_file) if args.news_file is not None else []
         artifacts = run_forecast_pipeline(
             candles=candles,
             posts=posts,
@@ -187,9 +294,30 @@ def build_parser() -> argparse.ArgumentParser:
     fetch.add_argument("--out", required=True, help="destination JSON snapshot")
     fetch.set_defaults(handler=_command_fetch_prices)
 
+    persist = subparsers.add_parser(
+        "persist", help="upsert snapshot inputs into the local storage database"
+    )
+    persist.add_argument(
+        "--prices", type=Path, required=True, help="price snapshot from fetch-prices"
+    )
+    persist.add_argument(
+        "--posts", type=Path, default=None, help="optional JSONL of normalized posts"
+    )
+    persist.add_argument(
+        "--database-url",
+        required=True,
+        help="local database URL, e.g. sqlite+aiosqlite:///./data/xsentiment.db",
+    )
+    persist.set_defaults(handler=_command_persist)
+
     run = subparsers.add_parser("run", help="run the offline evaluation pipeline")
-    run.add_argument("--prices", required=True, help="price snapshot from fetch-prices")
+    run.add_argument("--prices", type=Path, default=None, help="price snapshot from fetch-prices")
     run.add_argument("--posts", default=None, help="optional JSONL of normalized posts")
+    run.add_argument(
+        "--database-url",
+        default=None,
+        help="read inputs from a persisted storage database instead of snapshots",
+    )
     run.add_argument("--news-file", default=None, help="optional JSONL of news context")
     run.add_argument("--out", required=True, help="output directory for artefacts")
     run.add_argument("--asset", default="BTC-USD")

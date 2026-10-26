@@ -17,7 +17,11 @@ from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+)
 
 from xsentiment.ingestion.contracts import XPostRecord
 from xsentiment.ingestion.prices import PriceCandle
@@ -263,6 +267,115 @@ async def cutoff_post_price_join(
             )
         previous = bar
     return rows
+
+
+def session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
+    """Build an ``expire_on_commit=False`` session factory for unit-of-work use."""
+    return async_sessionmaker(engine, expire_on_commit=False)
+
+
+async def storage_snapshot_ids(session: AsyncSession) -> list[str]:
+    """Distinct non-null source snapshot IDs persisted across both tables."""
+    price_ids = (
+        await session.execute(
+            select(PriceBar.source_snapshot_id)
+            .where(PriceBar.source_snapshot_id.is_not(None))
+            .distinct()
+        )
+    ).scalars().all()
+    post_ids = (
+        await session.execute(
+            select(XPost.source_snapshot_id)
+            .where(XPost.source_snapshot_id.is_not(None))
+            .distinct()
+        )
+    ).scalars().all()
+    return sorted({str(value) for value in (*price_ids, *post_ids)})
+
+
+async def load_price_candles(
+    session: AsyncSession,
+    *,
+    product_id: str,
+    start_date: date | None = None,
+    end_date: date | None = None,
+) -> list[PriceCandle]:
+    """Read persisted daily bars back as validated :class:`PriceCandle` values.
+
+    Reconstruction re-runs the ``PriceCandle`` validation, so a malformed row fails
+    closed instead of silently feeding the pipeline. Rows are ordered by candle start.
+    """
+    statement = (
+        select(PriceBar)
+        .where(PriceBar.product_id == product_id)
+        .order_by(PriceBar.timestamp)
+    )
+    if start_date is not None:
+        statement = statement.where(PriceBar.bar_date >= start_date)
+    if end_date is not None:
+        statement = statement.where(PriceBar.bar_date <= end_date)
+    bars = (await session.execute(statement)).scalars().all()
+    return [
+        PriceCandle(
+            product_id=bar.product_id,
+            timestamp=_stored_utc(bar.timestamp),
+            low=Decimal(str(bar.low)),
+            high=Decimal(str(bar.high)),
+            open=Decimal(str(bar.open)),
+            close=Decimal(str(bar.close)),
+            volume=Decimal(str(bar.volume)),
+        )
+        for bar in bars
+    ]
+
+
+async def load_posts(
+    session: AsyncSession,
+    *,
+    start_date: date | None = None,
+    end_date: date | None = None,
+) -> list[XPostRecord]:
+    """Read persisted posts back as normalized :class:`XPostRecord` values.
+
+    Records are ordered by event time then post ID for deterministic runs. All
+    provenance fields round-trip; raw text stays inside the locally owned database.
+    """
+    statement = select(XPost).order_by(XPost.created_at, XPost.post_id)
+    if start_date is not None:
+        statement = statement.where(XPost.created_date >= start_date)
+    if end_date is not None:
+        statement = statement.where(XPost.created_date <= end_date)
+    rows = (await session.execute(statement)).scalars().all()
+    return [_post_record_from_row(row) for row in rows]
+
+
+def _post_record_from_row(row: XPost) -> XPostRecord:
+    warnings_value = row.warnings or []
+    sentiment = row.sentiment_score
+    return XPostRecord(
+        post_id=row.post_id,
+        # SQLite returns naive datetimes; stored values are UTC by contract, so
+        # re-tag them instead of passing naive values on to the strict contract.
+        created_at=_stored_utc(row.created_at),
+        retrieved_at=_stored_utc(row.retrieved_at),
+        text=row.text,
+        sentiment_score=float(sentiment) if sentiment is not None else None,
+        likes=row.likes,
+        reposts=row.reposts,
+        views=row.views,
+        author_followers=row.author_followers,
+        provenance_url=row.provenance_url,
+        source_name=row.source_name,
+        source_platform=row.source_platform,
+        source_created_at_raw=row.source_created_at_raw,
+        source_utc_offset=row.source_utc_offset,
+        author_id=row.author_id,
+        query_mode=row.query_mode,
+        query=row.query,
+        source_record_hash=row.source_record_hash,
+        schema_version=row.schema_version,
+        warnings=tuple(warnings_value),
+    )
 
 
 def _as_utc(value: datetime) -> datetime:
