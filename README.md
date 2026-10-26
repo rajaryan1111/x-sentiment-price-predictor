@@ -8,6 +8,10 @@ Research pipeline to evaluate whether timestamped X sentiment adds predictive va
 
 Read [docs/PHASE_1_REQUIREMENTS.md](docs/PHASE_1_REQUIREMENTS.md) before implementation. It maps the assessment brief to requirements, acceptance criteria, documented working defaults, external readiness gates, scope boundaries, data-integrity rules and a traceability matrix. BTC-USD and daily bars are the selected project choices; UTC cutoff, Coinbase candles and close-price horizons are implementation defaults rather than employer-confirmed requirements. External data access, provider behavior, source terms and any employer clarification must be checked before live ingestion or evaluation.
 
+## Phase 2 data-ingestion status
+
+The Coinbase adapter and point-in-time data primitives are implemented. The user-run UTC 180-day BTC-USD profile returned 180/180 daily bars with no missing or duplicate bars in the checked range. A configurable Apify adapter and mocked tests are present, but no live Apify Actor has been selected or run. Before collection, review [Apify X setup and run caps](docs/APIFY_X_SETUP.md) and [Phase 2 progress](docs/PHASE_2_PROGRESS.md). The adapter does not score sentiment or train forecasting models; those remain downstream work. The latest phase-2 implementation is tracked in [draft PR #10](https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/10).
+
 ## Historical dataset registry
 
 The curated inventory from the supplied historical Twitter/X dataset PDF is recorded in [data/registry/historical_twitter_x_datasets.json](data/registry/historical_twitter_x_datasets.json), with selection, licensing, provenance, point-in-time, and hydration caveats in [docs/data-sources.md](docs/data-sources.md). These are source references only: no corpus is bundled or automatically downloaded. Validate the inventory offline with `python scripts/validate_dataset_registry.py`.
