@@ -90,3 +90,25 @@ def test_validator_flags_a_broken_link_and_a_bad_status(tmp_path: Path) -> None:
 
     assert any("outside the allowed vocabulary" in error for error in matrix_errors)
     assert any("requirement IDs missing" in error for error in matrix_errors)
+
+
+def test_validator_flags_duplicate_and_unexpected_requirement_ids(tmp_path: Path) -> None:
+    """The real matrix is edited only in a temporary copy, never in the repository."""
+    text = MATRIX.read_text(encoding="utf-8")
+
+    duplicate_path = tmp_path / "duplicate.md"
+    duplicate_path.write_text(text.replace("| R2 |", "| R1 |", 1), encoding="utf-8")
+    duplicate_errors, _ = validate_docs.check_matrix(duplicate_path)
+    assert any("duplicate requirement IDs: R1" in error for error in duplicate_errors)
+
+    unexpected_path = tmp_path / "unexpected.md"
+    unexpected_path.write_text(text.replace("| R1 |", "| X1 |", 1), encoding="utf-8")
+    unexpected_errors, _ = validate_docs.check_matrix(unexpected_path)
+    assert any(
+        "unexpected requirement IDs" in error and "X1" in error
+        for error in unexpected_errors
+    )
+    assert any(
+        "requirement IDs missing" in error and "R1" in error
+        for error in unexpected_errors
+    )

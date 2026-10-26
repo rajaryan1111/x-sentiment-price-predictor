@@ -102,10 +102,10 @@ and period, not evidence of tradability.
 
 ## Robustness and go/no-go
 Possible predeclared comparisons include horizons, naive/price-only/sentiment models
-and coverage subsets. Do not repeatedly tune on a final holdout, and do not tune a
-model to beat the baseline after inspecting results; the current honest result is
-that the price-only model does not beat naive persistence on this sample, and that
-finding stays in the report.
+and coverage subsets. Do not tune on test folds, and no separate final holdout is
+currently reserved; do not add one after inspecting results and then present it as
+untouched. The current honest result is that the price-only model does not beat naive
+persistence on this sample, and that finding stays in the report.
 Do not train on X text until source terms/access, post-level text and time coverage,
 point-in-time semantics, the sentiment/null policy, matching prices, targets and
 chronological splits are validated.

@@ -30,12 +30,16 @@ Models predict the horizon ratio `close(cutoff + h) / reference_close`, where `r
 The strategy uses the `n+0` close as its entry price and the `n+1` close as its exit price, with `reference_close` only in the signal; see MODEL_PLAN.md for the rule and its assumptions.
 
 ## Adapter contract
-Explicit config, timeouts and bounded response/run controls. Validate Actor input against the chosen Actor's current schema before a real run. Common field aliases do not prove Actor compatibility. Live Apify calls are opt-in and may cost money; never run them in CI. Sanitize errors and never print credentials.
+Explicit config, timeouts and bounded response/run controls. Validate Actor input against the chosen Actor's current schema before a real run. Common field aliases do not prove Actor compatibility. The brief requires ticker, cashtag and keyword searches for the chosen asset; because the adapter accepts a caller-supplied input, the selected Actor's schema must map all three query modes explicitly and the non-secret query configuration must be recorded. No universal payload is assumed. Live Apify calls are opt-in and may cost money; never run them in CI. Sanitize errors and never print credentials.
+
+## Persistence (target)
+The brief requires joining the datasets in a database. The target schema stores normalized posts keyed by source post ID and price bars keyed by product and timestamp, with idempotent upserts and a join query keyed by asset and cutoff. This is **not implemented** (R15): the current pipeline reads file snapshots and joins in memory, and `src/xsentiment/storage/` is scaffolding. Raw post text and private data stay out of Git.
 
 ## Output contracts
 Forecast: asset, issue cutoff, horizon, predicted close, model version, feature/data run IDs and uncertainty/limitations.
 Evaluation: chronological fold boundaries, sample counts, target/horizon, baseline/candidate metrics, exclusions and reproducible references.
 Current outlook: as-of UTC time, latest completed bar, data coverage, sentiment coverage, contextual news source/time, model output if available, uncertainty and limitations.
+Chart: price and sentiment panels sharing a time axis; the sentiment panel must show change over time and must be labelled as empty when no scored posts exist, never zero-filled. The current implementation plots mean sentiment level and is recorded as a gap in R10.
 
 ## Artefacts of one run
 A run directory contains `evaluation-report.md`, `outlook.md`, `sentiment-vs-price.svg`, `metrics.json`, `predictions.jsonl` and `manifest.json`. The manifest records the run ID, as-of time, dataset profile, fold boundaries, warnings, unavailable items, input hashes and library versions. Every record in `predictions.jsonl` is out-of-sample; in-sample predictions are never written into an evaluation artefact.

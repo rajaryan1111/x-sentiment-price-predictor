@@ -7,8 +7,8 @@ Checks performed:
 3. requirement IDs are unique and every expected ID appears exactly once;
 4. every row has a non-empty requirement, acceptance criterion, evidence pointer and
    status, and the status comes from the fixed vocabulary;
-5. the status summary in the document matches the rows, printed as a table so the
-   counts in the document can be checked against reality.
+5. the status summary in the document matches the rows, both in counts and in the
+   exact requirement IDs listed for each status.
 
 No network access is used.
 """
@@ -45,9 +45,9 @@ REQUIRED_COLUMNS = (
 )
 
 EXPECTED_IDS = (
-    tuple(f"R{index}" for index in range(1, 15))
+    tuple(f"R{index}" for index in range(1, 16))
     + tuple(f"NFR{index}" for index in range(1, 7))
-    + tuple(f"A{index}" for index in range(1, 7))
+    + tuple(f"A{index}" for index in range(1, 8))
 )
 
 SKIP_DIRECTORIES = {".git", ".venv", ".venv-ci", "node_modules", "build", "dist", "__pycache__"}
@@ -148,8 +148,46 @@ def parse_matrix(path: Path) -> tuple[list[str], list[dict[str, str]]]:
     return errors, rows
 
 
+def _status_summary(text: str) -> dict[str, list[str]]:
+    """Parse the two-column status summary that follows the traceability matrix."""
+    summary: dict[str, list[str]] = {}
+    for line in text.splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = _cells(line)
+        if len(cells) == 2 and cells[0] in ALLOWED_STATUSES:
+            summary[cells[0]] = (
+                [] if cells[1].lower() == "none" else [item.strip() for item in cells[1].split(",")]
+            )
+    return summary
+
+
+def _check_status_summary(
+    matrix_path: Path, rows: list[dict[str, str]], counts: Counter
+) -> list[str]:
+    """Return errors when the documented status summary disagrees with the rows."""
+    summary = _status_summary(matrix_path.read_text(encoding="utf-8"))
+    errors: list[str] = []
+    for status in ALLOWED_STATUSES:
+        if status not in summary:
+            errors.append(f"status summary is missing a row for {status!r}")
+            continue
+        expected = sorted(row["ID"] for row in rows if row["Current status"] == status)
+        actual = sorted(summary[status])
+        if actual != expected:
+            errors.append(
+                f"status summary for {status!r} lists {actual} but the matrix rows are {expected}"
+            )
+        if len(actual) != counts.get(status, 0):
+            errors.append(
+                f"status summary for {status!r} lists {len(actual)} rows but the matrix has "
+                f"{counts.get(status, 0)}"
+            )
+    return errors
+
+
 def check_matrix(matrix_path: Path = MATRIX_PATH) -> tuple[list[str], Counter]:
-    """Validate the matrix structure, IDs and statuses; return errors and status counts."""
+    """Validate the matrix structure, IDs, statuses and summary; return errors and counts."""
     errors, rows = parse_matrix(matrix_path)
     if errors:
         return errors, Counter()
@@ -179,6 +217,7 @@ def check_matrix(matrix_path: Path = MATRIX_PATH) -> tuple[list[str], Counter]:
             errors.append(f"{row['ID']}: empty dependency/blocker column (write 'None' when clear)")
         if not row["Original requirement"]:
             errors.append(f"{row['ID']}: empty requirement description")
+    errors.extend(_check_status_summary(matrix_path, rows, counts))
     return errors, counts
 
 

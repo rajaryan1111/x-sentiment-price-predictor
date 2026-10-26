@@ -1,5 +1,5 @@
 # Test Plan
-A passing suite proves only the cases it actually exercises. 103 offline tests pass
+A passing suite proves only the cases it actually exercises. 104 offline tests pass
 locally (`pytest`), and CI runs lint, registry validation, documentation validation and
 pytest on Python 3.11 with only the `dev` and `storage` extras installed.
 
@@ -9,7 +9,7 @@ pytest on Python 3.11 with only the `dev` and `storage` extras installed.
   evaluation, chart/outlook/report rendering, input loaders.
 - Adapter contracts: mocked provider responses, pagination, timeout/error behaviour,
   normalization and secret redaction; no billing and no live provider call.
-- Integration: temporary storage/database and normalized data flow.
+- Integration: the current pipeline is exercised end to end in memory with synthetic snapshots. There is no storage/database integration test because R15 is not implemented; do not claim database coverage.
 - End-to-end: the offline `run` CLI on a clearly labelled synthetic snapshot, plus a
   separately documented real-data run using public Coinbase candles.
 - CI: Ruff, registry structural validation, documentation validation (`scripts/validate_docs.py`)
@@ -58,11 +58,13 @@ pytest on Python 3.11 with only the `dev` and `storage` extras installed.
 - Pipeline/CLI: input loaders reject malformed snapshots with line references, the run
   writes every documented artefact, manifest hashes match the inputs, prediction records
   match the manifest count, a zero-post run still completes, and CLI errors exit non-zero.
-- Apify: mocked run/status/dataset, auth header, bounds, timeouts/errors, no launch retry
-  and no real Actor in CI.
+- Apify: mocked run/status/dataset with the documented `data` envelope, auth header,
+  bounds, timeouts/errors, no launch retry and no real Actor in CI.
 - Registry: source/platform identity and structural fields, ID-only hydration caveats, and
   that a rolling source without a coverage end must carry a coverage/cutoff limitation;
   validation does not imply live access or legal approval.
+- Storage/persistence: not covered until R15 implements a schema, repositories and a
+  persisted price/post join. The absence of tests must not be presented as coverage.
 - Documentation: every relative Markdown link resolves; requirement IDs are unique and
   complete across the `R`, `NFR` and `A` namespaces; every matrix row has an acceptance
   criterion, an evidence pointer, a vocabulary status and a blocker entry.
@@ -91,6 +93,8 @@ documented, bounded end-to-end X ingest passes. **Unmet: no accepted X source ye
 Model/report: baselines and sentiment model run; walk-forward is leakage-safe;
 charts/outlook/report derive from actual outputs; risk metrics only from valid strategy
 returns. **Met for prices; the sentiment comparison is blocked on X data.**
+Storage: R15 (database persistence and join) is not implemented and has no acceptance
+test. **Unmet.**
 
 ## Commands
 From repo root:

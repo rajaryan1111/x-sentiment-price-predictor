@@ -1,4 +1,6 @@
-# Phase 2 canonical data contract
+# Data contract — Phase 2 data-quality workstream
+
+> Naming note: this file belongs to the repository's historical "Phase 2 data quality/alignment" workstream, which maps to canonical Phase 3 in [PHASES.md](../PHASES.md). It is not canonical documentation Phase 2.
 
 ## Scope
 

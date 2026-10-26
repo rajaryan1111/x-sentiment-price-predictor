@@ -8,13 +8,13 @@ Use only sources accessible through documented, permitted routes. A URL, dataset
 Default is Coinbase Exchange public BTC-USD daily candles. Record provider/endpoint, product, granularity, UTC interval, retrieval time, code revision and coverage profile. Public availability does not guarantee future API behavior or completeness.
 
 ## X source
-Required target is asset-related X posts over 180 days using an approved Apify/provider route. Before collection verify Actor identity, input/output schema, platform, terms, query support, charges, plan limits, max results and actual 180-day reach. No live Actor has been selected/run and no real X corpus is accepted. Do not assume free credits make an Actor free; no paid run without explicit budget approval.
+Required target is asset-related X posts over the most recent 180 days using an approved Apify/provider route, with ticker, cashtag and keyword searches. Before collection verify Actor identity, input/output schema, platform, terms, query support for all three modes, available fields (text, timestamps, likes, reposts, views, author followers), charges, plan limits, max results and actual 180-day reach. No live Actor has been selected/run and no real X corpus is accepted. Do not assume free credits make an Actor free; no paid run without explicit budget approval.
 
 ## Historical datasets
-Start with the assessment-linked resource if access is obtained; inspect actual contents, platform, schema, license/terms, version, text availability and event-time coverage. Registry entries are candidates only. ID-only files contain no text; older corpora cannot by themselves meet a recent 180-day window. Uploaded date/count and ID-list files do not provide post-level text. Uploaded 90-day-samples.zip and archive (2).zip have not been inspected internally; their contents, schema and rights are unverified.
+The assessment-linked Google Doc was retrieved on 2026-10-26; it is a 12-entry dataset-link compilation matching the companion PDF, not a tweet corpus. Start by selecting a candidate and inspecting its actual contents, platform, schema, license/terms, version, text availability and event-time coverage. Registry entries are candidates only. ID-only files contain no text; older corpora cannot by themselves meet a recent 180-day window. The uploaded files were inspected on 2026-10-26: `90-day-samples.zip` contains numeric tweet IDs only; the historical sample, date-tweet-id and statistics files contain IDs or date/count summaries; `archive.zip` is an air-quality CSV; the available `archive (1).zip` is MQTT sensor JSON; `archive (2).zip` is absent; `Manuscript.pdf` is a StockTwits paper. No uploaded file contains post-level X text, and none is an accepted dataset.
 
 ## News
-Tavily is named for recent relevant news. Default use is context for the outlook, not predictive features. Record URL, headline, publication time when available, retrieval time and query. Exa appears in the submission checklist but its runtime role is unresolved.
+Tavily is the named source for the most recent and relevant news. Default use is context for the outlook, not predictive features, because the brief says the model uses sentiment and price only. Record URL, headline, publication time when available, retrieval time and query. Exa appears only in the submission line and token request; it is optional unless actually used or employer-required.
 
 ## Provenance manifest
 Record source/platform/provider and URL; dataset version or non-secret run ID; query and UTC range; retrieval timestamp; code revision; license review status/date/restrictions; SHA-256 hash when a snapshot is retained; schema version; sanitized counts/missingness/duplicates/time range; transformations/exclusions; and whether historical availability is known. Never include secrets.
@@ -32,7 +32,7 @@ Committed: sanitized reports, charts, outlook pages, metrics, manifests and non-
 - Platform/source identity and access route verified.
 - Current terms reviewed for collection, training, storage, retention and reporting.
 - Actual schema and text availability inspected.
-- Required 180-day event-time coverage measured.
+- Required 180-day event-time coverage measured, with ticker, cashtag and keyword query modes documented.
 - Missing IDs/text/timestamps, duplicates, invalid timestamps and engagement availability profiled.
 - Provenance and hash/run ID recorded.
 - Point-in-time availability assessed and limitations stated.

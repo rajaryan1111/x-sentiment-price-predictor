@@ -1,5 +1,5 @@
 # Architecture
-Status: canonical target architecture; implementation is partial.
+Status: canonical target architecture; implementation is partial. The assignment source was verified on 2026-10-26; the database join and live X ingestion are not implemented.
 
 ## Flow
 Configuration/secrets -> source adapters (X/Apify, BTC prices, optional news context) -> response boundary and validation -> normalized records plus provenance -> approved storage -> point-in-time alignment -> feature and target generation -> naive/price-only/sentiment-plus-price models -> chronological evaluation -> optional strategy simulation -> metrics, charts, outlook and report.
@@ -7,11 +7,11 @@ Configuration/secrets -> source adapters (X/Apify, BTC prices, optional news con
 ## Components
 - Config: typed validated settings from environment; secrets never logged.
 - Ingestion contracts: normalized X records with explicit event/retrieval time semantics.
-- X adapter: explicit Actor ID/input and bounded controls; schema must be verified for the selected Actor.
+- X adapter: explicit Actor ID/input and bounded controls; schema, ticker/cashtag/keyword query support and required fields must be verified for the selected Actor.
 - Price adapter: Coinbase BTC-USD daily candles with UTC bounds and OHLCV validation.
-- Phase 2 pipeline: deduplication, coverage profiling, point-in-time features and n+0..n+5 close labels.
+- Data-quality pipeline (historical Phase 2 workstream): deduplication, coverage profiling, point-in-time features and n+0..n+5 close labels.
 - Features: VADER sentiment scoring, predeclared lagged/rolling price features, trailing-24h sentiment aggregation and supervised dataset assembly, with definitions governed by MODEL_PLAN.md.
-- Storage: project-owned schema/repository; raw social data only where terms permit.
+- Storage: target is a project-owned schema and idempotent repositories that persist and join posts with price bars. Current state is scaffolding only (engine/session lifecycle and an abstract repository); the pipeline joins file snapshots in memory. R15 tracks the unimplemented database join. Raw social data only where terms permit.
 - Models: naive persistence baseline, price-only ridge model and candidate sentiment-plus-price ridge model, one per horizon, fitted on ratio targets.
 - Validation: expanding walk-forward splits with a purge gap equal to the longest horizon, train-fold-only transforms and leakage guards.
 - Backtesting: forecasts-to-returns strategy simulation and risk metrics from out-of-sample predictions only.
@@ -31,6 +31,7 @@ Adapters normalize provider payloads without fabricating missing fields. Raw dat
 Secrets via environment/approved secret manager; raw/private data out of Git; retention follows source terms; avoid full-text logs. Record provider, query/window, retrieval timestamp, schema, non-secret run ID and hash where possible.
 
 ## Implementation status
-Implemented and verified on real public price data: Coinbase daily adapter (180/180 bars refetched 2026-10-26); normalized X contract; deduplication, coverage, point-in-time alignment and horizon-label primitives with unfinished-day exclusion; VADER sentiment scoring; price features and supervised dataset; naive, price-only and candidate ridge models; purged walk-forward evaluation with per-horizon MAE/RMSE; predeclared long/flat strategy with Sharpe/Sortino/drawdown and disclosure; SVG charts; one-page outlook; evaluation report; offline CLI and 103 tests with CI.
-Implemented but not live-verified: configurable Apify X adapter (mocked only; no Actor selected or run).
-Not evidenced complete: real X collection, accepted license/coverage for X data, the sentiment-versus-price comparison, and any claim that a model beats the naive baseline (the current measurement is the opposite).
+Implemented and verified on real public price data: Coinbase daily adapter (180/180 bars refetched 2026-10-26); normalized X contract; deduplication, coverage, point-in-time alignment and horizon-label primitives with unfinished-day exclusion; VADER sentiment scoring; price features and supervised dataset; naive, price-only and candidate ridge models; purged walk-forward evaluation with per-horizon MAE/RMSE; predeclared long/flat strategy with Sharpe/Sortino/drawdown and disclosure; SVG charts; one-page outlook; evaluation report; offline CLI and 104 tests with CI.
+Implemented but not live-verified: configurable Apify X adapter (mocked only; no Actor selected or run; ticker/cashtag/keyword inputs not exercised against a real Actor).
+Not implemented: database persistence and the persisted X-price join (R15); the current pipeline joins in memory from file snapshots.
+Not evidenced complete: real X collection, accepted license/coverage for X data, a live Tavily/Exa call, the sentiment-versus-price comparison, a sentiment-change chart, and any claim that a model beats the naive baseline (the current measurement is the opposite).

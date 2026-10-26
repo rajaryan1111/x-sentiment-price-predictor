@@ -2,6 +2,8 @@
 
 This registry is transcribed from the user-provided **Historical Twitter/X Datasets — Verified Download Links** PDF (compiled 21 October 2026). The PDF says its entries were checked against live pages on that date. We have captured the PDF's links and claims, but have **not independently re-verified the current provider pages, current availability, or license terms**.
 
+The assessment-linked Google Doc was retrieved on 2026-10-26; its exported text matches the PDF's 12 entries. The document is a dataset-link compilation, not a tweet corpus. Uploaded local files were also inspected: the 90-day samples are numeric tweet IDs only; the date/count files are summaries; the available archives are an air-quality CSV and MQTT sensor JSON; `Manuscript.pdf` is a StockTwits paper. No uploaded file contains X post text.
+
 Machine-readable source of truth: [`data/registry/historical_twitter_x_datasets.json`](../data/registry/historical_twitter_x_datasets.json).
 
 ## Selection guidance for this project

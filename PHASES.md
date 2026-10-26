@@ -21,27 +21,33 @@ reviewed. CI success alone does not complete a data/model phase, and a phase is 
 complete merely because its interface or a mock test exists.
 
 ## Phase 1 — Requirements lock
-Status: complete as a documented baseline, with two items that only the human can close.
-- Parse the assessment into traceable requirements with unique IDs (`R1`–`R14`, `NFR1`–`NFR6`, `A1`–`A6`).
+Status: complete as a documented baseline, with external data/provider and deadline items still open.
+- Parse the assessment into traceable requirements with unique IDs (`R1`–`R15`, `NFR1`–`NFR6`, `A1`–`A7`).
 - Set working choices BTC-USD, daily UTC, n+0..n+5 close targets and Coinbase default.
 - Separate required, optional/ambiguous and out-of-scope items.
 - Record conservative news and RL interpretations.
 - Give every requirement an acceptance criterion, a verification method, an evidence pointer, a status, a gap and a blocker.
 Evidence: docs/PHASE_1_REQUIREMENTS.md, PRD.md and the authoritative matrix in
-docs/REQUIREMENTS_TRACEABILITY.md, checked by `scripts/validate_docs.py`.
-**Open items that engineering cannot close:** the assessment PDF was not accessible to the
-authoring environment, so the requirement transcription needs human confirmation (D-023);
-and the employer's deadline is unknown (A1, D-014). This does not mean X data has been
+docs/REQUIREMENTS_TRACEABILITY.md, checked by `scripts/validate_docs.py`. Both assessment
+PDFs were read in full on 2026-10-26 and the requirement set was reconciled against them;
+D-023 is closed. The linked Google Doc was retrieved and is a dataset-link compilation,
+not a tweet corpus.
+**Open items that engineering cannot close:** the employer's calendar deadline is unknown
+(A1, D-014); provider access, credentials and the private transfer channel remain external
+(R2, A2, O10); dataset/Actor selection remains open (O6, O13); a Tavily key is needed for
+live news context (A4); and the n+0 convention still needs employer confirmation (O3/O4).
+R15 (database join) is a later-phase implementation gap. This does not mean X data has been
 collected or any sentiment result measured.
 
 ## Phase 2 — Canonical documentation
-Status: in progress until the documentation review completes on the open pull request.
+Status: in progress until the documentation review completes. The canonical documents were
+reconciled with the verified assignment source on 2026-10-26.
 - Maintain all nine root-level files: PRD, ARCHITECTURE, DESIGN, DATA_POLICY,
   MODEL_PLAN, TEST_PLAN, RULES, PHASES, DECISIONS.
 - Keep docs/REQUIREMENTS_TRACEABILITY.md and docs/PHASE_1_REQUIREMENTS.md aligned.
 Acceptance: files exist; asset, interval, cutoff, targets and scope agree; open gates are
-explicit; implementation status is honest; links/commands are checked; reviewed in PR and
-CI passes. No semantic implementation change without synchronized docs/tests.
+explicit; implementation status is honest; links/commands are checked; reviewed before
+merge and CI passes. No semantic implementation change without synchronized docs/tests.
 
 ## Phase 3 — Data access and ingestion
 Status: in progress; X data externally blocked. Price ingestion is complete and verified.
@@ -49,9 +55,14 @@ Status: in progress; X data externally blocked. Price ingestion is complete and 
   2026-10-25 UTC, refetched 2026-10-26 with no missing or duplicate timestamps and the
   unfinished current day excluded. Reproduced with `python -m xsentiment fetch-prices`.
 - X: no accepted dataset and no live Actor run. Local CSV/JSONL profiling exists and
-  refuses to call an old download point-in-time ready; ZIP internals remain unverified.
-Acceptance (unmet): accepted source, sanitized coverage evidence, time alignment and a
-bounded end-to-end X ingestion test.
+  refuses to call an old download point-in-time ready. The uploaded ZIPs were inspected on
+  2026-10-26: `90-day-samples.zip` contains numeric tweet IDs only; the available archives
+  are an air-quality CSV and MQTT sensor JSON, unrelated to X; `archive (2).zip` is absent.
+  No uploaded file contains X post text.
+- Database join (R15): not implemented. The pipeline joins file snapshots in memory and
+  `src/xsentiment/storage/` has only engine/session lifecycle and an abstract repository.
+Acceptance (unmet): accepted source, sanitized coverage evidence, time alignment, a
+bounded end-to-end X ingestion test and a persisted price/post join.
 
 ## Phase 4 — Sentiment and features
 Status: implemented and unit-verified; real-data acceptance blocked on accepted X text.
@@ -94,13 +105,16 @@ Status: implemented; the sentiment panel is empty until an accepted X source exi
   model outputs, contextual news and its limitations.
 - News remains context-only and is supplied from an optional file; no Tavily or Exa call
   has been made and no news feature exists.
-Acceptance (unmet): sentiment and price charts derived from real permitted X data.
+- The implemented sentiment series is the mean level; the brief asks for sentiment change.
+  The missing change series is recorded as a gap in R10.
+Acceptance (unmet): sentiment and price charts derived from real permitted X data, with a
+sentiment-change series.
 
 ## Phase 8 — Reproducibility and submission
 Status: in progress.
 - Done: offline reproducible CLI (`fetch-prices`, `run`), run manifest with input hashes,
-  commit-able report/chart/outlook artefacts, 103 offline tests, lint, registry and
+  commit-able report/chart/outlook artefacts, 104 offline tests, lint, registry and
   documentation validation.
 - Remaining: clean-environment run on a fresh clone, security/licence audit of any future
-  X source, the secure credential route, and confirmation of the actual submission
-  deadline from the employer.
+  X source, the secure credential route, confirmation of the actual submission deadline
+  from the employer, and the email submission packet required by the brief (A7).

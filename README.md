@@ -7,9 +7,13 @@ close forecasts at horizons `n+0` through `n+5`.
 > **Status: prices, features, models, evaluation and reporting are implemented and
 > verified on real public Coinbase data. X data access remains an open external
 > gate.** No live X corpus has been accepted, no Apify Actor has been run, and no
-> sentiment result is claimed. The pipeline runs end to end today with zero posts
-> and reports sentiment as unavailable rather than inventing it. CI passing is not
-> evidence of data access, model quality or profitability.
+> sentiment result is claimed. The database join required by the brief is **not
+> implemented** (R15); the pipeline currently joins file snapshots in memory. The
+> two assessment PDFs were read in full on 2026-10-26; the linked Google Doc is a
+> 12-entry dataset-link compilation, not a tweet corpus. The pipeline runs end to
+> end today with zero posts and reports sentiment as unavailable rather than
+> inventing it. CI passing is not evidence of data access, model quality or
+> profitability.
 
 ## Canonical engineering documents
 
@@ -30,7 +34,10 @@ contracts and status, and they list what is verified versus still open.
 
 Phase 1 deliverable: the authoritative [requirements traceability matrix](docs/REQUIREMENTS_TRACEABILITY.md)
 (every requirement with its acceptance criterion, verification method, evidence, status,
-gap and external blocker, checked by `python scripts/validate_docs.py`).
+gap and external blocker, checked by `python scripts/validate_docs.py`). The matrix also
+records the verified assignment PDFs (page counts and SHA-256), the 12 dataset candidates,
+and the requirements that are not yet implemented, including the database join (R15) and
+the email submission packet (A7).
 
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
 [Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),
@@ -49,7 +56,7 @@ Python 3.11+ (verified on 3.12.3):
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev,storage]"   # same extras CI installs
-cp .env.example .env                        # optional for the public price source
+cp .env.example .env                        # required for fetch-prices; not needed for an existing snapshot
 pytest
 ruff check src tests scripts
 python scripts/validate_dataset_registry.py
@@ -116,12 +123,18 @@ From `reports/btc-usd-180d/`, computed by the commands above:
 - **Strategy (predeclared long/flat, 10 bps per side):** price-only cumulative
   **+10.91%**, Sharpe **1.807**, Sortino **3.979**, max drawdown **4.08%** over 32
   long days, versus a +6.11% / 0.752 / 1.377 / 10.33% unconditional-long benchmark.
-  The naive rule never trades, so its risk ratios are undefined.
+  The naive rule never trades, so its own risk ratios are undefined; the benchmark is the same windows held long.
 
 **Honest reading:** on this 180-day sample the fitted price-only model does *not*
 beat the naive persistence baseline on forecast error, so no claim is made that the
 model adds predictive value. The strategy numbers are short-sample research
 statistics on a single asset and period, not evidence of tradability.
+
+**Source audit (2026-10-26):** both assessment PDFs were read in full. The linked
+Google Doc is a dataset-link compilation matching the companion PDF, not a tweet
+corpus. Uploaded local files contain tweet IDs, date/count summaries, unrelated
+air-quality/MQTT data or a StockTwits paper; none contains X post text. No candidate
+dataset has been accepted, licensed or profiled for 180-day text coverage.
 
 ## Module map
 
@@ -136,6 +149,8 @@ statistics on a single asset and period, not evidence of tradability.
 - `src/xsentiment/backtesting/` — forecast/risk metrics and the long/flat strategy.
 - `src/xsentiment/reporting/` — SVG charts, one-page outlook, evaluation report.
 - `src/xsentiment/pipeline/forecast_run.py` — offline end-to-end run and artefacts.
+- `src/xsentiment/storage/` — scaffolding only (async engine/session and an abstract
+  repository); database persistence and the price/post join are not implemented (R15).
 - `src/xsentiment/main.py` — `fetch-prices` and `run` CLI entry points.
 - `scripts/validate_docs.py` — Phase 1 documentation validator: link resolution,
   unique requirement IDs, matrix completeness and status-summary consistency.
@@ -162,5 +177,5 @@ statistics on a single asset and period, not evidence of tradability.
 - `docs/canonical-source-of-truth` — the nine canonical documents.
 - `feat/sentiment-features-and-forecasting` — sentiment, features, models, evaluation, reporting, CLI.
 
-Feature work is merged through review after lint, registry validation and pytest
-pass, as configured in [.github/workflows/ci.yml](.github/workflows/ci.yml).
+Feature work is merged through review after lint, registry validation, documentation
+validation and pytest pass, as configured in [.github/workflows/ci.yml](.github/workflows/ci.yml).

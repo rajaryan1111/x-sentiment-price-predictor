@@ -1,25 +1,27 @@
-# Phase 2 — No-cost X-data path
+# No-cost X-data path — Phase 2 workstream
+
+> Naming note: this file belongs to the repository's historical "Phase 2 data quality/alignment" workstream, which maps to canonical Phase 3 in [PHASES.md](../PHASES.md). It is not canonical documentation Phase 2.
 
 ## Goal
 
-Keep Phase 2 moving without requiring the project owner to purchase a scraper. The BTC-USD price path already uses Coinbase Exchange's public candles. X data must remain a separate, evidence-backed gate.
+Keep the data workstream moving without requiring the project owner to purchase a scraper. The BTC-USD price path already uses Coinbase Exchange's public candles. X data must remain a separate, evidence-backed gate.
 
 ## Current status
 
 - **Price history:** user-run profile verified 180/180 complete daily BTC-USD bars for 2026-04-29 through 2026-10-25 UTC (half-open end 2026-10-26), with no missing or duplicate timestamps in that checked range.
 - **Provider-neutral contracts and point-in-time alignment:** implemented and covered by unit tests.
 - **Apify adapter:** implemented and mocked in tests; no Actor is selected or run. Do not assume its free allowance will cover an Actor or 180-day search.
-- **Historical X collection:** not complete. No real X dataset has yet been retrieved, profiled, or accepted for use.
+- **Historical X collection:** not complete. The assessment-linked Google Doc was retrieved on 2026-10-26 and is a 12-entry dataset-link compilation, not a tweet corpus. No candidate dataset has been downloaded, profiled, or accepted for use. Uploaded local files contain IDs, date/count summaries, unrelated air-quality/MQTT data or a StockTwits paper; none contains X post text.
 
 ## Zero-budget options to investigate
 
 ### Option A — Assessment-linked historical dataset
 
-Start with the historical dataset resource named in the assessment brief. Review access, schema, timestamp coverage, license/terms, whether full text is present, and whether the rows are actual X posts. Do not assume the resource is accessible simply because a link exists. If it is accessible and permitted, record the exact snapshot/version and file hash, then profile it locally without committing the data.
+The assessment-linked Google Doc was retrieved on 2026-10-26. It is a 12-entry dataset-link compilation matching the companion dataset PDF, **not** a tweet corpus. Select one candidate from it and review access, schema, timestamp coverage, license/terms, whether full text is present, and whether the rows are actual X posts. Do not assume a dataset is usable simply because its link appeared in the assessment. If it is accessible and permitted, record the exact snapshot/version and file hash, then profile it locally without committing the data.
 
 ### Option B — Existing public research corpus
 
-The repository's dataset registry includes historical Bitcoin/X candidates, but their listed coverage ends by 2023. They can help test parsing and feature plumbing, **not** satisfy the required recent 180-day window. Confirm the live dataset card, current access, license and schema before downloading. Do not hydrate tweet IDs unless permitted and available.
+The repository's dataset registry includes historical Bitcoin/X candidates. Most listed coverage ends by 2023, and two rolling entries have no verified coverage end. None alone proves the required recent 180-day window. They can help test parsing and feature plumbing, **not** satisfy the requirement without live coverage evidence. Confirm the live dataset card, current access, license and schema before downloading. Do not hydrate tweet IDs unless permitted and available.
 
 ### Option C — Free rolling public data offer
 
