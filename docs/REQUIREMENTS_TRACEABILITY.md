@@ -60,7 +60,7 @@ Allowed status vocabulary, used verbatim in the table:
 | R12 | Produce an evaluation report in PDF or Markdown including Sharpe ratio, Sortino ratio and maximum drawdown | Assessment brief, Submission item 3; PHASE_1 §4 R12, DECISIONS D-007 and D-017 | Must | Report is Markdown or PDF; contains per-horizon MAE/RMSE with sample counts and Sharpe, Sortino and maximum drawdown only from a defined strategy on out-of-sample returns, with fees, annualisation and missing-data policy disclosed; unavailable metrics carry a reason | MODEL_PLAN.md §Trading risk metrics, PRD.md §R12 | `src/xsentiment/backtesting/metrics.py`, `backtesting/strategy.py`, `reporting/report.py` | `reports/btc-usd-180d/evaluation-report.md`; `tests/unit/test_metrics.py`, `test_strategy.py`, `test_reporting.py` | Verified complete | Short sample (32 long days) and a single asset/period; no sentiment variant yet | Re-run and re-report as coverage grows; keep ratios labelled as strategy statistics | R2 for the sentiment variant only |
 | R13 | Provide a reproducibility package: setup, commands, provider and Actor identifiers, query configuration, snapshots or hashes and secure secrets | Assessment brief, Submission item 2; PHASE_1 §4 R13 | Must | README covers setup and reproduction; non-secret identifiers and ticker/cashtag/keyword query configuration documented; secrets excluded from Git with a documented transfer route | README.md §Quick start, RULES.md §Security, DECISIONS D-012 | `README.md`, `src/xsentiment/main.py`, `.env.example`, `manifest.json` provenance | README quick start re-run; `.env.example` contains placeholders only; no secret in repository | Partially complete | No Actor ID exists to document; the credential transfer route is undefined; query configuration has not been exercised | Document the reviewed Actor ID and query input once selected; agree the credential channel with the employer | R2, A2, O10 |
 | R14 | Provide automated tests for schemas, timestamps, alignment, features, targets, leakage, metrics and reports | Assessment brief, project quality expectation; PHASE_1 §4 R14 | Must | Offline test suite covers each listed area and runs in CI with lint, registry validation and documentation validation | TEST_PLAN.md | `tests/unit/` (18 modules including documentation validation) | Local run after the Phase 2 work: 120 passed; prior GitHub Actions CI run 188 on commit dc4770a succeeded with ruff, registry validation, `scripts/validate_docs.py` and pytest | Verified complete | The new storage tests are local-only until the next CI run | Re-run CI on the branch head and record the run URL | None |
-| R15 | Join the X-post and price datasets in a database | Assessment brief, Project Overview; DECISIONS D-025, D-026 | Must | Normalized posts and price bars are persisted in a versioned database schema and joined by asset and cutoff, with idempotent writes and a reproducible query used by the pipeline | ARCHITECTURE.md §Components, DESIGN.md §Persistence, DATA_POLICY.md | `src/xsentiment/storage/models.py`, `repositories.py`, `database.py` | `tests/unit/test_storage_join.py`: idempotent price/post upserts, one bar per UTC day, descriptive same-day SQL join, and a cutoff join that uses the prior close and excludes late/future posts. The run CLI still reads file snapshots | Partially complete | Schema, repositories and both joins are implemented and tested; the end-to-end pipeline does not yet consume the persisted join, so the "used by the pipeline" acceptance clause is unmet | Add a persisted-input path to the run pipeline and an end-to-end test once real X rows exist; keep raw text out of Git | None internal; real X rows also depend on R2 |
+| R15 | Join the X-post and price datasets in a database | Assessment brief, Project Overview; DECISIONS D-025, D-026 | Must | Normalized posts and price bars are persisted in a versioned database schema and joined by asset and cutoff, with idempotent writes and a reproducible query used by the pipeline | ARCHITECTURE.md §Components, DESIGN.md §Persistence, DATA_POLICY.md | `src/xsentiment/storage/models.py`, `repositories.py`, `main.py` (`persist`, `run --database-url`) | `tests/unit/test_storage_join.py`: idempotent upserts, one bar per UTC day, descriptive and cutoff joins. `tests/unit/test_phase3_ingestion_e2e.py`: a bounded end-to-end ingest from a mocked adapter into a real SQLite file, the leakage-safe cutoff join over those rows, and a complete `xsentiment run --database-url` whose manifest records `input_source = persisted_storage` | Verified complete | Verified on fixtures only; a database holding real X rows still depends on R2 | Run against accepted real X rows once R2 unblocks; keep raw text out of Git | None internal; real X rows also depend on R2 |
 | NFR1 | Reproducibility metadata: code revision, source/version, query/window, retrieval time, schema, non-secret run ID | Assessment brief, Project Overview; PRD §Non-functional | Should | Each run records the listed metadata without secrets | PRD.md, RULES.md | `src/xsentiment/pipeline/forecast_run.py` (`_manifest`) | `manifest.json` provenance block; `tests/unit/test_pipeline.py` | Partially complete | Code revision is recorded only when the CLI is given provenance; the commit SHA is not auto-captured | Capture the git revision or require a provenance field, then add a test | None |
 | NFR2 | Temporal integrity: timezone-aware timestamps, event time distinct from first-observed time | Assessment brief, Project Scope §1; PHASE_1 §8 | Must | Naive timestamps rejected; retrieval time never derived from creation time | DESIGN.md, docs/PHASE_2_DATA_CONTRACT.md | `src/xsentiment/ingestion/contracts.py` | `tests/unit/test_contracts.py`, `tests/unit/test_pipeline.py` (naive timestamp rejection) | Verified complete | Real provider payloads unprofiled | Profile one accepted payload | R2 |
 | NFR3 | Security: no tokens, cookies, private exports or large raw datasets in Git | Assessment brief, Submission item 2; PHASE_1 §5 | Must | Repository contains no credentials or raw private exports; ignored paths cover data and secrets | RULES.md §Security, DATA_POLICY.md §What is committed | `.gitignore`, `.env.example` | Working-tree and history pattern scan on 2026-10-26 found no token or private-key patterns; only `.env.example` placeholders are tracked; no raw datasets committed | Verified complete | History cannot be fully guaranteed clean until the employer clones and scans | Re-scan after any future data addition | None |
@@ -82,8 +82,8 @@ cannot drift from the rows above.
 
 | Status | Requirements |
 | --- | --- |
-| Verified complete | R1, R3, R6, R8, R12, R14, NFR2, NFR3, NFR5, NFR6, A5 |
-| Partially complete | R4, R5, R7, R9, R10, R11, R13, R15, NFR1, NFR4, A3, A4, A6, A7 |
+| Verified complete | R1, R3, R6, R8, R12, R14, R15, NFR2, NFR3, NFR5, NFR6, A5 |
+| Partially complete | R4, R5, R7, R9, R10, R11, R13, NFR1, NFR4, A3, A4, A6, A7 |
 | Not implemented | None |
 | Blocked by external dependency | R2, A2 |
 | Needs clarification | A1 |
@@ -98,9 +98,9 @@ channel), **O11** (exact calendar deadline), **O13** (Apify Actor, pricing and s
 **A2/R2** (provider access and credentials), **A4** (Tavily key for live news context) and
 employer confirmation of the **O3/O4** target convention. Documented working defaults:
 O1–O5, O7–O9, O12, and the ML interpretation in O8; O3/O4 remain subject to employer
-confirmation. R15 (database join) now has a tested storage schema and cutoff join, but
-the end-to-end pipeline still reads file snapshots; it is an internal implementation gap,
-not a Phase 1 requirements ambiguity.
+confirmation. R15 (database join) now has a tested schema, cutoff join and a
+persisted-input CLI path (`xsentiment persist`, `run --database-url`); the residual
+real-data dependency is R2, not a Phase 1 requirements ambiguity.
 
 ## Phase 1 exit criteria
 
@@ -111,9 +111,9 @@ negative scope; and the blocker column names an owner for every blocked row. The
 PDFs have now been read and reconciled. The remaining external items are the employer
 deadline (A1), provider/credential access (A2, R2), dataset/Actor selection (O6, O13), the
 private credential channel (O10), a Tavily key for live news context (A4) and employer
-confirmation of the n+0 target convention (O3/O4). R15 now has a tested schema and join,
-but pipeline integration and the other partial implementation rows are later-phase gaps,
-not requirements ambiguities; they must not be presented as complete.
+confirmation of the n+0 target convention (O3/O4). R15 now has a tested schema, joins
+and a persisted-input CLI path, verified offline; the other partial implementation
+rows remain later-phase gaps and must not be presented as complete.
 
 ## Submission packet (assignment page 2)
 

@@ -39,7 +39,7 @@ Explicit config, timeouts and bounded response/run controls. Validate Actor inpu
 - `daily_post_price_join` is a descriptive SQL join by UTC event date. It must not feed a historical model because the same-day close is not known at that day's cutoff.
 - `cutoff_post_price_join` aggregates only posts in `(cutoff - 24h, cutoff]` with `retrieved_at <= cutoff`, and joins the last completed bar strictly before the cutoff. This is the leakage-safe shape.
 
-The end-to-end `run` CLI still reads file snapshots and joins in memory, so R15 remains partially complete. Raw post text and private data stay out of Git; the database is a local ignored artefact.
+The pipeline consumes this path offline: `xsentiment persist` upserts snapshot inputs and `xsentiment run --database-url` reads candles and posts from the same rows (manifest provenance records `input_source = persisted_storage` and the snapshot IDs; verified in `tests/unit/test_phase3_ingestion_e2e.py`). Row provenance keeps each row's non-null `source_snapshot_id`. Raw post text and private data stay out of Git; the database is a local ignored artefact.
 
 ## Output contracts
 Forecast: asset, issue cutoff, horizon, predicted close, model version, feature/data run IDs and uncertainty/limitations.

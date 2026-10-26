@@ -97,8 +97,10 @@ documented, bounded end-to-end X ingest passes. **Unmet: no accepted X source ye
 Model/report: baselines and sentiment model run; walk-forward is leakage-safe;
 charts/outlook/report derive from actual outputs; risk metrics only from valid strategy
 returns. **Met for prices; the sentiment comparison is blocked on X data.**
-Storage: R15 schema, idempotent repositories and both joins have acceptance tests, but
-the run CLI still reads file snapshots. **Partially met; pipeline integration remains.**
+Storage: R15 schema, idempotent repositories and both joins have acceptance tests, and
+the pipeline now consumes persisted inputs (`xsentiment persist`, run
+`--database-url`), verified by `tests/unit/test_phase3_ingestion_e2e.py`. **Met offline
+(on fixtures); a database holding real X rows remains blocked on R2.**
 
 ## Commands
 From repo root:

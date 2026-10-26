@@ -36,8 +36,9 @@ not a tweet corpus.
 (A1, D-014); provider access, credentials and the private transfer channel remain external
 (R2, A2, O10); dataset/Actor selection remains open (O6, O13); a Tavily key is needed for
 live news context (A4); and the n+0 convention still needs employer confirmation (O3/O4).
-R15 (database join) now has a tested storage layer but is not yet consumed by the run CLI.
-This does not mean X data has been collected or any sentiment result measured.
+R15 (database join) now has a tested storage layer plus a persisted-input CLI path
+(`xsentiment persist`, `run --database-url`), verified offline with fixtures. This
+does not mean X data has been collected or any sentiment result measured.
 
 ## Phase 2 — Canonical documentation
 Status: complete for the current verified baseline. The canonical documents were reconciled
@@ -68,11 +69,19 @@ Status: in progress; X data externally blocked. Price ingestion is complete and 
   with `offset`/`limit`, and records query provenance; it remains mocked-only.
 - Registry: 12 source records validate structurally, with an explicit
   `independent_verification.status = not-reverified` and no implied legal approval.
-- Database join (R15): versioned `price_bars`/`x_posts` tables, idempotent repositories and
-  tested descriptive/cutoff joins exist in `src/xsentiment/storage/`. The run CLI still
-  reads file snapshots, so R15 is partial.
-Acceptance (unmet): accepted source, sanitized coverage evidence, a bounded end-to-end X
-ingestion test, pipeline integration of the persisted join, and licensing/terms.
+- Database join (R15): complete for the offline path. Versioned `price_bars`/`x_posts`
+  tables, idempotent repositories and tested descriptive/cutoff joins exist in
+  `src/xsentiment/storage/`, and the pipeline now consumes persisted inputs:
+  `xsentiment persist` upserts snapshots into the local database and
+  `xsentiment run --database-url` runs the full evaluation from those rows (manifest
+  records `input_source = persisted_storage`).
+- Bounded end-to-end X ingestion: `tests/unit/test_phase3_ingestion_e2e.py` drives a
+  mocked adapter response (offline) through normalization, persistence and the
+  leakage-safe cutoff join, and then runs the persisted-input CLI end to end. This is
+  wiring evidence only; it proves no provider access and contains no real posts.
+Acceptance: met for the persisted-join pipeline integration and the bounded end-to-end
+ingestion test (offline, fixtures). Still unmet: an accepted X source, sanitized
+180-day coverage evidence and reviewed licensing/terms — all external (R2, O6, O13).
 
 ## Phase 4 — Sentiment and features
 Status: implemented and unit-verified; real-data acceptance blocked on accepted X text.

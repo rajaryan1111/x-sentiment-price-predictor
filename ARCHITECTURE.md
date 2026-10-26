@@ -11,7 +11,7 @@ Configuration/secrets -> source adapters (X/Apify, BTC prices, optional news con
 - Price adapter: Coinbase BTC-USD daily candles with UTC bounds and OHLCV validation.
 - Data-quality pipeline (historical Phase 2 workstream): deduplication, coverage profiling, point-in-time features and n+0..n+5 close labels.
 - Features: VADER sentiment scoring, predeclared lagged/rolling price features, trailing-24h sentiment aggregation and supervised dataset assembly, with definitions governed by MODEL_PLAN.md.
-- Storage: project-owned `price_bars`/`x_posts` schema, idempotent repositories and a leakage-safe cutoff join; tested in `tests/unit/test_storage_join.py`. The run CLI still joins file snapshots in memory, so R15 remains partial. Raw social data only where terms permit.
+- Storage: project-owned `price_bars`/`x_posts` schema, idempotent repositories and a leakage-safe cutoff join; tested in `tests/unit/test_storage_join.py`. The run CLI consumes persisted inputs (`xsentiment persist`, `run --database-url`; R15 verified offline in `tests/unit/test_phase3_ingestion_e2e.py`). Raw social data only where terms permit.
 - Models: naive persistence baseline, price-only ridge model and candidate sentiment-plus-price ridge model, one per horizon, fitted on ratio targets.
 - Validation: expanding walk-forward splits with a purge gap equal to the longest horizon, train-fold-only transforms and leakage guards.
 - Backtesting: forecasts-to-returns strategy simulation and risk metrics from out-of-sample predictions only.
@@ -32,7 +32,7 @@ Secrets via environment/approved secret manager; raw/private data out of Git; re
 
 ## Implementation status
 Implemented and verified on real public price data: Coinbase daily adapter (180/180 bars refetched 2026-10-26); normalized X contract with raw-timestamp/offset provenance; deduplication, coverage, point-in-time alignment and horizon-label primitives with unfinished-day exclusion; VADER sentiment scoring; price features and supervised dataset; naive, price-only and candidate ridge models; purged walk-forward evaluation with per-horizon MAE/RMSE; predeclared long/flat strategy with Sharpe/Sortino/drawdown and disclosure; SVG charts; one-page outlook; evaluation report; offline CLI and 120 offline tests.
-Implemented and unit-tested, not pipeline-integrated: versioned price/post tables, idempotent repositories and the descriptive/cutoff joins (R15 partial).
+Implemented and verified offline: versioned price/post tables, idempotent repositories, descriptive/cutoff joins, and a persisted-input CLI path (`xsentiment persist`, `run --database-url` with `input_source = persisted_storage` provenance; R15).
 Implemented but not live-verified: configurable Apify X adapter with response-envelope handling, offset pagination and query provenance (mocked only; no Actor selected or run; ticker/cashtag/keyword inputs not exercised against a real Actor).
-Not evidenced complete: the end-to-end run does not consume the persisted join; live X ingestion, accepted licensing/coverage, and sentiment-backed evaluation remain blocked.
+Not evidenced complete: live X ingestion, accepted licensing/coverage, and sentiment-backed evaluation remain blocked.
 Not evidenced complete: real X collection, accepted license/coverage for X data, a live Tavily/Exa call, the sentiment-versus-price comparison, a sentiment-change chart, and any claim that a model beats the naive baseline (the current measurement is the opposite).

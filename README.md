@@ -94,10 +94,25 @@ engagement-column coverage, malformed counts, daily gaps and whether the request
 calendar window is complete. A complete window is still not proof of point-in-time
 availability, licensing or X platform identity.
 
-Persist local snapshots and inspect the leakage-safe cutoff join (the database file is
-ignored by Git and post text is never printed):
+Persist local snapshots into the storage database, then run the whole evaluation from
+the persisted rows (the database file is ignored by Git and post text is never
+printed; requires `pip install -e ".[storage]"` already present with the dev extras):
 
 ```bash
+# populate the local database from snapshots; repeating this command is idempotent
+python -m xsentiment persist \
+  --prices data/btc-usd-daily-2026-04-29_2026-10-25.json \
+  --posts posts.jsonl \
+  --database-url sqlite+aiosqlite:///./data/xsentiment.db
+
+# run the full evaluation from the persisted rows; the manifest records
+# "input_source": "persisted_storage" and the source snapshot IDs
+python -m xsentiment run \
+  --database-url sqlite+aiosqlite:///./data/xsentiment.db \
+  --out reports/btc-usd-180d-persisted \
+  --now 2026-10-26T00:00:00+00:00
+
+# optionally inspect the leakage-safe cutoff join as a JSON report
 python scripts/persist_and_join.py \
   --prices data/btc-usd-daily-2026-04-29_2026-10-25.json \
   --posts posts.jsonl \
@@ -105,8 +120,9 @@ python scripts/persist_and_join.py \
   --start 2026-04-30 --end 2026-10-25 --out data/cutoff-join.json
 ```
 
-This exercises the schema and join but does not make the `run` CLI consume persisted
-data; R15 remains partial.
+This is verified offline on fixtures (`tests/unit/test_phase3_ingestion_e2e.py`); a
+database populated with real X rows is still blocked until R2 supplies an accepted,
+permitted source.
 
 Each run writes `evaluation-report.md`, `outlook.md`, `sentiment-vs-price.svg`,
 `metrics.json`, `predictions.jsonl` and `manifest.json` (code revision, config,
@@ -185,6 +201,8 @@ dataset has been accepted, licensed or profiled for 180-day text coverage.
   unique requirement IDs, matrix completeness and status-summary consistency.
 - `scripts/persist_and_join.py` — optional local persistence and cutoff-join report;
   requires the `storage` extra, makes no network call and prints no post text.
+- `xsentiment persist` — the CLI form of the same persistence step; `xsentiment run
+  --database-url` then evaluates from the persisted rows instead of file snapshots.
 - `tests/` — offline unit tests; live provider calls are never made in CI.
 
 ## Data, security and evaluation rules
