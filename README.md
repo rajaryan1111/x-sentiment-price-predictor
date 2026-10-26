@@ -2,7 +2,7 @@
 
 Research pipeline to evaluate whether timestamped X sentiment adds predictive value beyond price-only baselines for a selected asset.
 
-> **Current status:** Architecture scaffold and dataset registry are present. Phase 1 requirements have been drafted, but asset/period/target and data-access decisions remain open. This repository does not yet claim live ingestion, trained forecasts, backtest results, Sharpe ratio, Sortino ratio, or maximum drawdown.
+> **Current status:** Architecture scaffold and dataset registry are present. Phase 1 requirements are documented. The selected working assumptions are BTC-USD with daily (`1d`) bars; exact target semantics, price-provider details and historical-data rights remain open. This repository does not yet claim live ingestion, trained forecasts, backtest results, Sharpe ratio, Sortino ratio, or maximum drawdown.
 
 ## Requirements first
 
