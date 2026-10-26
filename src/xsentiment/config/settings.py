@@ -2,7 +2,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,6 +29,24 @@ class Settings(BaseSettings):
     price_provider_api_key: SecretStr | None = None
     asset_symbol: str | None = None
     asset_class: str | None = None
+
+    @field_validator(
+        "apify_api_token",
+        "apify_actor_id",
+        "tavily_api_key",
+        "exa_api_key",
+        "price_provider",
+        "price_provider_api_key",
+        "asset_symbol",
+        "asset_class",
+        mode="before",
+    )
+    @classmethod
+    def blank_optional_values_become_none(cls, value):
+        """Treat blank .env entries as missing instead of configured credentials."""
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value.strip() if isinstance(value, str) else value
 
 
 @lru_cache(maxsize=1)
