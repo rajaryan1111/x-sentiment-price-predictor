@@ -1,5 +1,5 @@
 # Test Plan
-A passing suite proves only the cases it actually exercises. 120 offline tests pass
+A passing suite proves only the cases it actually exercises. 127 offline tests pass
 locally (`pytest`), and CI runs lint, registry validation, documentation validation and
 pytest on Python 3.11 with only the `dev` and `storage` extras installed.
 
@@ -29,9 +29,13 @@ pytest on Python 3.11 with only the `dev` and `storage` extras installed.
   duplicate fails closed.
 - Prices: UTC half-open bounds, ordering, malformed OHLCV, invalid OHLC relation,
   duplicates, out-of-range rows, missing dates, incomplete current day.
-- Alignment: UTC boundary cases and the trailing 24-hour window.
+- Alignment: UTC boundary cases and the trailing 24-hour window, including that a post
+  created exactly at `cutoff - 24h` is excluded and a post created or retrieved exactly
+  at the cutoff is included. (Exact half-open window boundaries.)
 - Sentiment: scores stay inside [-1, 1] and keep their sign, blank text returns null,
-  scoring reports post/scored/unscored counts, and the scorer records a version.
+  scoring reports post/scored/unscored counts, the scorer records a version, non-string
+  text fails closed with `TypeError`, unicode text is scored without crashing, and
+  scoring is identical across repeat runs.
 - Features: every declared feature name is always present, short history yields null
   rather than zero, known values match hand-computed ones, and values are computed from
   completed candles only.

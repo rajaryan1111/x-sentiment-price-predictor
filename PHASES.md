@@ -91,6 +91,11 @@ Status: implemented and unit-verified; real-data acceptance blocked on accepted 
   with nulls preserved and no target leakage.
 - 180 price cutoffs were feature-built with zero posts, and sentiment correctly stayed
   unavailable instead of being zero-filled.
+- Phase 4 audit additions (127 offline tests): the exact half-open 24-hour window boundary is
+  unit-verified (a post created at `cutoff - 24h` is excluded; a post created or retrieved
+  exactly at the cutoff is included), scoring is deterministic across repeat runs, the
+  manifest records the versioned scorer, and unicode/non-string text are exercised without
+  crashing or weakening the null policy.
 Acceptance (unmet): a reproducible feature dataset and quality profile derived from
 permitted real post text.
 

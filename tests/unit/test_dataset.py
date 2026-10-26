@@ -67,6 +67,41 @@ def test_features_never_use_the_candle_that_starts_at_the_cutoff() -> None:
     assert last.labels == {}
 
 
+def test_aggregation_window_is_exactly_half_open_around_the_cutoff() -> None:
+    """Posts created at exactly cutoff-24h are out; cutoff-inclusive posts are in."""
+    candles = candles_from(["100", "101", "102", "103"])
+    cutoff = datetime(2026, 9, 3, tzinfo=UTC)
+    posts = [
+        make_post(
+            "at_window_start",
+            cutoff - timedelta(hours=24),
+            cutoff - timedelta(hours=24),
+            0.9,
+        ),
+        make_post("at_exact_cutoff", cutoff - timedelta(hours=5), cutoff, -0.9),
+        make_post("created_at_exact_cutoff", cutoff, cutoff, 0.1),
+    ]
+
+    row = {row.cutoff: row for row in build_supervised_dataset(candles, posts)}[cutoff]
+
+    assert row.features["post_count_24h"] == 2.0
+    assert row.features["mean_sentiment_24h"] == pytest.approx((-0.9 + 0.1) / 2)
+
+
+def test_dataset_assembly_is_deterministic_across_repeat_runs() -> None:
+    cutoff = datetime(2026, 9, 6, tzinfo=UTC)
+    posts = [
+        make_post("early", cutoff - timedelta(hours=6), cutoff - timedelta(hours=2), 0.4),
+        make_post("unscored", cutoff - timedelta(hours=3), cutoff - timedelta(hours=1), None),
+    ]
+    candles = candles_from([str(100 + index) for index in range(8)])
+
+    first = build_supervised_dataset(candles, posts)
+    second = build_supervised_dataset(candles, posts)
+
+    assert first == second
+
+
 def test_sentiment_features_use_only_posts_available_by_the_cutoff() -> None:
     candles = candles_from(["100", "101", "102", "103"])
     cutoff = datetime(2026, 9, 3, tzinfo=UTC)

@@ -5,7 +5,12 @@ from statistics import pstdev
 import pytest
 
 from xsentiment.features.price_features import PRICE_FEATURE_NAMES, price_features
-from xsentiment.features.sentiment import VaderSentimentScorer, coverage, score_posts
+from xsentiment.features.sentiment import (
+    VaderSentimentScorer,
+    coverage,
+    score_posts,
+    scorer_identity,
+)
 from xsentiment.ingestion.contracts import XPostRecord
 from xsentiment.ingestion.prices import PriceCandle
 
@@ -80,6 +85,39 @@ def test_vader_scorer_is_bounded_signed_and_versioned() -> None:
     assert positive is not None and 0.0 < positive <= 1.0
     assert negative is not None and -1.0 <= negative < 0.0
     assert scorer.score("   ") is None
+
+
+def test_scorer_rejects_non_string_text_and_scores_unicode_without_crashing() -> None:
+    scorer = VaderSentimentScorer()
+    with pytest.raises(TypeError, match="string"):
+        scorer.score(None)  # type: ignore[arg-type]
+
+    emoji_text = scorer.score("🚀🚀 huge gains for Bitcoin holders today!! 🚀🚀")
+    assert emoji_text is not None
+    assert 0.0 < emoji_text <= 1.0
+    # non-breaking space is unicode blank, too
+    assert scorer.score("\n\t\u00a0 ") is None
+
+
+def test_scorer_identity_records_the_installed_version() -> None:
+    identity = scorer_identity(VaderSentimentScorer())
+
+    assert identity["scorer"] == "vader"
+    assert identity["version"] and identity["version"][0].isdigit()
+
+
+def test_scored_posts_match_across_repeat_runs() -> None:
+    posts = [
+        make_post("a", "Bitcoin to the moon, huge bull run"),
+        make_post("c", "This crash is terrible news for holders"),
+    ]
+
+    first = score_posts(posts)
+    second = score_posts(posts)
+
+    assert [(post.post_id, post.sentiment_score) for post in first] == [
+        (post.post_id, post.sentiment_score) for post in second
+    ]
 
 
 def test_score_posts_fills_scores_and_reports_coverage() -> None:

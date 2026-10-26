@@ -199,6 +199,7 @@ def test_pipeline_writes_every_documented_artefact(tmp_path: Path) -> None:
     assert manifest["dataset"]["rows_with_sentiment"] > 0
     assert manifest["evaluation"]["folds"]
     assert manifest["provenance"]["price_snapshot_sha256"] == sha256_file(prices)
+    assert manifest["provenance"]["sentiment_scorer"].startswith("vader ")
     assert set(metrics["mean_mae_by_model"]) == {"naive", "price_only", "sentiment_price"}
     assert metrics["strategies"]["price_only"]["assumptions"]["fee_rate"] == 0.001
     assert len(predictions) == manifest["evaluation"]["predictions"]
