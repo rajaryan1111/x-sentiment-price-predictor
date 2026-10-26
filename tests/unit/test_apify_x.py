@@ -1,5 +1,5 @@
+import asyncio
 from datetime import UTC, datetime
-import json
 
 import httpx
 import pytest
@@ -7,7 +7,6 @@ from pydantic import SecretStr
 
 from xsentiment.config.settings import Settings
 from xsentiment.ingestion.apify_x import (
-    ApifyRunError,
     ApifyXAdapter,
     normalize_apify_post,
 )
@@ -88,7 +87,6 @@ def test_apify_config_is_required_before_network_activity() -> None:
         assert calls == []
         await adapter.aclose()
 
-    import asyncio
     asyncio.run(run())
 
 
