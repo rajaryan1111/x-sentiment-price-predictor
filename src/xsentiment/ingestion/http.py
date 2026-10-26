@@ -1,10 +1,12 @@
-"""Shared async HTTP client with bounded concurrency, timeouts and response-size limits."""
+"""Shared async HTTP client with bounded concurrency, retries and response-size limits."""
+import asyncio
 import hashlib
 from dataclasses import dataclass
 
 import httpx
 
 from xsentiment.config.settings import get_settings
+from xsentiment.errors import PayloadTooLargeError
 from xsentiment.ingestion.retry import retry_async
 
 
@@ -28,8 +30,7 @@ class AsyncHttpClient:
             follow_redirects=True,
             headers={"User-Agent": "XSentimentPricePredictor/0.1 (+research; contact repository owner)"},
         )
-        self._limit = settings.http_max_concurrency
-        self._semaphore = __import__("asyncio").Semaphore(self._limit)
+        self._semaphore = asyncio.Semaphore(settings.http_max_concurrency)
         self._max_bytes = settings.http_max_response_bytes
         self._attempts = settings.http_max_retries + 1
 
@@ -43,8 +44,9 @@ class AsyncHttpClient:
                     async for chunk in response.aiter_bytes():
                         total += len(chunk)
                         if total > self._max_bytes:
-                            from xsentiment.errors import PayloadTooLargeError
-                            raise PayloadTooLargeError(f"Response exceeded {self._max_bytes} bytes")
+                            raise PayloadTooLargeError(
+                                f"Response exceeded configured ceiling of {self._max_bytes} bytes"
+                            )
                         chunks.append(chunk)
                     body = b"".join(chunks)
                     return FetchResult(
@@ -54,6 +56,7 @@ class AsyncHttpClient:
                         content_hash=hashlib.sha256(body).hexdigest(),
                         headers=dict(response.headers),
                     )
+
         return await retry_async(request, attempts=self._attempts)
 
     async def aclose(self) -> None:
