@@ -105,10 +105,24 @@ def test_apify_run_uses_bearer_auth_cost_and_item_caps_and_fetches_dataset() -> 
             return httpx.Response(
                 201,
                 json={
-                    "id": "run-1",
-                    "status": "SUCCEEDED",
-                    "exitCode": 0,
-                    "defaultDatasetId": "ds-1",
+                    "data": {
+                        "id": "run-1",
+                        "status": "RUNNING",
+                        "exitCode": None,
+                        "defaultDatasetId": "ds-1",
+                    }
+                },
+            )
+        if request.method == "GET" and "/actor-runs/" in request.url.path:
+            return httpx.Response(
+                200,
+                json={
+                    "data": {
+                        "id": "run-1",
+                        "status": "SUCCEEDED",
+                        "exitCode": 0,
+                        "defaultDatasetId": "ds-1",
+                    }
                 },
             )
         if request.method == "GET" and "/datasets/" in request.url.path:

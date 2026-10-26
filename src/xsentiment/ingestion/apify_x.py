@@ -79,17 +79,19 @@ class ApifyXAdapter:
         headers = self._auth_headers()
         actor_id = quote(self.settings.apify_actor_id.strip(), safe="~")
         launch_url = f"{APIFY_API_BASE}/actors/{actor_id}/runs"
-        run = await self._request_json(
-            "POST",
-            launch_url,
-            headers=headers,
-            params={
-                "waitForFinish": "60",
-                "maxItems": str(max_items),
-                "maxTotalChargeUsd": f"{max_total_charge_usd:g}",
-                "timeout": str(timeout_seconds),
-            },
-            json_body=actor_input,
+        run = _unwrap_run(
+            await self._request_json(
+                "POST",
+                launch_url,
+                headers=headers,
+                params={
+                    "waitForFinish": "60",
+                    "maxItems": str(max_items),
+                    "maxTotalChargeUsd": f"{max_total_charge_usd:g}",
+                    "timeout": str(timeout_seconds),
+                },
+                json_body=actor_input,
+            )
         )
         if not isinstance(run, dict):
             raise ApifyRunError("Apify returned an invalid run object")
@@ -103,11 +105,13 @@ class ApifyXAdapter:
                 raise ApifyRunError("Apify run did not finish before the local wait deadline")
             await asyncio.sleep(1)
             run_url = f"{APIFY_API_BASE}/actor-runs/{quote(run_id, safe='')}"
-            run = await self._request_json(
-                "GET",
-                run_url,
-                headers=headers,
-                params={"waitForFinish": "60"},
+            run = _unwrap_run(
+                await self._request_json(
+                    "GET",
+                    run_url,
+                    headers=headers,
+                    params={"waitForFinish": "60"},
+                )
             )
             if not isinstance(run, dict):
                 raise ApifyRunError("Apify returned an invalid run status object")
@@ -196,6 +200,13 @@ class ApifyXAdapter:
 
     async def __aexit__(self, exc_type, exc, tb) -> None:  # noqa: ANN001
         await self.aclose()
+
+
+def _unwrap_run(payload: Any) -> Any:
+    """Unwrap the ``data`` envelope documented for Apify run endpoints."""
+    if isinstance(payload, dict) and isinstance(payload.get("data"), dict):
+        return payload["data"]
+    return payload
 
 
 def normalize_apify_post(
