@@ -18,7 +18,7 @@ A passing suite proves only the cases it actually exercises.
 - Features: lags exclude target period; no posts/scores yield null; engagement excluded without snapshots.
 - Targets: correct horizon mapping; missing/gapped/incomplete targets omitted; no targets in features.
 - Validation: chronological folds, gap handling, non-overlapping test windows, no leakage, transforms fit only on training folds, holdout isolation. The split helper does not itself fit models or prove label leakage is absent.
-- Models/metrics: baseline consistency, per-horizon MAE/RMSE, edge cases and deterministic config.
+- Models/metrics: persistence baseline emits all six horizons from a completed close; reject non-Decimal, non-finite and non-positive prices; per-horizon MAE/RMSE remains pending.
 - Trading metrics: invalid/zero returns and assumptions; no metrics without strategy return series.
 - Reporting: cutoff/provenance, separate observed facts/predictions/news and unavailable metric labels.
 - Profiler: CSV/JSONL, custom mappings, invalid times, duplicate/missing fields, no text printed.
