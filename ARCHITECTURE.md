@@ -10,12 +10,13 @@ Configuration/secrets -> source adapters (X/Apify, BTC prices, optional news con
 - X adapter: explicit Actor ID/input and bounded controls; schema must be verified for the selected Actor.
 - Price adapter: Coinbase BTC-USD daily candles with UTC bounds and OHLCV validation.
 - Phase 2 pipeline: deduplication, coverage profiling, point-in-time features and n+0..n+5 close labels.
-- Features: sentiment aggregation and lagged price features, with definitions governed by MODEL_PLAN.md.
+- Features: VADER sentiment scoring, predeclared lagged/rolling price features, trailing-24h sentiment aggregation and supervised dataset assembly, with definitions governed by MODEL_PLAN.md.
 - Storage: project-owned schema/repository; raw social data only where terms permit.
-- Models: naive baseline, price-only model and candidate sentiment-plus-price model.
-- Validation: walk-forward splits, train-fold-only transforms and leakage guards.
-- Backtesting: optional strategy simulation from out-of-sample forecasts only.
-- Reporting: metric tables, charts, one-page outlook and report assembly.
+- Models: naive persistence baseline, price-only ridge model and candidate sentiment-plus-price ridge model, one per horizon, fitted on ratio targets.
+- Validation: expanding walk-forward splits with a purge gap equal to the longest horizon, train-fold-only transforms and leakage guards.
+- Backtesting: forecasts-to-returns strategy simulation and risk metrics from out-of-sample predictions only.
+- Reporting: metric tables, SVG charts, one-page outlook and report assembly.
+- Pipeline: offline run orchestration plus JSON/JSONL input loaders and the `fetch-prices` / `run` CLI.
 - Dashboard: presentation only; authoritative metrics come from the pipeline.
 - Scripts: explicit bounded entry points; no paid/network side effects on import.
 - Tests: offline unit tests and mocked provider contracts by default.
@@ -30,5 +31,6 @@ Adapters normalize provider payloads without fabricating missing fields. Raw dat
 Secrets via environment/approved secret manager; raw/private data out of Git; retention follows source terms; avoid full-text logs. Record provider, query/window, retrieval timestamp, schema, non-secret run ID and hash where possible.
 
 ## Implementation status
-Implemented: Coinbase daily adapter; normalized X contract; configurable Apify adapter (mocked, not live verified); deduplication, coverage, point-in-time alignment and horizon-label primitives; local CSV/JSONL profiler; tests/CI.
-Not evidenced complete: real X collection, accepted license/coverage, sentiment scoring, trained forecasts, walk-forward evaluation, trading metrics, charts, current outlook and full report.
+Implemented and verified on real public price data: Coinbase daily adapter (180/180 bars refetched 2026-10-26); normalized X contract; deduplication, coverage, point-in-time alignment and horizon-label primitives with unfinished-day exclusion; VADER sentiment scoring; price features and supervised dataset; naive, price-only and candidate ridge models; purged walk-forward evaluation with per-horizon MAE/RMSE; predeclared long/flat strategy with Sharpe/Sortino/drawdown and disclosure; SVG charts; one-page outlook; evaluation report; offline CLI and 97 tests with CI.
+Implemented but not live-verified: configurable Apify X adapter (mocked only; no Actor selected or run).
+Not evidenced complete: real X collection, accepted license/coverage for X data, the sentiment-versus-price comparison, and any claim that a model beats the naive baseline (the current measurement is the opposite).

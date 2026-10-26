@@ -1,5 +1,5 @@
 # Product Requirements Document (PRD)
-Status: canonical working baseline; data-access and employer-clarification gates remain open.
+Status: canonical working baseline. Price ingestion, features, baselines, walk-forward evaluation, charts, outlook and report are implemented and verified on real public price data. X data access, the sentiment-versus-price comparison and employer clarifications remain open gates.
 Authority: the supplied CWT X sentiment Agent - intern task.pdf defines assignment requirements. This document translates them into testable requirements; it does not claim incomplete work is done.
 
 ## Goal
@@ -45,7 +45,13 @@ Other assets/intervals, live order execution, guaranteed returns, investment adv
 At cutoff t, a post is eligible only when event time and defensible availability time are <= t. Use only completed prior candles as price inputs. Targets are separate from features; omit incomplete or gap-crossing horizons. Current engagement is metadata unless historical snapshots exist. Use walk-forward/chronological splits, fit transforms only on training folds, and keep a final holdout untouched. Report MAE/RMSE by horizon and baseline comparisons. Trading metrics require a separately specified strategy, out-of-sample returns, costs, slippage, annualization and return conventions.
 
 ## Current evidence, not completion
-The user-run Coinbase profile reported 180/180 daily BTC-USD bars for 2026-04-29 through 2026-10-25 UTC with no missing/duplicate timestamps. Ingestion/alignment primitives are implemented and CI passed lint, registry validation and pytest. No live Apify Actor is selected or run; no real post-level X dataset is accepted; uploaded ZIP contents remain unverified. No trained model, walk-forward results, charts, outlook or valid trading metrics are claimed complete.
+- **Prices (verified).** 180/180 public Coinbase `BTC-USD` daily bars for 2026-04-29 through 2026-10-25 UTC, refetched 2026-10-26 with no missing or duplicate timestamps and the unfinished current day excluded; reproduced by `python -m xsentiment fetch-prices`.
+- **Features and targets (implemented, unit-verified, run on real prices).** Point-in-time price and sentiment features plus n+0..n+5 ratio labels; the unfinished UTC day is dropped and no target column can enter a feature row.
+- **Models and evaluation (implemented, run on real prices).** Naive persistence, price-only ridge and sentiment-plus-price ridge on identical folds and eligible rows: 5 expanding folds, 60→140 training rows, 20 test rows, 5-row purge, 100 out-of-sample days per model and horizon, 1800 stored predictions.
+- **Measured result (negative).** Mean MAE across horizons: naive **$1,828.36**, price-only ridge **$2,264.62** (23.86% worse). No claim is made that any model adds predictive value, and the candidate model is identical to price-only because no sentiment was available.
+- **Risk metrics (computed, short sample).** Predeclared long/flat strategy: +10.91% cumulative net return, Sharpe 1.807, Sortino 3.979, 4.08% maximum drawdown over 32 long days, against a +6.11% / 0.752 / 1.377 / 10.33% unconditional-long benchmark. The naive rule never trades, so its ratios are undefined.
+- **Reporting (implemented).** Chart, one-page outlook, evaluation report, metrics and manifest are produced by one offline command.
+- **Still not evidenced.** X data access, terms and any accepted post-level X dataset; the sentiment-versus-price comparison; a live Apify Actor run; uploaded ZIP archive contents; the runtime role of Tavily/Exa news; and every employer clarification of target semantics or deadline.
 
 ## Open gates
 Verify legal access, platform identity, actual schema/text and 180-day coverage; verify Actor terms/pricing/limits before any run; clarify target/news/RL/Exa expectations and deadline with employer. See the other eight canonical files.

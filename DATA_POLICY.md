@@ -25,6 +25,9 @@ created_at is event time; retrieved_at is when first observed. Never backdate re
 ## Security, retention and cost
 Keep raw datasets, private exports, hydrated text, cookies and secrets out of Git. Use ignored local paths or approved private storage; honor retention/deletion terms. Share credentials only through a verified employer-approved private channel. Bound items, timeout and spend; use a small schema test first; no automatic retries of non-idempotent paid launches.
 
+## What is committed to the repository
+Committed: sanitized reports, charts, outlook pages, metrics, manifests and non-secret configuration. Every real run records input SHA-256 hashes, counts and the library versions used. Post text is never written into a committed artefact, and bulk generated prediction dumps stay out of Git (see D-021). Optional news files are operator-supplied context only; the news text never becomes a model feature.
+
 ## Source acceptance checklist
 - Platform/source identity and access route verified.
 - Current terms reviewed for collection, training, storage, retention and reporting.

@@ -1,45 +1,97 @@
 # Test Plan
-A passing suite proves only the cases it actually exercises.
+A passing suite proves only the cases it actually exercises. 97 offline tests pass
+locally (`pytest`), and CI runs lint, registry validation and pytest on Python 3.11
+with only the `dev` and `storage` extras installed.
 
 ## Layers
-- Unit: validation, timestamps, deduplication, price coverage, features, targets, metrics and report formatting.
-- Adapter contracts: mocked responses, pagination, timeout/error behavior, normalization and secret redaction; no billing.
+- Unit: validation, timestamps, deduplication, price coverage, sentiment scoring,
+  price features, dataset assembly, fold generation, models, metrics, strategy,
+  evaluation, chart/outlook/report rendering, input loaders.
+- Adapter contracts: mocked provider responses, pagination, timeout/error behaviour,
+  normalization and secret redaction; no billing and no live provider call.
 - Integration: temporary storage/database and normalized data flow.
-- End-to-end: explicit opt-in using accepted permitted data; no paid scrape by default.
-- CI: Ruff, registry structural validation and pytest; describe only actual workflow checks.
+- End-to-end: the offline `run` CLI on a clearly labelled synthetic snapshot, plus a
+  separately documented real-data run using public Coinbase candles.
+- CI: Ruff, registry structural validation and pytest. No network call is made by the
+  suite; `fetch-prices` is exercised manually, not in CI.
 
 ## Required matrix
 - Config: missing/invalid config and caps fail clearly; secrets never logged.
-- X records: valid/missing optional fields, invalid IDs/timestamps, naive time rejection, negative counts.
-- Point-in-time: future event excluded; late-retrieved post excluded even if old; no backdating.
-- Deduplication: stable-ID exact duplicate handled deterministically; conflicting duplicate fails closed.
-- Prices: UTC half-open bounds, ordering, malformed OHLCV, invalid OHLC relation, duplicates, out-of-range rows, missing dates, incomplete current day.
-- Alignment: UTC boundary cases and trailing 24-hour window.
-- Features: lags exclude target period; no posts/scores yield null; engagement excluded without snapshots.
-- Targets: correct horizon mapping; missing/gapped/incomplete targets omitted; no targets in features.
-- Validation: chronological folds, no leakage, transforms fit only on training folds, holdout isolation.
-- Models/metrics: baseline consistency, per-horizon MAE/RMSE, edge cases and deterministic config.
-- Trading metrics: invalid/zero returns and assumptions; no metrics without strategy return series.
-- Reporting: cutoff/provenance, separate observed facts/predictions/news and unavailable metric labels.
-- Profiler: CSV/JSONL, custom mappings, invalid times, duplicate/missing fields, no text printed.
-- Apify: mocked run/status/dataset, auth header, bounds, timeouts/errors, no launch retry and no real Actor in CI.
-- Registry: source/platform identity and structural fields; validation does not imply live access or legal approval.
+- X records: valid/missing optional fields, empty or missing text, invalid IDs/timestamps,
+  naive timestamp rejection, negative counts, out-of-range sentiment.
+- Point-in-time: future event excluded; late-retrieved post excluded even if old; no
+  backdating; unfinished current UTC day dropped from features and labels.
+- Deduplication: stable-ID exact duplicate handled deterministically; conflicting
+  duplicate fails closed.
+- Prices: UTC half-open bounds, ordering, malformed OHLCV, invalid OHLC relation,
+  duplicates, out-of-range rows, missing dates, incomplete current day.
+- Alignment: UTC boundary cases and the trailing 24-hour window.
+- Sentiment: scores stay inside [-1, 1] and keep their sign, blank text returns null,
+  scoring reports post/scored/unscored counts, and the scorer records a version.
+- Features: every declared feature name is always present, short history yields null
+  rather than zero, known values match hand-computed ones, and values are computed from
+  completed candles only.
+- Dataset: labels exist only with a complete gap-free horizon; the cutoff candle's own
+  close never appears in its features; rows with missing sentiment keep null.
+- Folds: expanding windows, purge gap equals the longest horizon, empty result when
+  history is too short, invalid configuration fails closed, leaking folds rejected.
+- Models: naive persistence returns the last completed close; ridge recovers a known
+  linear relationship; imputation and standardisation use training statistics only; an
+  unobserved feature carries zero weight; the price-only model's feature list contains
+  no sentiment column; the candidate model's does.
+- Metrics: MAE/RMSE/mean error known values; equity curve and drawdown on a known path;
+  Sharpe and Sortino closed-form checks; degenerate series return `None`; invalid input
+  and non-finite values fail closed.
+- Strategy: fee-charged long days, flat days earning zero, withheld risk metrics below
+  the sample threshold, zero-dispersion reporting, assumption validation, disclosure text.
+- Evaluation: all models scored on identical folds and rows with equal sample counts,
+  purge gap measured in days, deterministic repeat runs, no test-fold row present in its
+  own training block, warnings when sentiment is unidentifiable, and a stated reason when
+  history is too short.
+- Reporting: both chart panels render, an empty sentiment panel says so instead of
+  drawing a fabricated curve, outlook coverage and limitations appear, and the report
+  separates measured tables from unavailable items and withheld metrics.
+- Pipeline/CLI: input loaders reject malformed snapshots with line references, the run
+  writes every documented artefact, manifest hashes match the inputs, prediction records
+  match the manifest count, a zero-post run still completes, and CLI errors exit non-zero.
+- Apify: mocked run/status/dataset, auth header, bounds, timeouts/errors, no launch retry
+  and no real Actor in CI.
+- Registry: source/platform identity and structural fields; validation does not imply live
+  access or legal approval.
 
 ## Data profile acceptance
-Report row count, UTC min/max, required-window coverage/gaps, missing IDs/text/timestamps, duplicates, invalid timestamps, engagement-field availability, provider/query/window/retrieval time, version/run ID, terms-review status, hash if retained, and point-in-time limitations. Never print raw text or credentials.
+Report row count, UTC min/max, required-window coverage/gaps, missing IDs/text/timestamps,
+duplicates, invalid timestamps, engagement-field availability, provider/query/window/
+retrieval time, version/run ID, terms-review status, hash if retained, and point-in-time
+limitations. Never print raw text or credentials.
+
+## Fixture policy
+Unit and integration tests build clearly labelled synthetic series and records; no test
+presents a fixture, mock or synthetic value as observed provider data. The only real-data
+run committed to the repository is the public Coinbase price run documented in the README,
+which contains no post text.
 
 ## Reproducibility
-Record commit, non-secret config, seed, dataset version/hash, schema version and fold boundaries. Re-run from a clean environment. Do not commit raw data to make tests pass.
+Record commit, non-secret config, seed, dataset version/hash, schema version and fold
+boundaries. Re-run from a clean environment. Do not commit raw data to make tests pass.
 
 ## Release gates
-Documentation: all nine canonical files agree; links/commands checked; statuses honest.
-Ingestion: terms and source verified, real profile exists, point-in-time limitations documented, bounded end-to-end ingest passes.
-Model/report: baselines and sentiment model run; walk-forward is leakage-safe; charts/outlook/report derive from actual outputs; risk metrics only from valid strategy returns.
+Documentation: all nine canonical files agree; links/commands checked; statuses honest;
+traceability matrix current.
+Ingestion: terms and source verified, real profile exists, point-in-time limitations
+documented, bounded end-to-end X ingest passes. **Unmet: no accepted X source yet.**
+Model/report: baselines and sentiment model run; walk-forward is leakage-safe;
+charts/outlook/report derive from actual outputs; risk metrics only from valid strategy
+returns. **Met for prices; the sentiment comparison is blocked on X data.**
 
 ## Commands
 From repo root:
+
+```bash
 python -m pip install -e ".[dev,storage]"
 ruff check src tests scripts
 python scripts/validate_dataset_registry.py
 pytest
+```
+
 Live-provider tests remain opt-in and must not run in ordinary CI.

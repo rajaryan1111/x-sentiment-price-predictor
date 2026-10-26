@@ -3,9 +3,10 @@ Status: canonical contract. Breaking changes require synchronized updates to tes
 
 ## Forecast/time contract
 All internal timestamps are timezone-aware and normalized to UTC. Daily bars are labelled by candle start. Forecasts issue at 00:00 UTC at start of day n. Features may use only completed prior price bars and posts whose event and defensible availability times are no later than cutoff. Horizon h in 0..5 targets the close of the daily candle starting at cutoff + h days. n+0 is not yet known at issue time.
+When the caller supplies the current time, the unfinished UTC day is dropped before any feature or label is built, so a partial intraday close can never act as a completed prior close or as a horizon label.
 
 ## Normalized X post
-Required: post_id (non-empty stable source ID), created_at (timezone-aware event time), retrieved_at (first observed time, never inferred from created_at), source/platform/provider provenance. Text is nullable and stored only if returned and permitted.
+Required: post_id (non-empty stable source ID), created_at (timezone-aware event time), retrieved_at (first observed time, never inferred from created_at), source/platform/provider provenance, and non-empty text. Text is stored only if returned and permitted; a record without recoverable text is rejected at the adapter boundary instead of being admitted with empty or fabricated text (D-022), so post-volume counts only describe posts that were actually observed with text.
 Optional nullable fields: sentiment_score in [-1,1], likes, reposts, views, author_followers. Counts are non-negative integers when present. Null means unknown/unavailable/unscored, not zero or neutral.
 Reject/quarantine invalid core timestamps, malformed IDs and negative counts with explicit reasons. Deduplicate by stable ID; conflicting duplicate payloads fail closed. Do not print text in profiler summaries.
 
@@ -18,6 +19,16 @@ Key by asset and cutoff. Include cutoff, feature-window bounds, source/run refer
 ## Targets
 Exactly horizons 0..5 daily steps. Emit only when the required future candle exists and is valid; omit incomplete or gap-crossing horizons under the current conservative rule. Do not use target timestamps/values during feature creation.
 
+## Supervised row and model target
+Each supervised row is anchored at one UTC cutoff and carries exactly the predeclared feature groups in `xsentiment.features.dataset.FEATURE_GROUPS`:
+
+- price group: `return_1d`, `return_3d`, `return_7d`, `volatility_7d`, `range_1d`, `close_vs_sma_7d`;
+- sentiment group: `post_count_24h`, `scored_post_count_24h`, `mean_sentiment_24h`, `positive_share_24h`, `negative_share_24h`.
+
+A feature is null when its window lacks the required history. Imputation with training-fold means and standardisation with training-fold statistics happen inside the model layer only. The price-only baseline never receives sentiment columns; the candidate model receives both groups.
+Models predict the horizon ratio `close(cutoff + h) / reference_close`, where `reference_close` is the last completed close known at the cutoff. A predicted close is `reference_close x predicted ratio`, which keeps model output directly comparable with the naive persistence baseline, whose prediction is exactly ratio `1.0`.
+The strategy uses the `n+0` close as its entry price and the `n+1` close as its exit price, with `reference_close` only in the signal; see MODEL_PLAN.md for the rule and its assumptions.
+
 ## Adapter contract
 Explicit config, timeouts and bounded response/run controls. Validate Actor input against the chosen Actor's current schema before a real run. Common field aliases do not prove Actor compatibility. Live Apify calls are opt-in and may cost money; never run them in CI. Sanitize errors and never print credentials.
 
@@ -25,6 +36,9 @@ Explicit config, timeouts and bounded response/run controls. Validate Actor inpu
 Forecast: asset, issue cutoff, horizon, predicted close, model version, feature/data run IDs and uncertainty/limitations.
 Evaluation: chronological fold boundaries, sample counts, target/horizon, baseline/candidate metrics, exclusions and reproducible references.
 Current outlook: as-of UTC time, latest completed bar, data coverage, sentiment coverage, contextual news source/time, model output if available, uncertainty and limitations.
+
+## Artefacts of one run
+A run directory contains `evaluation-report.md`, `outlook.md`, `sentiment-vs-price.svg`, `metrics.json`, `predictions.jsonl` and `manifest.json`. The manifest records the run ID, as-of time, dataset profile, fold boundaries, warnings, unavailable items, input hashes and library versions. Every record in `predictions.jsonl` is out-of-sample; in-sample predictions are never written into an evaluation artefact.
 
 ## Versioning
 Version persisted schemas and run manifests. Any target/schema change requires updated tests and DECISIONS.md. Never silently change target semantics after evaluation; start a new experiment version.
