@@ -28,7 +28,12 @@ class AsyncHttpClient:
         self._client = client or httpx.AsyncClient(
             timeout=settings.http_timeout_seconds,
             follow_redirects=True,
-            headers={"User-Agent": "XSentimentPricePredictor/0.1 (+research; contact repository owner)"},
+            headers={
+                "User-Agent": (
+                    "XSentimentPricePredictor/0.1 "
+                    "(+research; contact repository owner)"
+                )
+            },
         )
         self._semaphore = asyncio.Semaphore(settings.http_max_concurrency)
         self._max_bytes = settings.http_max_response_bytes
