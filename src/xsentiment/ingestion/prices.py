@@ -149,7 +149,7 @@ class CoinbasePriceAdapter:
         if self._owns_client:
             await self.http_client.aclose()
 
-    async def __aenter__(self) -> "CoinbasePriceAdapter":
+    async def __aenter__(self) -> CoinbasePriceAdapter:
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:  # noqa: ANN001
