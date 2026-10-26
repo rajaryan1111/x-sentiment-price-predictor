@@ -1,6 +1,5 @@
 """Offline tests for the historical dataset registry."""
 import json
-from pathlib import Path
 
 from scripts.validate_dataset_registry import DEFAULT_REGISTRY, validate_registry
 
@@ -11,13 +10,15 @@ def test_curated_registry_is_structurally_valid() -> None:
 
 def test_registry_contains_all_pdf_entries() -> None:
     document = json.loads(DEFAULT_REGISTRY.read_text(encoding="utf-8"))
-    assert len(document["datasets"]) == 11
-    assert len({item["id"] for item in document["datasets"]}) == 11
+    assert len(document["datasets"]) == 12
+    assert len({item["id"] for item in document["datasets"]}) == 12
 
 
 def test_stocktwits_is_not_mislabeled_as_x() -> None:
     document = json.loads(DEFAULT_REGISTRY.read_text(encoding="utf-8"))
-    stocktwits = next(item for item in document["datasets"] if item["id"] == "stocktwits-nyu-2008-2022")
+    stocktwits = next(
+        item for item in document["datasets"] if item["id"] == "stocktwits-nyu-2008-2022"
+    )
     assert stocktwits["platform"] == "StockTwits"
     assert stocktwits["recommended_for_initial_run"] is False
 
