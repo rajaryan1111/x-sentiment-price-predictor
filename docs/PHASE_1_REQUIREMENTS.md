@@ -20,17 +20,16 @@ The assessment asks for a Python-based machine-learning / reinforcement-learning
 
 The linked historical-tweet resource is referenced by the PDF as a potential learning/training dataset. Its exact contents, availability, rights, schema, and suitability must be verified before it is relied on.
 
-## 3. Selected working assumptions (user-confirmed)
+## 3. Confirmed choices and working implementation defaults
 
-The user has selected the following working assumptions for this assessment. These are project choices, **not claims that the employer specified them**:
+The user explicitly selected only these two project choices:
 
 - **Asset:** Bitcoin spot reference symbol `BTC-USD`.
 - **Bar interval:** daily (`1d`).
-- **Working horizon interpretation:** `n` denotes the current daily period and `n+1` through `n+5` denote the next one through five daily periods. This is provisional until the target cutoff is clarified; `n+0` must not use future information and is not yet defined as a deployable forecast target.
-- **Target definition:** still open. Do not assume whether each horizon predicts close price, close-to-close return, or another target until O4 is resolved.
-- **Market convention:** BTC trades continuously, unlike exchange-traded equities; daily-bar boundary/timezone and price provider must still be explicitly fixed. Do not assume that UTC is employer-approved solely because it is convenient.
 
-All downstream query examples and test fixtures must use the selected asset and interval. The operational defaults below are chosen for a reproducible baseline; they are engineering assumptions, not claims that the employer explicitly mandated a particular provider or target convention. Do not quietly broaden the scope to other assets or intervals.
+The remaining conventions below are **documented engineering defaults**, not user-confirmed or employer-confirmed requirements. They make the implementation reproducible while keeping unresolved external approvals visible. The employer's written clarification, if received, overrides a default and must be recorded before model evaluation.
+
+All downstream query examples and test fixtures must use the selected asset and interval unless a documented scope change is approved. Do not quietly broaden the scope to other assets or intervals.
 
 ### Operational forecasting convention (default for implementation)
 
