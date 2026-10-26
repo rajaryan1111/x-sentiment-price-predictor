@@ -36,7 +36,11 @@ def test_profile_csv_counts_rows_duplicates_and_window(tmp_path: Path) -> None:
             "id": "", "text": "", "created_at": "invalid", "likes": "", "retweet_count": "",
         })
 
-    result = profile(Namespace(file=path, days=180, id_column=None, text_column=None, timestamp_column=None))
+    result = profile(
+        Namespace(
+            file=path, days=180, id_column=None, text_column=None, timestamp_column=None
+        )
+    )
 
     assert result["row_count"] == 3
     assert result["unique_nonempty_ids"] == 1
@@ -57,10 +61,20 @@ def test_profile_jsonl_requires_explicit_timestamp_when_no_alias(tmp_path: Path)
         encoding="utf-8",
     )
     with pytest.raises(ValueError, match="timestamp column"):
-        profile(Namespace(file=path, days=180, id_column=None, text_column=None, timestamp_column=None))
+        profile(
+            Namespace(
+                file=path, days=180, id_column=None, text_column=None, timestamp_column=None
+            )
+        )
 
     result = profile(
-        Namespace(file=path, days=180, id_column="post_id", text_column="body", timestamp_column="event")
+        Namespace(
+            file=path,
+            days=180,
+            id_column="post_id",
+            text_column="body",
+            timestamp_column="event",
+        )
     )
     assert result["row_count"] == 1
     assert result["rows_in_last_window"] == 1
