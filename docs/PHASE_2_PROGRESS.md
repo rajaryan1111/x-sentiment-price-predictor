@@ -63,6 +63,12 @@ These are deterministic primitives, not a forecasting system. Sentiment scores r
 - Trading risk metrics are unavailable until a defined strategy has valid out-of-sample returns and disclosed cost assumptions.
 
 
+## Latest repository verification
+
+The latest CI run for commit `49d2970681a581dc97d77c41ab9f267c4e5f0ef7` passed all configured steps: Ruff lint, dataset-registry structural validation, and pytest. The local dataset profiler is implemented in `src/xsentiment/ingestion/local_dataset_profile.py`, with a thin CLI at `scripts/profile_local_x_dataset.py` and unit tests in `tests/unit/test_local_dataset_profile.py`.
+
+This verifies code quality only. It does not close the external X-data access, license, recent-coverage, or point-in-time availability gates below.
+
 ## Zero-budget fallback added
 
 A local CSV/JSONL profiler is available at `scripts/profile_local_x_dataset.py`. It reports field detection, timestamp coverage, duplicate/missing IDs, missing text/time, engagement-field presence and rows in the last N days. It never prints post text or persists the source file. Example:
