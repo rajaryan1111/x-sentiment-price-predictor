@@ -61,3 +61,27 @@ These are deterministic primitives, not a forecasting system. Sentiment scores r
 - No fabricated bars, missing fields, sentiment scores or evaluation metrics.
 - No model training until X/price coverage and availability timestamps are profiled and point-in-time cutoffs are enforceable.
 - Trading risk metrics are unavailable until a defined strategy has valid out-of-sample returns and disclosed cost assumptions.
+
+
+## Zero-budget fallback added
+
+A local CSV/JSONL profiler is available at `scripts/profile_local_x_dataset.py`. It reports field detection, timestamp coverage, duplicate/missing IDs, missing text/time, engagement-field presence and rows in the last N days. It never prints post text or persists the source file. Example:
+
+```bash
+python scripts/profile_local_x_dataset.py /absolute/path/to/local_dataset.csv --days 180
+# If automatic field detection does not match the source schema:
+python scripts/profile_local_x_dataset.py /absolute/path/to/local_dataset.csv \
+  --id-column tweet_id --text-column full_text --timestamp-column created_at --days 180
+```
+
+This is an inspection utility, not an ingestion or licensing approval. The profiler intentionally reports `point_in_time_backtest_ready=false`: downloading an old dataset today does not establish what was observable at historical forecast cutoffs. Do not backdate retrieval times.
+
+See [Phase 2 no-cost data plan](PHASE_2_NO_COST_DATA_PLAN.md) for zero-budget paths and limitations. Existing historical candidates in the registry end by 2023 and therefore cannot alone satisfy a recent 180-day window. A free rolling crypto-X dataset listing may cover only the last month; verify current availability, terms and any infrastructure costs before relying on it.
+
+## Remaining Phase 2 acceptance gates
+
+- Select a source that is accessible at zero cost and legally usable for the intended assessment.
+- Profile the actual source file or bounded collection and establish coverage/schema/license evidence.
+- Confirm 180-day coverage or explicitly record the shortfall; do not imply a 30-day sample satisfies 180 days.
+- Validate real retrieval/availability timestamps before claiming leakage-safe historical features.
+- Re-run local lint/tests and GitHub CI after these changes.
