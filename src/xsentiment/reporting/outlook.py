@@ -42,6 +42,7 @@ class OutlookReport:
     latest_completed_cutoff: datetime | None
     predictions: tuple[OutlookPrediction, ...]
     labelled_rows: int
+    full_horizon_rows: int
     rows: int
     posts: int
     scored_posts: int
@@ -142,6 +143,7 @@ def build_outlook(
         ),
         predictions=tuple(predictions),
         labelled_rows=len(labelled),
+        full_horizon_rows=summary.rows_with_full_horizon,
         rows=len(rows),
         posts=summary.posts,
         scored_posts=summary.scored_posts,
@@ -167,7 +169,9 @@ def render_outlook_markdown(outlook: OutlookReport) -> str:
         "",
         "## Data coverage",
         f"- Completed price cutoffs in the dataset: **{outlook.rows}**",
-        f"- Cutoffs with a full n+0..n+5 horizon: **{outlook.labelled_rows}**",
+        f"- Cutoffs with a full n+0..n+5 horizon: **{outlook.full_horizon_rows}**",
+        f"- Eligible cutoffs (full horizon and a known previous close): "
+        f"**{outlook.labelled_rows}**",
         f"- Posts supplied: **{outlook.posts}** (scored: **{outlook.scored_posts}**)",
         f"- Cutoffs with scored-post sentiment: **{outlook.days_with_sentiment}**",
         "",

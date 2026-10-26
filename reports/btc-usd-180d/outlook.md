@@ -7,7 +7,8 @@
 
 ## Data coverage
 - Completed price cutoffs in the dataset: **180**
-- Cutoffs with a full n+0..n+5 horizon: **174**
+- Cutoffs with a full n+0..n+5 horizon: **175**
+- Eligible cutoffs (full horizon and a known previous close): **174**
 - Posts supplied: **0** (scored: **0**)
 - Cutoffs with scored-post sentiment: **0**
 

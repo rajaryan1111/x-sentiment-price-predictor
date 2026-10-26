@@ -111,6 +111,8 @@ def test_outlook_reports_coverage_predictions_and_limitations() -> None:
     }
     assert "current sentiment outlook" in rendered
     assert "vader" in rendered
+    assert outlook.full_horizon_rows == summary.rows_with_full_horizon
+    assert "Eligible cutoffs (full horizon and a known previous close)" in rendered
     assert "Example headline" in rendered
     assert "not investment advice" in rendered
     assert "Data coverage" in rendered
