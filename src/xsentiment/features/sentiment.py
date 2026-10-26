@@ -1,1 +1,1 @@
-"""Sentiment aggregation contract; concrete scoring awaits canonical requirements/data inspection."""
+"""Sentiment aggregation contract; scoring awaits canonical requirements."""
