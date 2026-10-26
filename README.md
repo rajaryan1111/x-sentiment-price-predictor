@@ -6,7 +6,7 @@ Research pipeline to evaluate whether timestamped X sentiment adds predictive va
 
 ## Requirements first
 
-Read [docs/PHASE_1_REQUIREMENTS.md](docs/PHASE_1_REQUIREMENTS.md) before implementation. It maps the assessment brief to requirements, acceptance criteria, open decisions, scope boundaries, data-integrity rules and a traceability matrix. The document deliberately marks unresolved choices instead of guessing. Full modeling implementation is not cleared until the blocking asset, timeframe, target and data-access questions are resolved.
+Read [docs/PHASE_1_REQUIREMENTS.md](docs/PHASE_1_REQUIREMENTS.md) before implementation. It maps the assessment brief to requirements, acceptance criteria, documented working defaults, external readiness gates, scope boundaries, data-integrity rules and a traceability matrix. BTC-USD and daily bars are the selected project choices; UTC cutoff, Coinbase candles and close-price horizons are implementation defaults rather than employer-confirmed requirements. External data access, provider behavior, source terms and any employer clarification must be checked before live ingestion or evaluation.
 
 ## Historical dataset registry
 
