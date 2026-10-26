@@ -100,7 +100,7 @@ def test_apify_run_uses_bearer_auth_cost_and_item_caps_and_fetches_dataset() -> 
 
     def handler(request: httpx.Request) -> httpx.Response:
         requests.append(request)
-        if request.method == "POST" and "/acts/" in request.url.path:
+        if request.method == "POST" and "/actors/" in request.url.path:
             assert request.headers["Authorization"] == "Bearer test-token"
             return httpx.Response(
                 201,
