@@ -1,50 +1,50 @@
 # Phase 2 — Data access and ingestion progress
 
-**Status:** In progress. This document records implementation evidence separately from external-provider verification. No live data pull, paid scrape, model training, or performance claim is implied.
+**Status: partially implemented; external data-access gates remain open.** This document distinguishes code and test evidence from provider/account verification. Live X ingestion, a verified 180-day dataset, model training, and performance evaluation are not yet complete.
 
-## Work started
+## Implemented and locally verified
 
-### 1. Coinbase daily candle adapter
+### Coinbase daily candles
 
-Implemented in `src/xsentiment/ingestion/prices.py` on branch `feat/phase-2-coinbase-price-ingestion`.
+- Public Coinbase Exchange daily-candle adapter for configured BTC-USD.
+- UTC-aware bounds, daily granularity, provider range limit, Decimal OHLCV parsing, sorting, malformed-row and duplicate checks.
+- Local smoke script checks seven completed daily bars without saving raw market data.
+- User-run live smoke test succeeded for 2026-10-19 through 2026-10-25: 7 candles, no missing bars in that seven-day window.
+- User-run local verification reported Ruff passing and 18 tests passing before the new Phase 2 tests in this branch.
 
-- Uses Coinbase Exchange public endpoint `GET /products/{product_id}/candles`.
-- Requests daily granularity (`86400` seconds) for the configured product (Phase 1 default: `BTC-USD`).
-- Requires timezone-aware request bounds and converts them to UTC.
-- Enforces the provider's 300-candle maximum per request.
-- Parses the documented six-field response rows into typed candles using `Decimal` for OHLCV values.
-- Sorts records chronologically, rejects malformed rows, inconsistent OHLC values and duplicate timestamps.
-- Filters the returned records locally to the project's UTC `[start, end)` range because Coinbase documents that returned data may include candles preceding the requested start.
-- Uses the repository's shared HTTP client with bounded retries and response-size limits. No price API key is required by this public endpoint.
+### Data-quality and point-in-time primitives
 
-Official provider reference: https://docs.cdp.coinbase.com/api-reference/exchange-api/rest-api/products/get-product-candles
+Implemented in src/xsentiment/pipeline/phase2.py:
 
-### 2. Automated tests added
+- Canonical XPostRecord keeps event time and retrieval/availability time distinct and validates timestamps and optional fields.
+- Stable-ID deduplication fails closed on conflicting duplicate IDs.
+- Daily price coverage report enumerates missing UTC days, duplicate timestamps, out-of-range records and possible incomplete current-day candles. It never fills missing candles.
+- Point-in-time feature builder uses prior completed closes and only posts published and retrieved by each cutoff; current engagement counts are deliberately excluded as historical features.
+- Close-target builder creates n+0 through n+5 labels only where the full horizon exists; target labels remain separate from features.
+- Unit tests cover late-arriving/future-post exclusion, missing sentiment, duplicate IDs, missing price bars and horizon tails.
 
-`tests/unit/test_coinbase_prices.py` covers chronological sorting, decimal values, daily granularity, timezone-aware bounds, provider range limits, duplicate timestamps, malformed JSON, invalid OHLC values, and UTC normalization.
-
-These are mocked unit tests. They do **not** prove that the live endpoint currently accepts this product/range, that all expected candles are present, or that a real 180-day dataset has been obtained. A read-only local smoke-test command is available at `python scripts/smoke_test_coinbase.py`; it checks the latest seven completed UTC daily bars and prints a coverage summary without saving raw data.
+These are deterministic primitives, not a complete collection or forecasting system. They do not scrape X or calculate sentiment themselves; sentiment scores must come from an explicitly configured sentiment model.
 
 ## External gates still open
 
-1. **Live Coinbase verification:** perform a small, read-only request; record HTTP status, product availability, returned schema/order, coverage, missing UTC daily bars, boundary behavior, and a sanitized data-profile artifact. The web documentation confirms the endpoint and 86400-second daily granularity, and states a 300-candle maximum; the live endpoint response was not accessible through the web retrieval tool in this session.
-2. **Historical X dataset:** retrieve the linked resource from the assessment and review actual contents, access permissions, license/terms, schema, timestamps, and whether text is available. Do not train on it until these checks are recorded.
-3. **Apify:** inspect the user's available Actors and account pricing/terms; verify 180-day query strategy, output fields, actual plan rate and a strict run cost cap. No actor has been selected and no paid run has been initiated.
-4. **Credentials:** confirm configuration privately; never add tokens, cookies, or credentials to Git.
-5. **Deadline:** confirm the employer's actual submission deadline from the original message.
+1. 180-day live price profile: collect in chunks no larger than the Coinbase endpoint limit, excluding the incomplete current UTC day. Record sanitized coverage metadata; do not commit raw market data by default.
+2. Historical X dataset: retrieve the assessment's linked resource and review contents, access permissions, terms/license, schema, event-time coverage, text availability and source platform before use.
+3. Apify: inspect available Actors and account pricing/terms; verify query strategy, output fields, plan rate, 180-day coverage and strict run cost cap before any paid run. No actor selected and no paid run initiated.
+4. Credentials: verify provider configuration privately; never add tokens, cookies or credentials to Git.
+5. Employer constraints: confirm the actual submission deadline and any target-semantics clarification.
 
-## Next implementation steps
+## Next steps after access gates
 
-1. Run CI and correct any failures from the adapter/tests.
-2. Complete a read-only live price API smoke test when an execution environment with outbound network access is available; save only non-secret metadata and a schema/coverage profile.
-3. Add deterministic price-data quality checks for missing UTC days, duplicate timestamps, bounds, and incomplete current-day candles.
-4. Inspect the historical dataset and Apify Actor before implementing X ingestion; do not assume engagement fields are historically point-in-time.
-5. Add the approved X post schema and adapter only after actor output and terms are verified.
+1. Run CI and local lint/tests on this branch.
+2. Execute a bounded 180-day Coinbase price profile in chunks and inspect missing UTC days and boundary behavior.
+3. Review historical dataset contents/terms and inspect the actual Apify actor schema before implementing a provider-specific X adapter.
+4. Add the approved X adapter and storage/export format, then run schema and point-in-time quality checks on a permitted sample.
+5. Add an explicit sentiment model, train/evaluate baselines chronologically, and report only evidence-backed metrics.
 
-## Phase 2 acceptance guardrails
+## Guardrails
 
-- Do not commit raw provider data or secrets.
-- Do not use current engagement counts as historical features without point-in-time snapshots.
-- Do not infer missing candles or fabricate post fields.
-- Do not begin model training until price/X coverage and timestamp availability have been profiled and the point-in-time cutoff is enforceable.
-- Do not calculate trading metrics until out-of-sample strategy returns and cost assumptions exist.
+- No raw provider datasets, tokens, cookies or other secrets in Git.
+- Current likes/reposts/views/follower counts are not historical features without point-in-time snapshots.
+- No fabricated bars, missing fields, sentiment scores or evaluation metrics.
+- No model training until X/price coverage and availability timestamps are profiled and point-in-time cutoffs are enforceable.
+- Trading risk metrics are unavailable until a defined strategy has valid out-of-sample returns and disclosed cost assumptions.
