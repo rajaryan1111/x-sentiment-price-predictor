@@ -145,7 +145,7 @@ Phase 1 is ready for implementation planning when:
 
 ## 9. Proposed end-to-end workflow
 
-1. Use the selected BTC-USD and daily-bar assumptions; resolve remaining O1/O3/O4/O5 details to define the forecasting problem.
+1. Use the selected BTC-USD and daily-bar assumptions together with the operational defaults in Section 3; check for employer clarification and verify the live Coinbase API/product behavior in Phase 2 before relying on collected prices.
 2. Verify candidate historical dataset(s) and provider access/terms; select the smallest suitable reproducible sample for schema/prototype checks.
 3. Define canonical schemas and timestamp/availability rules.
 4. Ingest the 180-day X window and matching price window through bounded, logged provider adapters.
