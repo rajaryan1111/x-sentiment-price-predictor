@@ -1,74 +1,92 @@
-# Requirements traceability matrix
+# Phase 1 — Requirements traceability matrix
 
-Every explicit assignment requirement, mapped to the canonical document that owns it,
-the code that implements it, the evidence that exists for it, and the next action.
+The single authoritative matrix for the assessment requirements. Every material
+requirement appears once, with an acceptance criterion, a verification method, an
+evidence pointer, an evidence-based status and its external blocker.
 
-## Authority and a limitation to read first
+## Authority and an unresolved source limitation
 
-The authoritative source is the supplied assessment PDF (`CWT X sentiment Agent -
-intern task.pdf`) together with its dataset-reference PDF. **Those PDFs are not
-available in the environment where this matrix was last updated**, so the requirement
-wording below is transcribed from this repository's own record of the brief in
-[PHASE_1_REQUIREMENTS.md](PHASE_1_REQUIREMENTS.md) §2. If the PDF differs, the PDF
-wins and this matrix must be corrected. Requirement text, deadlines and employer
-clarifications are never inferred from repository timestamps.
+The authority is the supplied assessment PDF (`CWT X sentiment Agent - intern task.pdf`)
+and its companion dataset-reference PDF. **Neither PDF is present in the repository, the
+workspace or this conversation**, so the requirement wording below is transcribed from
+the project's own record of the brief in [PHASE_1_REQUIREMENTS.md](PHASE_1_REQUIREMENTS.md)
+§2 and from the delivered source artifacts referenced in `data/registry`. This is recorded
+as DECISIONS.md **D-023**: a human must confirm the transcription against the PDF before
+the requirement set is treated as final. No deadline, licence, credential or employer
+intent is inferred anywhere in this document.
 
-## Status vocabulary
+## Requirement ID conventions
 
-- **verified complete** — implemented and evidenced by tests plus a real-data run.
-- **implemented, evidence limited** — code exists and is unit-tested, but the real
-  input it needs is not available, so the end-to-end claim is unproven.
-- **partial** — some sub-parts are verified while others are open.
-- **blocked** — needs an external decision, account, dataset or clarification.
-- **ambiguous** — the brief permits more than one reading; a documented default is in
-  force and the ambiguity is recorded rather than silently resolved.
+| Namespace | Meaning | Home |
+| --- | --- | --- |
+| `R1`–`R14` | Required functional outcomes from the assignment | PRD.md §Functional requirements |
+| `NFR1`–`NFR6` | Non-functional requirements | PRD.md §Non-functional requirements |
+| `A1`–`A6` | Assessment-specific items that are not R/NFR (timeline, credentials, supplied resources) | this document |
+| `O1`–`O13` | Open decisions and their provisional interpretations | PHASE_1_REQUIREMENTS.md §7 |
+| `D-001`–`D-024` | Decision-log entries with rationale | DECISIONS.md |
 
-## Matrix
+Allowed status vocabulary, used verbatim in the table:
+**Verified complete**, **Partially complete**, **Not implemented**,
+**Blocked by external dependency**, **Needs clarification**.
 
-| ID | Requirement (faithful summary) | Canonical doc | Implementation | Evidence | Status | Next action |
-| --- | --- | --- | --- | --- | --- | --- |
-| R1 | Reproducible Python pipeline from acquisition through reporting | PRD §FR1, RULES | `src/xsentiment/main.py`, `pipeline/forecast_run.py`, `pipeline/phase2.py` | `python -m xsentiment run` writes report/outlook/chart/metrics/predictions/manifest; manifest records input hashes, config and versions; README commands | verified complete | Keep commands and hashes current as code changes |
-| R2 | Collect asset-related X posts for the 180-day window via an approved Apify/provider route | PRD §FR2, DATA_POLICY §X source, DECISIONS D-009 | `ingestion/apify_x.py` (bounded, mocked), `ingestion/local_dataset_profile.py` | `tests/unit/test_apify_x.py`, `test_local_dataset_profile.py`; no live run, no accepted dataset | blocked | Inspect a real Actor's schema/terms/pricing and obtain spend approval, or accept a permitted post-level dataset |
-| R3 | Price observations for the same asset and period with documented provider, interval, timezone and currency | PRD §FR3, DATA_POLICY §Price source, DECISIONS D-003 | `ingestion/prices.py`, `scripts/profile_coinbase_180d.py` | 180/180 public Coinbase `BTC-USD` daily bars for 2026-04-29→2026-10-25 UTC refetched 2026-10-26 with no missing/duplicate timestamps; `tests/unit/test_coinbase_prices.py` | verified complete | Re-run the profile at submission time if newer coverage is wanted |
-| R4 | Preserve source IDs, event time, UTC normalisation, retrieval time and provenance | DESIGN §Normalized X post, PHASE_2_DATA_CONTRACT | `ingestion/contracts.py`, `pipeline/phase2.py` | `test_contracts.py`, `test_phase2_pipeline.py` (naive timestamp rejection, late-arrival exclusion, no backdating) | implemented, evidence limited | Real provider records still need a provenance profile on accepted data |
-| R5 | Preserve post text plus available engagement and follower counts; missing values stay missing | DESIGN, DECISIONS D-010/D-022 | `ingestion/contracts.py`, `ingestion/apify_x.py` | Nullable engagement/follower fields with rejection of negative counts; current counts are excluded from historical features | implemented, evidence limited | Confirm field availability on the selected Actor before any collection |
-| R6 | Deterministic alignment of posts and price bars (bar boundaries, timezone, duplicates, gaps) | DESIGN §Forecast/time contract, PRD §FR5 | `pipeline/phase2.py` (`build_point_in_time_features`, `profile_daily_price_coverage`) | `test_phase2_pipeline.py`, `test_dataset.py`: trailing-24h window, late/future exclusion, gap reporting, unfinished-day drop | verified complete | None |
-| R7 | Time-based sentiment and price features | MODEL_PLAN §Features, PRD §FR7 | `features/sentiment.py`, `features/price_features.py`, `features/dataset.py` | `test_features.py`, `test_dataset.py`; feature groups are fixed and the price-only group excludes sentiment columns | implemented, evidence limited | Score real permitted text once an X source is accepted |
-| R8 | Outputs for horizons n+0 through n+5 | DESIGN §Targets, MODEL_PLAN §Question and target, DECISIONS D-004 | `pipeline/phase2.py` (`build_close_targets`), `models/forecasting.py`, `models/evaluation.py` | `reports/btc-usd-180d/metrics.json` has all six horizons for three models; `test_evaluation.py` asserts horizon coverage | verified complete | Target semantics still need employer confirmation |
-| R9 | Chronological out-of-sample evaluation against price-only and naive baselines | MODEL_PLAN §Validation, PRD §FR9 | `validation/walk_forward.py`, `models/evaluation.py` | 5 purged expanding folds, 100 test days per model/horizon, 1800 predictions; deterministic repeat-run test; no random split in code | verified complete for prices; blocked for the sentiment comparison | Add sentiment rows when an X source is accepted |
-| R10 | Charts comparing X sentiment and price over time | PRD §FR10, MODEL_PLAN | `reporting/charts.py` | `reports/btc-usd-180d/sentiment-vs-price.svg`; `test_reporting.py` covers both panels and the explicit empty-sentiment message | implemented, evidence limited | The sentiment curve appears only once real scored posts exist |
-| R11 | One-page current sentiment outlook | PRD §FR11, DESIGN §Output contracts | `reporting/outlook.py` | `reports/btc-usd-180d/outlook.md`; `test_reporting.py` checks coverage, limitations and disclaimer | implemented, evidence limited | Outlook currently states sentiment unavailability by design |
-| R12 | Evaluation report including Sharpe, Sortino and maximum drawdown | MODEL_PLAN §Trading risk metrics, DECISIONS D-007/D-017 | `backtesting/metrics.py`, `backtesting/strategy.py`, `reporting/report.py` | `reports/btc-usd-180d/evaluation-report.md`; ratios computed only from out-of-sample strategy returns with fees/annualisation disclosed, and withheld with a reason when the sample is under 30 days or dispersion is zero | implemented, evidence limited | Report trading metrics only as strategy statistics; re-run once sentiment exists |
-| R13 | Reproducibility package: setup, commands, provider/Actor identifiers, configuration, secure secrets | PRD §FR13, RULES §Security, DATA_POLICY | `README.md`, `main.py`, run `manifest.json`, `.env.example` | README quick start, manifest provenance block, documented secret-handling policy | partial | Actor ID is not chosen yet; credentials must go through an employer-approved private channel, never Git |
-| R14 | Automated tests for schemas, timestamps, alignment, features, targets, leakage, metrics and reports | TEST_PLAN | `tests/unit/*` (97 tests) | Local `pytest` 97 passed; CI runs Ruff + registry validation + pytest | verified complete for implemented behaviour | Add X-provider contract tests when a real source is accepted |
-| A1 | Submission timeline (brief says “within one week” and “5–7 days”) | DECISIONS D-014 | — | Repo contains no employer deadline; none is inferred | ambiguous | Confirm the actual deadline from the employer's message |
-| A2 | Provider tokens and Actor IDs for reproducibility | PHASE_1_REQUIREMENTS §5 Credentials | `.env.example` placeholders only | No token or Actor ID is required in Git; secrets stay out of the repository | blocked | Decide the secure transfer route with the employer |
-| A3 | Historical dataset resource linked by the assessment | DATA_POLICY §Historical datasets, DECISIONS D-008 | `ingestion/dataset_registry.py`, `data/registry/*.json` | 12 candidate sources validated structurally; platform identity and rights unchecked; uploaded ZIP internals unverified | blocked | Retrieve the linked resource (or inspect the archives locally with `scripts/profile_local_x_dataset.py`) and review terms |
-| A4 | Recent news ingestion via Tavily (Exa also named in the checklist) | DECISIONS D-005/D-013, DATA_POLICY §News | `ingestion/news.py` (placeholder), `--news-file` context loader | No Tavily/Exa call was made; news is context-only and never a feature | ambiguous | Confirm whether news is contextual or predictive, then implement the adapter if needed |
-| A5 | Machine learning / reinforcement learning wording | DECISIONS D-006 | `models/baseline.py`, `models/forecasting.py` | Supervised multi-horizon forecasting with baselines; RL excluded until an action/reward/execution model is specified | ambiguous | Revisit only with an explicit RL requirement and a specified design |
+## Traceability matrix
 
-## Known gaps that block a complete submission
+| ID | Original requirement (faithful summary) | Source/reference | Priority | Acceptance criterion | Relevant documentation | Implementation or file path | Required tests or evidence | Current status | Gap or defect | Planned resolution | Dependency or external blocker |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| R1 | A reproducible Python pipeline from data acquisition through reporting | Assessment brief, PHASE_1 §4 R1 | Must | One documented command produces every artefact from a pinned input, and a manifest records configuration, input hashes and library versions | PRD.md, README.md, RULES.md | `src/xsentiment/main.py`, `src/xsentiment/pipeline/forecast_run.py` | `reports/btc-usd-180d/manifest.json`, README quick start re-run, `tests/unit/test_pipeline.py` | Verified complete | None known | Keep commands and hashes current as code changes | None |
+| R2 | Collect asset-related X posts covering the most recent 180-day period via an approved Apify/provider route | Assessment brief, PHASE_1 §4 R2 | Must | An accepted, permitted source produces a sanitized profile proving 180-day event-time coverage and the required fields, from a bounded end-to-end ingest | PRD.md, DATA_POLICY.md, docs/APIFY_X_SETUP.md | `src/xsentiment/ingestion/apify_x.py`, `src/xsentiment/ingestion/local_dataset_profile.py` | `tests/unit/test_apify_x.py` and `test_local_dataset_profile.py` exist; no live run, no accepted corpus, profile absent | Blocked by external dependency | No Actor selected, no accepted dataset, no 180-day X coverage evidence, retention terms unknown | Select and review one Actor or dataset, record terms and cost cap, then run one bounded ingest and the profiler | Provider account, spend approval, source terms; D-009, O13 |
+| R3 | Obtain price observations for the same asset and period with documented provider, interval, timezone and currency | Assessment brief, PHASE_1 §4 R3 | Must | Provider, product, granularity, timezone and currency documented, with gap and duplicate checks passing for the requested period | DATA_POLICY.md §Price source, DECISIONS D-003 | `src/xsentiment/ingestion/prices.py`, `src/xsentiment/main.py` | 180/180 public Coinbase BTC-USD daily bars for 2026-04-29 to 2026-10-25 UTC refetched 2026-10-26, no missing or duplicate timestamps; `tests/unit/test_coinbase_prices.py` | Verified complete | Public-endpoint availability could change for future runs | Re-run `fetch-prices` at submission time and keep the snapshot hash | None |
+| R4 | Preserve source identifiers, event timestamps, UTC normalisation, retrieval timestamps and provenance | Assessment brief, PHASE_1 §4 R4 | Must | Timezone-aware event time and first-observed time kept distinct for every record, with source identity and provenance retained | DESIGN.md §Normalized X post, docs/PHASE_2_DATA_CONTRACT.md | `src/xsentiment/ingestion/contracts.py`, `src/xsentiment/pipeline/phase2.py` | `tests/unit/test_contracts.py`, `tests/unit/test_phase2_pipeline.py`; run manifest provenance block | Partially complete | Contract and rules verified by tests, but no real X record has been profiled against them | Profile one accepted provider payload and confirm field mapping | R2 |
+| R5 | Preserve post text plus available engagement and follower counts, keeping missing values missing | Assessment brief, PHASE_1 §4 R5 | Must | Text required for an admitted post; nullable engagement and follower fields; negatives rejected; current counts excluded from historical features | DESIGN.md, DECISIONS D-010 and D-022 | `src/xsentiment/ingestion/contracts.py`, `src/xsentiment/ingestion/apify_x.py` | `tests/unit/test_contracts.py`, `tests/unit/test_apify_x.py`; feature-group test proving engagement is not a feature | Partially complete | Field availability unknown until a real provider payload is inspected | Confirm the selected Actor's engagement and author fields | R2, O13 |
+| R6 | Align social posts and price bars deterministically, covering bar boundaries, timezone, duplicates and gaps | Assessment brief, PHASE_1 §4 R6 | Must | Documented UTC aggregation rules; duplicate IDs and missing days reported and never filled; late and future posts excluded | DESIGN.md §Forecast/time contract, docs/PHASE_2_DATA_CONTRACT.md | `src/xsentiment/pipeline/phase2.py` | `tests/unit/test_phase2_pipeline.py`, `tests/unit/test_dataset.py` (window bounds, late-arrival, future, gap, unfinished-day) | Verified complete | Alignment rules are exercised only with fixtures and price data | Re-run alignment tests against accepted post data when R2 unblocks | R2 for real-data confirmation |
+| R7 | Create documented time-based sentiment and price features | Assessment brief, PHASE_1 §4 R7 | Must | Predeclared feature set computed only from information available at the cutoff; missing sentiment stays null, never neutral | MODEL_PLAN.md §Features, DESIGN.md §Supervised row | `src/xsentiment/features/sentiment.py`, `price_features.py`, `dataset.py` | `tests/unit/test_features.py`, `tests/unit/test_dataset.py`; 180 price cutoffs feature-built with zero posts and null sentiment | Partially complete | No permitted real text has been scored, so sentiment features are unproven on real language | Score accepted text once R2 unblocks and re-profile null rates | R2 |
+| R8 | Produce model outputs for horizons n+0 through n+5 | Assessment brief, PHASE_1 §4 R8, DECISIONS D-004 | Must | Six horizons emitted under the documented cutoff and target convention, with targets never present in features | DESIGN.md §Targets, MODEL_PLAN.md §Question and target | `src/xsentiment/pipeline/phase2.py` (`build_close_targets`), `src/xsentiment/models/forecasting.py` | `reports/btc-usd-180d/metrics.json` contains all six horizons; `tests/unit/test_evaluation.py` asserts horizon coverage | Verified complete | Horizon semantics remain a working default, not employer-confirmed | Obtain employer confirmation of the n+0 convention | O3, O4 (needs employer) |
+| R9 | Evaluate chronologically on unseen periods and compare sentiment-plus-price against baselines | Assessment brief, PHASE_1 §4 R9 | Must | Walk-forward folds with a purge gap; naive and price-only baselines plus candidate model on identical folds and eligible rows, no random split | MODEL_PLAN.md §Validation, PRD.md §R9 | `src/xsentiment/validation/walk_forward.py`, `src/xsentiment/models/evaluation.py` | 5 purged folds, 100 out-of-sample days per model and horizon, 1800 predictions; `tests/unit/test_walk_forward.py`, `test_evaluation.py`; deterministic repeat-run test | Partially complete | The sentiment comparison cannot run: no scored posts exist, so the candidate is flagged not identifiable | Re-run evaluation after R2 produces scored posts | R2 |
+| R10 | Generate charts comparing X sentiment and price over time | Assessment brief, PHASE_1 §4 R10 | Must | Reproducible chart from observed data; a panel with no data is labelled as such and never fabricated or zero-filled | PRD.md §R10, MODEL_PLAN.md | `src/xsentiment/reporting/charts.py` | `reports/btc-usd-180d/sentiment-vs-price.svg`; `tests/unit/test_reporting.py` covers both panels and the empty-sentiment message | Partially complete | Only the price panel carries real data today | Regenerate with scored posts after R2 | R2 |
+| R11 | Produce a one-page current sentiment outlook | Assessment brief, PHASE_1 §4 R11 | Must | Outlook states as-of time, cutoff, coverage, model outputs or their absence, news context and limitations | DESIGN.md §Output contracts, PRD.md §R11 | `src/xsentiment/reporting/outlook.py` | `reports/btc-usd-180d/outlook.md`; `tests/unit/test_reporting.py` (coverage counts, disqualifiers, disclaimer) | Partially complete | Sentiment content is reported as unavailable by design until R2 | Re-run the outlook once scored posts exist | R2 |
+| R12 | Produce an evaluation report including Sharpe, Sortino and maximum drawdown | Assessment brief, PHASE_1 §4 R12, DECISIONS D-007 and D-017 | Must | Report contains per-horizon MAE/RMSE with sample counts and risk metrics only from a defined strategy on out-of-sample returns, with fees, annualisation and missing-data policy disclosed; unavailable metrics carry a reason | MODEL_PLAN.md §Trading risk metrics, PRD.md §R12 | `src/xsentiment/backtesting/metrics.py`, `backtesting/strategy.py`, `reporting/report.py` | `reports/btc-usd-180d/evaluation-report.md`; `tests/unit/test_metrics.py`, `test_strategy.py`, `test_reporting.py` | Verified complete | Short sample (32 long days) and a single asset/period; no sentiment variant yet | Re-run and re-report as coverage grows; keep ratios labelled as strategy statistics | R2 for the sentiment variant only |
+| R13 | Provide a reproducibility package: setup, commands, provider/actor identifiers, configuration and secure secrets | Assessment brief, PHASE_1 §4 R13 | Must | README covers setup and reproduction; non-secret identifiers documented; secrets excluded from Git with a documented transfer route | README.md §Quick start, RULES.md §Security, DECISIONS D-012 | `README.md`, `src/xsentiment/main.py`, `.env.example`, `manifest.json` provenance | README quick start re-run; `.env.example` contains placeholders only; no secret in repository | Partially complete | No Actor ID exists to document, and the credential transfer route is undefined | Document the reviewed Actor ID once selected; agree the credential channel with the employer | R2, A2, O10 |
+| R14 | Provide automated tests for schemas, timestamps, alignment, features, targets, leakage, metrics and reports | Assessment brief, PHASE_1 §4 R14 | Must | Offline test suite covers each listed area and runs in CI with lint and registry validation | TEST_PLAN.md | `tests/unit/` (17 modules) | Local run 103 passed; CI-parity venv with only `.[dev,storage]` passes too; `.github/workflows/ci.yml` runs ruff, registry validation, `scripts/validate_docs.py` and pytest | Verified complete | Remote CI conclusion for the new branch could not be read because the unauthenticated API was rate limited | Confirm the CI run on the pushed branch in the Actions tab | None |
+| NFR1 | Reproducibility metadata: code revision, source version, query/window, retrieval time, schema, non-secret run ID | Assessment brief, PRD §Non-functional | Should | Each run records the listed metadata without secrets | PRD.md, RULES.md | `src/xsentiment/pipeline/forecast_run.py` (`_manifest`) | `manifest.json` provenance block; `tests/unit/test_pipeline.py` | Verified complete | Code revision is recorded only when the CLI is given provenance; commit SHA is not auto-captured | Optionally capture the git revision in the CLI | None |
+| NFR2 | Temporal integrity: timezone-aware timestamps, event time distinct from first-observed time | Assessment brief, PHASE_1 §8 | Must | Naive timestamps rejected; retrieval time never derived from creation time | DESIGN.md, docs/PHASE_2_DATA_CONTRACT.md | `src/xsentiment/ingestion/contracts.py` | `tests/unit/test_contracts.py`, `tests/unit/test_pipeline.py` (naive timestamp rejection) | Verified complete | Real provider payloads unprofiled | Profile one accepted payload | R2 |
+| NFR3 | Security: no tokens, cookies, private exports or large raw datasets in Git | Assessment brief, PHASE_1 §5 | Must | Repository contains no credentials or raw private exports; ignored paths cover data and secrets | RULES.md §Security, DATA_POLICY.md §What is committed | `.gitignore`, `.env.example` | Secret scan of the working tree and history subject files; `.gitignore` rules verified against real artifacts | Verified complete | History cannot be fully guaranteed clean until the employer clones and scans | Re-scan after any future data addition | None |
+| NFR4 | Robustness: bounded timeouts, payloads, concurrency and cost; no automatic retry of paid launches | Assessment brief, PHASE_1 §5 | Must | Caps configurable and enforced; paid Actor launch never retried automatically | RULES.md, DATA_POLICY.md §Security retention and cost | `src/xsentiment/config/settings.py`, `src/xsentiment/ingestion/apify_x.py` | `tests/unit/test_apify_x.py`, `tests/unit/test_retry.py`, settings validation | Partially complete | Live paid-run behaviour and provider billing semantics are untested by design | Verify caps against the selected Actor's documented pricing before any run | R2, O13 |
+| NFR5 | Auditability: exclusions recorded with reasons; post text never logged by default | Assessment brief, PHASE_1 §8 | Should | Profiles and reports record counts and exclusions without printing post text | TEST_PLAN.md §Data profile acceptance, DATA_POLICY.md | `src/xsentiment/ingestion/local_dataset_profile.py`, `reporting/report.py` | `tests/unit/test_local_dataset_profile.py`, `tests/unit/test_reporting.py` | Verified complete | No real post text exists to test the no-print guarantee against | Re-verify on accepted data | R2 |
+| NFR6 | Honest reporting: fixtures and in-sample values never presented as real out-of-sample results | Assessment brief, PHASE_1 §4 non-goals | Must | Artefacts label unavailable items and synthetic fixtures; no unverified claim is made | RULES.md §Data/model integrity, MODEL_PLAN.md | `src/xsentiment/reporting/report.py`, `outlook.py` | `tests/unit/test_reporting.py`; this matrix is checked by `scripts/validate_docs.py` | Verified complete | Enforcement is partly convention plus tests rather than a hard gate on every sentence | Extend the docs validator as new claims appear | None |
+| A1 | Submit within the stated timeline (brief says one week and also 5–7 days) | Assessment brief, PHASE_1 §7 O11 | Must | Actual deadline confirmed from employer communication and recorded | DECISIONS D-014 | Not applicable | No employer communication exists in the repository | Needs clarification | Two different durations appear in the brief; no date is known | Ask the employer for the exact due date and record it here | Employer reply (O11) |
+| A2 | Provide provider tokens and actor identifiers for reproducibility | Assessment brief, PHASE_1 §5 Credentials | Must | Identifiers documented in the report; secrets transferred only through an approved private channel | RULES.md §Security, docs/APIFY_X_SETUP.md | `.env.example` placeholders only | No identifier is required in Git; no secret is committed | Blocked by external dependency | Actor ID not chosen; credential transfer route undefined and must not be invented | Select the Actor, then agree a private transfer channel with the employer | R2, O10, O13 |
+| A3 | Use the historical dataset resource linked by the assessment | Assessment brief, PHASE_1 §5, DATA_POLICY.md | Should | Resource retrieved, terms reviewed, schema and 180-day coverage profiled before use | DATA_POLICY.md §Historical datasets, DECISIONS D-008 | `src/xsentiment/ingestion/local_dataset_profile.py`, `scripts/profile_local_x_dataset.py` | Registry holds 12 candidate records; the linked resource itself was never retrievable and uploaded archives remain uninspected | Blocked by external dependency | Access, licence, schema and text availability unverified; ID-only files carry no text | Retrieve the resource or run the profiler on the archives locally, then record provenance | Resource access, O6 |
+| A4 | Ingest recent relevant news with Tavily (Exa also named in the submission checklist) | Assessment brief, PHASE_1 §5 and §7 O7 and O12 | Could | News is ingested as context only unless a clarification makes it a model feature | DECISIONS D-005 and D-013, DATA_POLICY.md §News | `src/xsentiment/ingestion/news.py`, `--news-file` loader | No Tavily or Exa call has been made; the outlook labels news as context | Needs clarification | The brief's news role versus its stated predictive inputs conflict; Exa's runtime role is unknown | Ask whether news must influence the forecast; implement the adapter only with that answer and a key | Employer clarification, API key |
+| A5 | The brief mentions machine learning and reinforcement learning | Assessment brief, PHASE_1 §5 | Could | Any RL work must define action space, reward, execution model and evaluation protocol before use | DECISIONS D-006, MODEL_PLAN.md | `src/xsentiment/models/baseline.py`, `models/forecasting.py` | Supervised multi-horizon forecasting with baselines exists; no RL environment exists | Needs clarification | RL requirements, action space and reward are unspecified in the transcribed brief | Ask whether RL is required; otherwise keep the documented supervised scope | Employer clarification, O8 |
+| A6 | Reference inventory of historical Twitter/X datasets with verified download links | Supplied dataset-reference PDF | Should | Inventory recorded machine-readably with platform identity and text availability, validated offline | docs/data-sources.md | `data/registry/historical_twitter_x_datasets.json`, `scripts/validate_dataset_registry.py` | Validator reports 12 records; 11 X/Twitter and 1 StockTwits; 3 are ID-only with hydration caveats; two rolling sources have null coverage end and carry cutoff/coverage limitations | Partially complete | Registry claims come from the supplied PDF and were not independently re-verified; source PDF is unavailable to the agent environment | Re-verify selected candidate pages at submission time | Live provider pages, O6 |
 
-1. **X data access (R2, R7, R9, R10, R11).** The only blocker for the sentiment half of
-   the assignment. Needs an accepted, permitted, profiled post-level source with event
-   times and defensible availability, plus a spend decision if a paid Actor is used.
-2. **Sentiment-versus-price result (RE9/R12).** Cannot be produced honestly until (1) is
-   resolved; the pipeline already reports it as not identifiable instead of guessing.
-3. **Employer clarifications (A1, A2, target semantics).** Deadline, credential route and
-   confirmation of the `n+0` interpretation.
-4. **News role (A4).** Tavily/Exa runtime role remains undecided.
+## Status summary
 
-## Corrections made on this branch
+Counts are produced by `python scripts/validate_docs.py` against this table, so they
+cannot drift from the rows above.
 
-- Added an unfinished-UTC-day guard to `build_point_in_time_features` and
-  `build_close_targets`, so a partial intraday close can no longer act as a completed
-  prior close or as a horizon label; covered by new tests.
-- Corrected `DESIGN.md`, which described post text as nullable while the implemented
-  contract requires non-empty text; recorded the rule as DECISIONS D-022.
-- Fixed a real defect found by the new tests: the evaluation report passed a
-  `StrategyResult` where `StrategyAssumptions` was expected, which raised at render time.
-- Fixed the CLI hashing its inputs before its error handling, which turned a missing
-  input file into an unhandled traceback instead of a non-zero exit.
-- Replaced placeholder modules (`features`, `models`, `validation`, `backtesting`,
-  `reporting`, `main`) with implemented, tested code and updated every canonical
-  document that made a status or interface claim about them.
+| Status | Requirements |
+| --- | --- |
+| Verified complete | R1, R3, R6, R8, R12, R14, NFR1, NFR2, NFR3, NFR5, NFR6 |
+| Partially complete | R4, R5, R7, R9, R10, R11, R13, NFR4, A6 |
+| Not implemented | none |
+| Blocked by external dependency | R2, A2, A3 |
+| Needs clarification | A1, A4, A5 |
+
+## Open decisions
+
+Provisional interpretations and their status are maintained in
+[PHASE_1_REQUIREMENTS.md](PHASE_1_REQUIREMENTS.md) §7 and recorded as decisions in
+[DECISIONS.md](../DECISIONS.md). Unresolved and requiring an external answer:
+**O6** (linked dataset access), **O11** (submission deadline), **O12** (Exa),
+**O13** (Apify Actor, pricing and spend cap). Resolved as documented working defaults:
+O1–O5, O7–O10.
+
+## Phase 1 exit criteria
+
+Phase 1 is complete when: the matrix above has no empty acceptance-criterion,
+evidence or status cell; every status is drawn from the allowed vocabulary; the docs
+validator passes; the canonical documents agree on asset, interval, cutoff, targets and
+negative scope; and the blocker column names an owner for every blocked row. The two
+rows that cannot be closed by engineering work are A1 (employer deadline) and R2 (X
+data access), and both are stated as blockers rather than guessed.

@@ -21,5 +21,7 @@ jobs:
         run: ruff check src tests scripts
       - name: Validate dataset registry
         run: python scripts/validate_dataset_registry.py
+      - name: Validate documentation
+        run: python scripts/validate_docs.py
       - name: Test
         run: pytest

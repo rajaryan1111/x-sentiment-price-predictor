@@ -107,7 +107,9 @@ Phase 1 is ready for implementation planning when:
 - [x] Requirements that depend on external accounts, source terms, credentials, or employer confirmation are tracked as Phase 2 readiness gates below.
 - [x] No implementation or performance claim is made solely because this requirements document exists.
 
-**Data-resource verification note:** The assessment's linked historical-tweet Google Doc was not accessible through the available read-only retrieval in this session. Its contents, access terms, and suitability are therefore **not verified**. This does not prevent closing the requirements-documentation phase, but it is a hard Phase 2 gate before selecting or training on that resource.
+**Data-resource verification note:** The assessment's linked historical-tweet Google Doc was not accessible through the available read-only retrieval in this session. Its contents, access terms, and suitability are therefore **not verified**. This does not prevent closing the requirements-documentation phase, but it is a hard gate before selecting or training on that resource.
+
+**Assignment-source limitation (recorded as D-023):** the assessment PDF and its companion dataset-reference PDF are not present in the repository, the agent workspace or this conversation. Requirements in this file are transcribed from the project's own record of the brief, so a human must confirm them against the PDF before the requirement set is treated as final. No deadline, licence, credential or employer intent is inferred anywhere.
 
 ## 7. Open decisions — do not guess
 
@@ -159,27 +161,28 @@ Phase 1 is ready for implementation planning when:
 
 ## 10. Traceability matrix
 
-| Requirement | Evidence expected | Planned component / report |
-|---|---|---|
-| R1 | Reproducible commands and run manifest | README, pipeline entry point, run manifest |
-| R2 | Source IDs, query/window, retrieval logs, counts | Apify adapter and ingestion report |
-| R3 | Price rows, provider/source, interval, adjustment policy | Price adapter and price schema |
-| R4 | Timestamp/provenance assertions and tests | Canonical records, storage, tests |
-| R5 | Field coverage and missingness report | X post schema and data-quality report |
-| R6 | Alignment tests around bar boundaries/timezones | Aggregation/alignment module and tests |
-| R7 | Feature schema, definitions and unit tests | Feature module and feature report |
-| R8 | Horizon-specific target tests and predictions | Target builder/model output schema |
-| R9 | Walk-forward folds, baseline comparisons, held-out predictions | Evaluation module and report |
-| R10 | Reproducible sentiment/price charts | Reporting/visualization module |
-| R11 | One-page asset outlook with data cutoff and uncertainty | Outlook report |
-| R12 | Metrics, formulas and assumptions in report | Backtest/evaluation report |
-| R13 | Provider/actor IDs, environment guide, secure secret procedure | README and submission checklist |
-| R14 | CI plus deterministic unit/integration tests | Tests and GitHub Actions |
+The authoritative matrix — with acceptance criteria, verification methods, evidence
+pointers, statuses, gaps, planned resolutions and external blockers — is maintained in
+[docs/REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md). It is the single
+source for status; this file keeps the requirement definitions and the decision context.
+Requirement IDs (`R1`–`R14`), their definitions in PRD.md and the matrix rows are the
+same IDs and must always be updated together.
 
 ## 11. Phase 1 exit decision
 
 **Phase 1 status: CLOSED — requirements and scope baseline documented.** The selected BTC-USD/daily assumptions, operational forecast cutoff, horizon targets, data rules, baseline/evaluation methodology, scope decisions, acceptance criteria, and traceability are now explicit. The assessment's stated deliverables are mapped to planned evidence.
 
-**Phase 2 readiness gates (must pass before live ingestion/model training):** (1) retrieve and review the linked historical dataset resource and its terms; (2) verify current Coinbase BTC-USD daily candle response and data quality; (3) choose/inspect an Apify Actor, verify its current terms/fields/180-day capability and set a cost cap; (4) verify provider credentials privately without committing them; (5) record actual data snapshots, schema profiles and provenance; (6) confirm the submission deadline from the employer's message. These are external access/operational checks, not hidden requirements gaps. The Google Doc was not accessible in this session, so its contents and rights remain unverified.
+**Readiness gates (must pass before live X ingestion or X-based training):**
 
-This closure means the **requirements phase** is complete; it does not mean data has been collected, model code implemented, performance measured, or the employer has approved the working assumptions. Any employer clarification overrides these defaults and must be logged before evaluation.
+1. Retrieve and review the linked historical dataset resource and its terms — **open**.
+2. Verify the current Coinbase BTC-USD daily candle response and data quality — **satisfied**: 180/180 bars for 2026-04-29 to 2026-10-25 UTC were refetched on 2026-10-26 with no missing or duplicate timestamps and the unfinished current day excluded.
+3. Choose and inspect an Apify Actor, verify its current terms, fields, 180-day capability and cost, and set a spend cap — **open**, no paid run may start before this.
+4. Verify provider credentials privately without committing them — **partially satisfied**: the price path needs no credentials; no X credential route is agreed yet.
+5. Record actual data snapshots, schema profiles and provenance — **partially satisfied**: the price snapshot, its SHA-256 and the run provenance are recorded; no X profile exists.
+6. Confirm the submission deadline from the employer's message — **open**; the brief states both “one week” and “5–7 days”, so no date is assumed.
+
+These are external access/operational checks, not hidden requirements gaps. The Google Doc was not accessible, so its contents and rights remain unverified.
+
+This closure means the **requirements phase** is complete; it does not mean X data has been collected, a sentiment result measured, or the employer has approved the working assumptions. Any employer clarification overrides these defaults and must be logged before evaluation.
+
+Requirement status is evidence-based: rows R1, R3, R6, R8, R12, R14 and the non-functional rows NFR1–NFR3, NFR5 and NFR6 are verified; R4, R5, R7, R9, R10, R11, R13 and NFR4 are partially complete; R2, A2 and A3 are blocked on external access; A1, A4 and A5 need employer clarification. See docs/REQUIREMENTS_TRACEABILITY.md for the per-row evidence.

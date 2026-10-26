@@ -64,5 +64,11 @@ Status: decision. Models predict the horizon ratio close(cutoff + h) / close(cut
 ## D-021 Artefact set and chart renderer
 Status: decision. Each run writes evaluation-report.md, outlook.md, sentiment-vs-price.svg, metrics.json, predictions.jsonl and manifest.json. Charts are rendered as dependency-free SVG; a plotting library is not required. Generated prediction dumps stay out of Git while the report, outlook, chart, manifest and metrics are small enough to review.
 
+## D-023 Assignment source availability
+Status: open, human action required. The assessment PDF (`CWT X sentiment Agent - intern task.pdf`) and its companion dataset-reference PDF are not present in the repository, the agent workspace or the conversation, so requirement wording is transcribed from the project's own record in docs/PHASE_1_REQUIREMENTS.md §2. Consequence: the requirement set, the `n+0` interpretation and the timeline are treated as provisional until a human confirms them against the PDF. No deadline, licence, credential or employer intent may be inferred from repository timestamps or from any summary.
+
+## D-024 Identifier and phase-label scheme
+Status: agreed. Requirement IDs are `R1`–`R14` (functional, defined in PRD.md and PHASE_1_REQUIREMENTS.md), `NFR1`–`NFR6` (non-functional), `A1`–`A6` (assessment-specific items such as the timeline, credentials and supplied resources), `O1`–`O13` (open decisions) and `D-001`–`D-024` (decisions). Each ID appears exactly once per namespace, and the same ID means the same requirement in every document. Phase numbering has three distinct schemes mapped in PHASES.md; canonical Phase 1 is the requirements and scope baseline, and the repository's “Phase 2 data quality/alignment” workstream is canonical Phase 3, not canonical Phase 2.
+
 ## D-022 Post text requirement
 Status: rule. A normalized post requires non-empty text, while text remains stored only when returned and permitted. Records without recoverable text are rejected at the adapter boundary rather than admitted with empty text, so post-volume features count only posts that were actually observed with text. Making the contract nullable is deferred until a real ID-only source is accepted and the quarantine policy is specified.

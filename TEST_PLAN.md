@@ -1,7 +1,7 @@
 # Test Plan
-A passing suite proves only the cases it actually exercises. 97 offline tests pass
-locally (`pytest`), and CI runs lint, registry validation and pytest on Python 3.11
-with only the `dev` and `storage` extras installed.
+A passing suite proves only the cases it actually exercises. 103 offline tests pass
+locally (`pytest`), and CI runs lint, registry validation, documentation validation and
+pytest on Python 3.11 with only the `dev` and `storage` extras installed.
 
 ## Layers
 - Unit: validation, timestamps, deduplication, price coverage, sentiment scoring,
@@ -12,8 +12,12 @@ with only the `dev` and `storage` extras installed.
 - Integration: temporary storage/database and normalized data flow.
 - End-to-end: the offline `run` CLI on a clearly labelled synthetic snapshot, plus a
   separately documented real-data run using public Coinbase candles.
-- CI: Ruff, registry structural validation and pytest. No network call is made by the
-  suite; `fetch-prices` is exercised manually, not in CI.
+- CI: Ruff, registry structural validation, documentation validation (`scripts/validate_docs.py`)
+  and pytest. No network call is made by the suite; `fetch-prices` is exercised manually,
+  not in CI.
+- Documentation: Markdown link resolution, unique requirement IDs and traceability-matrix
+  completeness are checked by the same validator, including that the status summary in the
+  matrix matches its own rows.
 
 ## Required matrix
 - Config: missing/invalid config and caps fail clearly; secrets never logged.
@@ -56,8 +60,12 @@ with only the `dev` and `storage` extras installed.
   match the manifest count, a zero-post run still completes, and CLI errors exit non-zero.
 - Apify: mocked run/status/dataset, auth header, bounds, timeouts/errors, no launch retry
   and no real Actor in CI.
-- Registry: source/platform identity and structural fields; validation does not imply live
-  access or legal approval.
+- Registry: source/platform identity and structural fields, ID-only hydration caveats, and
+  that a rolling source without a coverage end must carry a coverage/cutoff limitation;
+  validation does not imply live access or legal approval.
+- Documentation: every relative Markdown link resolves; requirement IDs are unique and
+  complete across the `R`, `NFR` and `A` namespaces; every matrix row has an acceptance
+  criterion, an evidence pointer, a vocabulary status and a blocker entry.
 
 ## Data profile acceptance
 Report row count, UTC min/max, required-window coverage/gaps, missing IDs/text/timestamps,
@@ -91,6 +99,7 @@ From repo root:
 python -m pip install -e ".[dev,storage]"
 ruff check src tests scripts
 python scripts/validate_dataset_registry.py
+python scripts/validate_docs.py
 pytest
 ```
 

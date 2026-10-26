@@ -1,6 +1,18 @@
 # Implementation Roadmap
-This is the controlling roadmap. The earlier repository label “Phase 2 data ingestion”
-is a workstream label, not the same as canonical documentation Phase 2.
+This is the controlling roadmap. The earlier repository label “Phase 2 data ingestion” is a workstream label, not the same as canonical documentation Phase 2.
+
+## Phase label mapping
+Three numbering schemes exist in this project's history. They must not be conflated.
+
+| Scheme | Meaning | Where it lives |
+| --- | --- | --- |
+| Canonical roadmap phases | The phases below (1–8), numbered for engineering sequencing | this file |
+| Internship execution phases | The employer-facing labels (“Phase 1 requirements, scope and baseline”, then the next delivery phase) | docs/REQUIREMENTS_TRACEABILITY.md, PRD.md |
+| Repository workstream labels | Historical branch names such as the “Phase 2 data quality/alignment” workstream | docs/PHASE_2_PROGRESS.md |
+
+Canonical Phase 1 = internship execution Phase 1 = the requirements and scope baseline.
+The repository's “Phase 2 data quality/alignment” workstream maps to canonical Phase 3
+(data access and ingestion), not to canonical Phase 2 (canonical documentation).
 
 ## Status definitions
 Not started = no evidence. In progress = some work exists but acceptance is unmet.
@@ -9,12 +21,18 @@ reviewed. CI success alone does not complete a data/model phase, and a phase is 
 complete merely because its interface or a mock test exists.
 
 ## Phase 1 — Requirements lock
-Status: complete as a documented baseline; employer clarifications remain open.
-- Parse the assessment into traceable requirements.
+Status: complete as a documented baseline, with two items that only the human can close.
+- Parse the assessment into traceable requirements with unique IDs (`R1`–`R14`, `NFR1`–`NFR6`, `A1`–`A6`).
 - Set working choices BTC-USD, daily UTC, n+0..n+5 close targets and Coinbase default.
 - Separate required, optional/ambiguous and out-of-scope items.
 - Record conservative news and RL interpretations.
-Evidence: docs/PHASE_1_REQUIREMENTS.md and PRD.md. This does not mean data or models are complete.
+- Give every requirement an acceptance criterion, a verification method, an evidence pointer, a status, a gap and a blocker.
+Evidence: docs/PHASE_1_REQUIREMENTS.md, PRD.md and the authoritative matrix in
+docs/REQUIREMENTS_TRACEABILITY.md, checked by `scripts/validate_docs.py`.
+**Open items that engineering cannot close:** the assessment PDF was not accessible to the
+authoring environment, so the requirement transcription needs human confirmation (D-023);
+and the employer's deadline is unknown (A1, D-014). This does not mean X data has been
+collected or any sentiment result measured.
 
 ## Phase 2 — Canonical documentation
 Status: in progress until the documentation review completes on the open pull request.
@@ -81,7 +99,8 @@ Acceptance (unmet): sentiment and price charts derived from real permitted X dat
 ## Phase 8 — Reproducibility and submission
 Status: in progress.
 - Done: offline reproducible CLI (`fetch-prices`, `run`), run manifest with input hashes,
-  commit-able report/chart/outlook artefacts, 97 offline tests, lint and registry checks.
+  commit-able report/chart/outlook artefacts, 103 offline tests, lint, registry and
+  documentation validation.
 - Remaining: clean-environment run on a fresh clone, security/licence audit of any future
   X source, the secure credential route, and confirmation of the actual submission
   deadline from the employer.

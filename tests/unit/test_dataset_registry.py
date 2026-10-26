@@ -46,6 +46,21 @@ def test_validator_reports_duplicate_ids(tmp_path: Path) -> None:
     assert any("Duplicate dataset id" in error for error in validate_registry(registry_path))
 
 
+def test_rolling_source_without_coverage_end_requires_a_limitation(tmp_path: Path) -> None:
+    document = json.loads(DEFAULT_REGISTRY.read_text(encoding="utf-8"))
+    dataset = next(
+        item for item in document["datasets"] if item["id"] == "bitcoin-tweets-2021-onward"
+    )
+    assert dataset["date_end"] is None
+    dataset["limitations"] = ["Count from the provider card."]
+    registry_path = tmp_path / "registry.json"
+    registry_path.write_text(json.dumps(document), encoding="utf-8")
+
+    errors = validate_registry(registry_path)
+
+    assert any("coverage is unverified" in error for error in errors)
+
+
 def test_source_pdf_count_mismatch_is_flagged() -> None:
     document = json.loads(DEFAULT_REGISTRY.read_text(encoding="utf-8"))
     dataset = next(item for item in document["datasets"] if item["id"] == "crypto-stock-tweets-hf")

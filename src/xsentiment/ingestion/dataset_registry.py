@@ -77,6 +77,21 @@ def validate_registry(path: Path = DEFAULT_REGISTRY) -> list[str]:
             errors.append(f"{prefix}.limitations must be a list of non-empty strings.")
         if not isinstance(dataset["recommended_for_initial_run"], bool):
             errors.append(f"{prefix}.recommended_for_initial_run must be boolean.")
+        for field_name in ("date_start", "date_end"):
+            value = dataset[field_name]
+            if value is None:
+                joined = " ".join(dataset["limitations"]).lower()
+                if "coverage" not in joined and "cutoff" not in joined:
+                    errors.append(
+                        f"{prefix}.{field_name} is null but the limitations do not warn that "
+                        "coverage is unverified"
+                    )
+            elif not isinstance(value, str) or not value.strip():
+                errors.append(
+                    f"{prefix}.{field_name} must be a date string, or null accompanied by a "
+                    "coverage limitation"
+                )
+
         if dataset["text_availability"] == "ids-only" and not any(
             word in " ".join(dataset["limitations"]).lower()
             for word in ("id", "hydration")

@@ -11,7 +11,7 @@ The first implementation target is BTC-USD with UTC daily bars. This contract de
 | post_id | string | Stable source identifier; required for deduplication |
 | created_at | timezone-aware datetime | Original event time, normalized to UTC for calculations |
 | retrieved_at | timezone-aware datetime | When the system first observed the record; never backdate it |
-| text | string | Original text, subject to source terms and storage policy |
+| text | non-empty string | Required for an admitted post; original text, subject to source terms and storage policy. A record without recoverable text is rejected at the adapter boundary rather than admitted with empty text, so post-volume counts only describe posts observed with text (see DESIGN.md and DECISIONS.md D-022) |
 | sentiment_score | float or null | Optional model output in [-1, 1]; null means unscored, not neutral |
 | likes/reposts/views/author_followers | non-negative integer or null | Preserve missingness; exclude from historical features without point-in-time snapshots |
 

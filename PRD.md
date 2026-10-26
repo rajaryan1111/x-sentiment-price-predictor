@@ -14,29 +14,38 @@ Build a reproducible Python research pipeline to test whether X/Twitter sentimen
 - Modeling: supervised multi-horizon forecasting, a naive baseline and a price-only baseline. RL is out of initial scope unless explicitly confirmed and fully specified.
 - Exa appears in the submission checklist but not the main news requirement; its runtime role remains open.
 
-## Functional requirements and acceptance evidence
-1. Reproducible workflow from ingestion through reporting — commands, config and run metadata.
-2. X ingestion for the bounded 180-day period — verified source, terms, schema and sanitized coverage profile.
-3. Matching BTC-USD daily prices — provider/window metadata and gap/duplicate checks.
-4. Preserve post ID, text where permitted, event time, retrieval/availability time, provenance and available engagement/follower metadata.
-5. Normalize timestamps to UTC and deterministically align posts and bars.
-6. Preserve missingness; never fabricate rows, counts, prices or sentiment.
-7. Generate documented time-based sentiment and price features.
-8. Produce horizon targets/forecasts n+0 through n+5 with no leakage.
-9. Chronological out-of-sample evaluation against naive and price-only baselines.
-10. Charts comparing X sentiment and price over time.
-11. One-page current outlook with cutoff, provenance and uncertainty.
-12. PDF/Markdown evaluation report. Sharpe, Sortino and max drawdown only when valid strategy returns exist; otherwise explain unavailable status.
-13. Reproducibility package with configuration, provider/Actor identifiers, data snapshot/hash and run instructions.
-14. Automated schema, timestamp, alignment, feature, target, leakage, metric and report tests.
+## Functional requirements and acceptance criteria
+These IDs (`R1`–`R14`) are the project's primary assessment IDs; the same IDs and their
+statuses, gaps and blockers are maintained in
+docs/REQUIREMENTS_TRACEABILITY.md and docs/PHASE_1_REQUIREMENTS.md.
+
+| ID | Requirement | Acceptance criterion | Verification method |
+| --- | --- | --- | --- |
+| R1 | Reproducible workflow from ingestion through reporting | One documented command produces every artefact from a pinned input, and a manifest records config, hashes and versions | README quick start re-run; run manifest contents |
+| R2 | X ingestion for the bounded 180-day window via an approved provider route | Accepted permitted source with a sanitized profile proving 180-day event-time coverage and required fields | Coverage profile; terms review; bounded end-to-end ingest |
+| R3 | Matching BTC-USD daily prices | Provider, product, interval, timezone and currency documented; gap and duplicate checks pass | Price snapshot plus coverage table; adapter tests |
+| R4 | Preserve post ID, event time, retrieval/availability time and provenance | Timezone-aware, distinct event and first-observed times with source identity retained | Contract tests; run provenance block |
+| R5 | Preserve post text and available engagement/follower metadata | Text required for an admitted post; optional counts nullable; negatives rejected | Contract and adapter tests; missingness counts in profile |
+| R6 | Normalize timestamps to UTC and align posts with bars deterministically | Documented UTC windows; duplicates and gaps reported, never filled; late and future posts excluded | Alignment and dataset tests |
+| R7 | Generate documented time-based sentiment and price features | Predeclared features computed only from information available at the cutoff; missing sentiment stays null | Feature tests; feature definitions in MODEL_PLAN.md |
+| R8 | Produce horizon targets/forecasts n+0 through n+5 with no leakage | Six horizons under the documented cutoff and target convention; targets never in features | Horizon tests; per-horizon metrics rows |
+| R9 | Chronological out-of-sample evaluation against naive and price-only baselines | Purged walk-forward folds; all models on identical folds and eligible rows; no random split | Fold and evaluation tests; deterministic repeat-run test |
+| R10 | Charts comparing X sentiment and price over time | Reproducible chart from observed data; empty panels labelled rather than fabricated | Chart artefact; rendering tests |
+| R11 | One-page current outlook with cutoff, provenance and uncertainty | Outlook states as-of time, cutoff, coverage, model output or absence, news context and limitations | Outlook artefact; rendering tests |
+| R12 | Evaluation report with Sharpe, Sortino and maximum drawdown where valid | Report contains per-horizon MAE/RMSE and risk metrics only from a defined strategy on out-of-sample returns, with fees, annualisation and missing-data policy disclosed | Report artefact; strategy specification; metric tests |
+| R13 | Reproducibility package with configuration, provider/Actor identifiers, snapshot hash and run instructions | Setup and reproduction documented; non-secret identifiers documented; secrets excluded with a defined transfer route | README; APIFY_X_SETUP.md; manifest provenance |
+| R14 | Automated schema, timestamp, alignment, feature, target, leakage, metric and report tests | Offline suite covers each area and runs in CI alongside lint and registry validation | pytest output; CI workflow |
 
 ## Non-functional requirements
-- Reproducibility: record code revision, source/version, query/window, retrieval time, schema and non-secret run ID.
-- Temporal integrity: timezone-aware timestamps; event time is distinct from first-observed time.
-- Security: never commit tokens, cookies, private exports or large raw datasets.
-- Robustness: bounded timeouts/responses/concurrency/cost; do not blindly retry paid Actor launches.
-- Auditability: record exclusions and reasons without logging post text by default.
-- Honest reporting: fixtures and in-sample metrics are never presented as real out-of-sample results.
+
+| ID | Requirement | Acceptance criterion | Verification method |
+| --- | --- | --- | --- |
+| NFR1 | Reproducibility metadata: code revision, source/version, query/window, retrieval time, schema, non-secret run ID | Each run records the listed metadata and no secrets | Run manifest inspection |
+| NFR2 | Temporal integrity: timezone-aware timestamps, event time distinct from first-observed time | Naive timestamps rejected; retrieval time never derived from creation time | Contract and loader tests |
+| NFR3 | Security: never commit tokens, cookies, private exports or large raw datasets | Repository contains no credentials or raw private exports; ignored paths cover data and secrets | Secret scan; `.gitignore` review |
+| NFR4 | Robustness: bounded timeouts, responses, concurrency and cost; no blind retry of paid launches | Caps configurable and enforced; paid Actor launch never auto-retried | Adapter and settings tests |
+| NFR5 | Auditability: record exclusions and reasons without logging post text by default | Profiles and reports record counts and exclusions without printing post text | Profiler and report tests |
+| NFR6 | Honest reporting: fixtures and in-sample metrics are never presented as real out-of-sample results | Artefacts label unavailable items and synthetic fixtures; no unverified claim is made | Report tests; docs validation |
 
 ## Out of scope
 Other assets/intervals, live order execution, guaranteed returns, investment advice, automatic paid scraping, using current engagement as historical features without snapshots, mixing StockTwits into X, and RL without a defined action/reward/cost/evaluation design.

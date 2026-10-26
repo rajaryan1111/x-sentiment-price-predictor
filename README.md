@@ -28,6 +28,10 @@ contracts and status, and they list what is verified versus still open.
 | [PHASES.md](PHASES.md) | Roadmap, phase status and completion gates |
 | [DECISIONS.md](DECISIONS.md) | Every working default, rule and open question |
 
+Phase 1 deliverable: the authoritative [requirements traceability matrix](docs/REQUIREMENTS_TRACEABILITY.md)
+(every requirement with its acceptance criterion, verification method, evidence, status,
+gap and external blocker, checked by `python scripts/validate_docs.py`).
+
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
 [Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),
 [historical dataset registry](docs/data-sources.md),
@@ -49,6 +53,7 @@ cp .env.example .env                        # optional for the public price sour
 pytest
 ruff check src tests scripts
 python scripts/validate_dataset_registry.py
+python scripts/validate_docs.py
 ```
 
 Run the real pipeline on public BTC-USD daily candles (no credentials, no cost):
@@ -132,6 +137,8 @@ statistics on a single asset and period, not evidence of tradability.
 - `src/xsentiment/reporting/` — SVG charts, one-page outlook, evaluation report.
 - `src/xsentiment/pipeline/forecast_run.py` — offline end-to-end run and artefacts.
 - `src/xsentiment/main.py` — `fetch-prices` and `run` CLI entry points.
+- `scripts/validate_docs.py` — Phase 1 documentation validator: link resolution,
+  unique requirement IDs, matrix completeness and status-summary consistency.
 - `tests/` — offline unit tests; live provider calls are never made in CI.
 
 ## Data, security and evaluation rules
