@@ -121,7 +121,9 @@ class ApifyXAdapter:
         for record in records:
             existing = seen.get(record.post_id)
             if existing is not None and existing != record:
-                raise ApifyRunError(f"Actor returned conflicting duplicate post ID: {record.post_id}")
+                raise ApifyRunError(
+                    f"Actor returned conflicting duplicate post ID: {record.post_id}"
+                )
             seen[record.post_id] = record
         return sorted(seen.values(), key=lambda record: (record.created_at, record.post_id))
 
