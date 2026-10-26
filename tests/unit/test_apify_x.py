@@ -73,7 +73,11 @@ def test_normalizer_rejects_missing_required_or_invalid_time(item: dict, message
 
 def test_apify_config_is_required_before_network_activity() -> None:
     calls: list[str] = []
-    transport = httpx.MockTransport(lambda request: calls.append(str(request.url)) or httpx.Response(500))
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(str(request.url))
+        return httpx.Response(500)
+
+    transport = httpx.MockTransport(handler)
     client = httpx.AsyncClient(transport=transport)
     adapter = ApifyXAdapter(
         settings=Settings(http_timeout_seconds=2),
@@ -99,7 +103,12 @@ def test_apify_run_uses_bearer_auth_cost_and_item_caps_and_fetches_dataset() -> 
             assert request.headers["Authorization"] == "Bearer test-token"
             return httpx.Response(
                 201,
-                json={"id": "run-1", "status": "SUCCEEDED", "exitCode": 0, "defaultDatasetId": "ds-1"},
+                json={
+                    "id": "run-1",
+                    "status": "SUCCEEDED",
+                    "exitCode": 0,
+                    "defaultDatasetId": "ds-1",
+                },
             )
         if request.method == "GET" and "/datasets/" in request.url.path:
             return httpx.Response(
@@ -130,9 +139,11 @@ def test_apify_run_uses_bearer_auth_cost_and_item_caps_and_fetches_dataset() -> 
 
 def test_apify_rejects_bad_caps_before_network_activity() -> None:
     calls: list[str] = []
-    client = httpx.AsyncClient(
-        transport=httpx.MockTransport(lambda request: calls.append(str(request.url)) or httpx.Response(500))
-    )
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(str(request.url))
+        return httpx.Response(500)
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
     adapter = ApifyXAdapter(settings=configured_settings(), client=client)
 
     async def run() -> None:
