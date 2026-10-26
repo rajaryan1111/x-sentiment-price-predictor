@@ -92,7 +92,10 @@ def profile_daily_price_coverage(
     start_utc, end_utc, now_utc = _utc(start, "start"), _utc(end, "end"), _utc(now, "now")
     if start_utc >= end_utc:
         raise ValueError("start must be earlier than end")
-    if any(value.hour or value.minute or value.second or value.microsecond for value in (start_utc, end_utc)):
+    if any(
+        value.hour or value.minute or value.second or value.microsecond
+        for value in (start_utc, end_utc)
+    ):
         raise ValueError("daily coverage bounds must be UTC midnight")
     if candles and any(c.product_id != candles[0].product_id for c in candles):
         raise ValueError("all candles must use the same product")
@@ -104,7 +107,13 @@ def profile_daily_price_coverage(
     observed_days = {stamp for stamp in unique if stamp in expected_days}
     missing = tuple(stamp.date().isoformat() for stamp in sorted(expected_days - observed_days))
     duplicate = tuple(sorted(stamp.isoformat() for stamp in unique if timestamps.count(stamp) > 1))
-    outside = tuple(sorted(c.timestamp.isoformat() for c in candles if not start_utc <= c.timestamp < end_utc))
+    outside = tuple(
+        sorted(
+            c.timestamp.isoformat()
+            for c in candles
+            if not start_utc <= c.timestamp < end_utc
+        )
+    )
     current_day_start = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
     incomplete = any(c.timestamp >= current_day_start for c in candles)
     return PriceCoverageReport(
@@ -128,7 +137,10 @@ def deduplicate_posts(posts: Iterable[XPostRecord]) -> list[XPostRecord]:
         if prior is not None and prior != post:
             raise ValueError(f"conflicting duplicate post_id: {post.post_id}")
         by_id[post.post_id] = post
-    return sorted(by_id.values(), key=lambda post: (_utc(post.created_at, "created_at"), post.post_id))
+    return sorted(
+        by_id.values(),
+        key=lambda post: (_utc(post.created_at, "created_at"), post.post_id),
+    )
 
 
 def build_point_in_time_features(
