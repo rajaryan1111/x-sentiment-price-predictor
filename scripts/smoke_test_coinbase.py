@@ -2,7 +2,7 @@
 import asyncio
 from datetime import UTC, datetime, timedelta
 
-from xsentiment.ingestion.prices import CoinbasePriceAdapter, DAILY_GRANULARITY_SECONDS
+from xsentiment.ingestion.prices import DAILY_GRANULARITY_SECONDS, CoinbasePriceAdapter
 
 
 async def run() -> int:
@@ -31,7 +31,10 @@ async def run() -> int:
     print(f"last_candle_utc={candles[-1].timestamp.isoformat() if candles else 'none'}")
     print(f"missing_daily_bars={[value.isoformat() for value in missing]}")
     if missing or len(candles) != 7:
-        print("RESULT=FAIL: recent daily candle coverage did not match the expected 7 complete bars")
+        print(
+            "RESULT=FAIL: recent daily candle coverage did not match "
+            "the expected 7 complete bars"
+        )
         return 1
     print("RESULT=PASS: recent 7-bar read-only smoke test")
     return 0
