@@ -10,7 +10,7 @@ Sentiment-plus-price candidates: sentiment mean/dispersion from scored eligible 
 Exclude by default: current engagement/follower counts without historical snapshots; news features; future posts/prices; targets in features; synthetic values represented as real data.
 
 ## Baselines and candidate
-1. Naive persistence baseline: last known completed close, applied consistently to each horizon.
+1. Naive persistence baseline: implemented as persistence_forecast in src/xsentiment/models/baseline.py; repeats the last completed close for n+0 through n+5. This is a baseline prediction function, not an evaluation pipeline.
 2. Price-only supervised baseline.
 3. Sentiment-plus-price candidate using the same folds, targets and eligible rows as price-only.
 Choose model family after profiling actual sample size and missingness. Start with simple, reproducible models. RL is out of initial scope unless explicitly required and its action space, reward, execution/cost model and evaluation are specified.
