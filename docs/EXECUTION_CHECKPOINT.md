@@ -108,9 +108,10 @@ documentation-only checkpoint):
   integration): `27 passed`; the network-isolation regression alone: `1 passed`.
 - `ruff check src tests scripts`: All checks passed.
 - `python -m compileall -q src tests scripts`: OK.
-- `scripts/validate_docs.py`: after the new documentation, 97 links, 16
-  test-count claims, 28 matrix rows OK (the earlier pre-clarifications run
-  verified 69 links / 14 claims — both passed).
+- `scripts/validate_docs.py`: all relative Markdown links resolve, 16
+  test-count claims and 28 matrix rows OK (the link count grows with each added
+  doc — the earlier pre-clarifications run verified 69 links / 14 claims; the
+  post-clarifications runs verified ~98 links / 16 claims; all passed).
 - `scripts/validate_dataset_registry.py`: 12 records OK.
 - `git diff --check`: clean.
 - Offline demo run twice from a clean `reports/generated/verify-2026-10-28/`

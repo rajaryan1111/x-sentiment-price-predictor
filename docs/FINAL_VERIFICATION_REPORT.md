@@ -84,7 +84,8 @@ git diff --check -> CLEAN
 
 `scripts/validate_docs.py` and `scripts/validate_dataset_registry.py` outputs at
 code checkpoint `8bc4f7f` (before the employer-clarifications document was added;
-the later re-run at `a19ee2f` verified 97 links and 16 test-count claims, also OK):
+later re-runs after that document verified all relative links — the exact link
+count grows with each new doc — and 16 test-count claims, all OK):
 
 ```text
 Checked 69 relative Markdown links across the repository.
