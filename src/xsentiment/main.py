@@ -45,6 +45,7 @@ from xsentiment.ingestion.tavily_news import (
 from xsentiment.pipeline.forecast_run import (
     load_candles,
     load_news_context,
+    load_price_snapshot_metadata,
     run_forecast_pipeline,
     sha256_file,
 )
@@ -256,6 +257,7 @@ def _command_fetch_prices(args: argparse.Namespace) -> int:
         print(f"price download failed: {exc}", file=sys.stderr)
         return 1
     destination = Path(args.out)
+    fetched_at = datetime.now(UTC).isoformat()
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(
         json.dumps(
@@ -264,6 +266,7 @@ def _command_fetch_prices(args: argparse.Namespace) -> int:
                 "granularity_seconds": 86_400,
                 "requested_start": args.start.isoformat(),
                 "requested_end": args.end.isoformat(),
+                "fetched_at": fetched_at,
                 "fetch_mode": "public_no_credentials",
                 "candles": rows,
             },
@@ -385,6 +388,11 @@ def _command_run(args: argparse.Namespace) -> int:
             provenance["input_source"] = "file_snapshot"
             provenance["price_snapshot"] = str(args.prices)
             provenance["price_snapshot_sha256"] = sha256_file(args.prices)
+            price_metadata = load_price_snapshot_metadata(args.prices)
+            provenance["price_snapshot_metadata"] = price_metadata
+            fetched_at = price_metadata.get("fetched_at")
+            if isinstance(fetched_at, str) and fetched_at:
+                provenance["price_snapshot_retrieved_at"] = fetched_at
             if args.posts is not None:
                 provenance["posts_snapshot"] = str(args.posts)
                 provenance["posts_snapshot_sha256"] = sha256_file(args.posts)
@@ -402,11 +410,25 @@ def _command_run(args: argparse.Namespace) -> int:
             "Trading metrics describe a simple long/flat research strategy, not a "
             "deployable trading system.",
         ]
+        price_metadata = provenance.get("price_snapshot_metadata")
+        if isinstance(price_metadata, dict) and price_metadata.get("synthetic"):
+            limitations.append(
+                "The supplied price snapshot is labelled synthetic; its metrics demonstrate "
+                "the pipeline and are not observed market evidence."
+            )
         if posts:
             limitations.append(
                 "Caller-supplied posts are not independently verified: their provenance, "
                 "licensing and point-in-time availability must be checked in the snapshot."
             )
+            if any(
+                post.source_platform != "x" or "synthetic" in post.source_name.lower()
+                for post in posts
+            ):
+                limitations.append(
+                    "One or more supplied posts are labelled synthetic or non-X; the "
+                    "sentiment results are a labelled demonstration, not real X evidence."
+                )
         if news:
             limitations.append(
                 "News context is caller-supplied, appears only in the outlook and never "

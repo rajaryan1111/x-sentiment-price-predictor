@@ -2,7 +2,7 @@
 
 > Naming note: this file belongs to the repository's historical "Phase 2 data quality/alignment" workstream, which maps to canonical Phase 3 in [PHASES.md](../PHASES.md). It is not canonical documentation Phase 2.
 
-**Status: partially implemented; external data-access gates remain open.** This document distinguishes code and test evidence from provider/account verification. Live X ingestion and a verified 180-day X dataset are not yet complete, so the sentiment-versus-price comparison remains blocked. Price-only models, walk-forward evaluation and reporting are implemented on `feat/sentiment-features-and-forecasting`. The offline suite is 149 tests, all passing as of 2026-10-26; see [TEST_PLAN.md](../TEST_PLAN.md) for the authoritative current count.
+**Status: partially implemented; external data-access gates remain open.** This document distinguishes code and test evidence from provider/account verification. Live X ingestion and a verified 180-day X dataset are not yet complete, so the sentiment-versus-price comparison remains blocked. Price-only models, walk-forward evaluation and reporting are implemented on `feat/sentiment-features-and-forecasting`. The offline suite is 165 tests, all passing as of 2026-10-27; see [TEST_PLAN.md](../TEST_PLAN.md) for the authoritative current count.
 
 ## Implemented and locally verified
 

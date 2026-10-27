@@ -158,7 +158,33 @@ permitted source.
 
 Each run writes `evaluation-report.md`, `outlook.md`, `sentiment-vs-price.svg`,
 `metrics.json`, `predictions.jsonl` and `manifest.json` (code revision, config,
-hashes, counts, warnings).
+hashes, input lineage, counts and warnings).
+
+### Fully offline demonstration (synthetic inputs)
+
+No network, credentials or accepted X corpus is needed for this walkthrough. The
+generator writes deterministic, **explicitly labelled synthetic** daily bars and
+posts; the resulting metrics demonstrate the software only and must never be
+reported as real BTC-USD or X evidence.
+
+```bash
+python scripts/make_offline_demo.py \
+  --out reports/generated/offline-demo-inputs/prices.json \
+  --posts-out reports/generated/offline-demo-inputs/posts.jsonl \
+  --generated-at 2026-10-27T00:00:00+00:00
+
+python -m xsentiment run \
+  --prices reports/generated/offline-demo-inputs/prices.json \
+  --posts reports/generated/offline-demo-inputs/posts.jsonl \
+  --out reports/generated/offline-demo \
+  --now 2026-07-30T00:00:00+00:00 \
+  --input-note "synthetic offline demo from scripts/make_offline_demo.py"
+```
+
+Inspect `reports/generated/offline-demo/evaluation-report.md`, `outlook.md`,
+`sentiment-vs-price.svg`, `metrics.json`, `predictions.jsonl` and `manifest.json`.
+The generated paths are ignored by Git. `tests/integration/test_offline_demo.py`
+executes the same CLI and validates every artefact and deterministic repeatability.
 
 ## What the pipeline does
 
@@ -197,9 +223,9 @@ From `reports/btc-usd-180d/`, computed by the commands above:
   commands after refetching the public snapshot — whose SHA-256 matched the committed
   provenance exactly — and reproduced every metric within 5e-13 (platform float noise
   only). That refetch is not part of the current sandbox verification, whose outbound
-  network is restricted; the current [TEST_PLAN.md](TEST_PLAN.md) records 161 offline
+  network is restricted; the current [TEST_PLAN.md](TEST_PLAN.md) records 165 offline
   tests at this revision (2026-10-27). No credentials, paid services or network X calls
-  are needed for the offline test suite.
+  are needed for the offline test suite or the synthetic demo run.
 - **Mean MAE across horizons:** naive persistence **$1,828.36**, price-only ridge
   **$2,264.62** (+23.86% worse), sentiment-plus-price identical to price-only
   because no sentiment was available.
@@ -240,6 +266,8 @@ dataset has been accepted, licensed or profiled for 180-day text coverage.
   entry points; `fetch-news` is the only live-capable, gated command.
 - `scripts/validate_docs.py` — Phase 1 documentation validator: link resolution,
   unique requirement IDs, matrix completeness and status-summary consistency.
+- `scripts/make_offline_demo.py` — deterministic, explicitly synthetic price/post
+  snapshots for a no-credential, no-network end-to-end demonstration.
 - `scripts/persist_and_join.py` — optional local persistence and cutoff-join report;
   requires the `storage` extra, makes no network call and prints no post text.
 - `xsentiment persist` — the CLI form of the same persistence step; `xsentiment run

@@ -105,6 +105,37 @@ def load_candles(path: str | Path) -> list[PriceCandle]:
     return candles
 
 
+_SAFE_PRICE_METADATA_KEYS = (
+    "granularity_seconds",
+    "requested_start",
+    "requested_end",
+    "fetched_at",
+    "generated_at",
+    "recommended_now",
+    "fetch_mode",
+    "synthetic",
+    "generator",
+    "generator_seed",
+    "retrieval_time_note",
+    "schema_version",
+)
+
+
+def load_price_snapshot_metadata(path: str | Path) -> dict[str, object]:
+    """Read only allow-listed, scalar provenance fields from a price snapshot."""
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        return {}
+    metadata: dict[str, object] = {}
+    for key in _SAFE_PRICE_METADATA_KEYS:
+        value = payload.get(key)
+        if value is None or not isinstance(value, (str, int, float, bool)):
+            continue
+        if len(str(value)) <= 500:
+            metadata[key] = value
+    return metadata
+
+
 def load_posts(path: str | Path) -> list[XPostRecord]:
     """Load normalized X post records from JSONL; fails closed with a line number."""
     posts: list[XPostRecord] = []
@@ -361,7 +392,8 @@ def run_forecast_pipeline(
                 summary=summary,
                 evaluation=evaluation,
                 provenance=run_provenance,
-                posts=len(posts),
+                candles=candles,
+                posts=posts,
             ),
             indent=2,
             sort_keys=True,
@@ -437,6 +469,61 @@ def _metrics_payload(evaluation: EvaluationResult) -> dict[str, object]:
     }
 
 
+def _input_lineage(
+    candles: Sequence[PriceCandle],
+    posts: Sequence[XPostRecord],
+    provenance: dict[str, object],
+) -> dict[str, object]:
+    """NFR1 metadata: source, window, retrieval, schema and non-secret query identity."""
+    price_times = [candle.timestamp.astimezone(UTC) for candle in candles]
+    event_times = [post.created_at.astimezone(UTC) for post in posts]
+    observed_times = [post.retrieved_at.astimezone(UTC) for post in posts]
+    query_terms = sorted({post.query for post in posts if post.query})
+    query_hash = (
+        hashlib.sha256("\n".join(query_terms).encode("utf-8")).hexdigest()
+        if query_terms
+        else None
+    )
+    price_metadata = provenance.get("price_snapshot_metadata")
+    if not isinstance(price_metadata, dict):
+        price_metadata = {}
+    retrieved_at = provenance.get("price_snapshot_retrieved_at")
+    return {
+        "price": {
+            "product_ids": sorted({candle.product_id for candle in candles}),
+            "bars": len(candles),
+            "first_bar": min(price_times).isoformat() if price_times else None,
+            "last_bar": max(price_times).isoformat() if price_times else None,
+            "schema": "PriceCandle (Decimal OHLCV, UTC; see DESIGN.md)",
+            "snapshot_metadata": price_metadata,
+            "synthetic": bool(price_metadata.get("synthetic", False)),
+            "retrieved_at": retrieved_at if isinstance(retrieved_at, str) else None,
+            "retrieved_at_reason": (
+                None
+                if isinstance(retrieved_at, str)
+                else "the supplied price snapshot does not record a provider retrieval time"
+            ),
+        },
+        "posts": {
+            "count": len(posts),
+            "schema_versions": sorted({post.schema_version for post in posts}),
+            "source_names": sorted({post.source_name for post in posts}),
+            "source_platforms": sorted({post.source_platform for post in posts}),
+            "event_time_first": min(event_times).isoformat() if event_times else None,
+            "event_time_last": max(event_times).isoformat() if event_times else None,
+            "retrieved_at_first": min(observed_times).isoformat() if observed_times else None,
+            "retrieved_at_last": max(observed_times).isoformat() if observed_times else None,
+        },
+        "queries": {
+            "modes": sorted({post.query_mode for post in posts if post.query_mode}),
+            "term_count": len(query_terms),
+            "terms_sha256": query_hash,
+            "policy": "raw query terms are not stored in the manifest; they may contain secrets",
+        },
+        "input_source": provenance.get("input_source", "unspecified"),
+    }
+
+
 def _manifest(
     *,
     as_of: datetime,
@@ -444,7 +531,8 @@ def _manifest(
     summary: DatasetSummary,
     evaluation: EvaluationResult,
     provenance: dict[str, object],
-    posts: int,
+    candles: Sequence[PriceCandle],
+    posts: Sequence[XPostRecord],
 ) -> dict[str, object]:
     return {
         "run_id": as_of.strftime("run-%Y%m%dT%H%M%SZ"),
@@ -456,7 +544,7 @@ def _manifest(
             "rows_with_sentiment": summary.rows_with_sentiment,
             "first_cutoff": _iso(summary.first_cutoff),
             "last_cutoff": _iso(summary.last_cutoff),
-            "posts": posts,
+            "posts": len(posts),
             "scored_posts": summary.scored_posts,
             "unfinished_day_dropped": summary.unfinished_day_dropped,
         },
@@ -476,6 +564,7 @@ def _manifest(
             "warnings": list(evaluation.warnings),
         },
         "provenance": provenance,
+        "input_lineage": _input_lineage(candles, posts, provenance),
     }
 
 

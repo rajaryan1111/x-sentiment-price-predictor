@@ -1,19 +1,20 @@
 # Test Plan
 A passing suite proves only the cases it actually exercises. The current suite is
-**161 offline tests, all passing** (`pytest` -> `161 passed`, 0 failed, 0 skipped,
+**165 offline tests, all passing** (`pytest` -> `165 passed`, 0 failed, 0 skipped,
 0 xfailed), last run on 2026-10-27 UTC in a clean Python 3.11.2 virtual environment
 installed with `pip install -e '.[dev,storage,analysis]'`. CI runs the same command
 set on Python 3.11, which is the supported baseline in `pyproject.toml`, with the
 `dev` and `storage` extras; the offline pipeline itself needs no analysis extras.
 CI runs lint, registry validation, documentation validation and pytest.
 
-The suite collects 161 cases from 159 test functions across 21 modules in
-`tests/unit/`: one function is parametrized into three cases. The checkpoint revision
-(commit `5af5bc7`) had 152 tests; the nine added in `test_fetch_news_cli.py` cover
-`fetch-news` registration, the live-call gate, environment-only credentials, request
-bounds, single-request behaviour, mocked HTTP errors, credential redaction, JSONL
-normalization and the two-step `run --news-file` integration. Earlier figures
-(149, 152) are historical results for their own revisions.
+The suite collects 165 cases from 163 test functions across 22 modules in
+`tests/unit/` and `tests/integration/`: one function is parametrized into three cases.
+The checkpoint revision (commit `5af5bc7`) had 152 tests; nine added in
+`test_fetch_news_cli.py` cover the gated news CLI, and four added in
+`tests/integration/test_offline_demo.py` cover deterministic synthetic input
+generation, snapshot metadata allow-listing, mocked `fetch-prices` retrieval
+metadata and a complete offline CLI run with artefact validation and repeatability.
+Earlier figures (149, 152, 161) are historical results for their own revisions.
 
 **This file is the single authoritative source for the current count.** Counts quoted
 elsewhere in the repository must be tied to a date or a commit and are historical
@@ -39,8 +40,12 @@ results for that revision. `scripts/validate_docs.py` enforces that rule, and
   manifest records `input_source = persisted_storage`. These remain fixture/mock based: they
   do not prove a production PostgreSQL deployment, and they do not prove acceptance of any
   real X corpus.
-- End-to-end: the offline `run` CLI on a clearly labelled synthetic snapshot, plus a
-  separately documented real-data run using public Coinbase candles.
+- End-to-end: `tests/integration/test_offline_demo.py` generates deterministic,
+  explicitly labelled synthetic price/post snapshots, drives the real `run` CLI,
+  validates every artefact (manifest lineage, six horizons, three models, finite
+  metrics, prediction records, chart/outlook/report sections) and proves a repeat
+  run produces byte-identical predictions and metrics. A separately documented
+  historical real-data run uses public Coinbase candles; it is not refetched in CI.
 - CI: Ruff, registry structural validation, documentation validation (`scripts/validate_docs.py`)
   and pytest. No network call is made by the suite; `fetch-prices` is exercised manually,
   not in CI.

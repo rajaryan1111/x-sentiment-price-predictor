@@ -5,7 +5,9 @@ actually been verified, and the next safe command. It is not a completion claim.
 
 ## Current phase
 
-Phase 0 and Phase 1 complete; Phase 2 (requirements audit) next.
+Phases 0, 1 and the offline implementation/e2e work are complete and pushed.
+Remaining: final requirements audit, submission documents, final engineering
+review, final full verification and delivery.
 
 ## Recovery state (2026-10-27 UTC)
 
@@ -31,48 +33,63 @@ Phase 0 and Phase 1 complete; Phase 2 (requirements audit) next.
 - Wired `run --news-file` to record the news snapshot hash, item count and
   context-only policy, and to display caller-supplied provenance limitations in
   both the outlook and report.
-- Added mocked-transport CLI coverage in `tests/unit/test_fetch_news_cli.py`,
-  including byte-identical predictions/metrics with and without news context.
-- Updated README, PHASES, DECISIONS, TEST_PLAN, EXTERNAL_BLOCKERS and the
-  traceability matrix to describe the verified two-step workflow honestly.
-- Extended CI push triggers to `arena/**` so this working branch can be verified
-  by GitHub Actions without pushing to another branch.
+- Added mocked-transport CLI coverage including byte-identical predictions/metrics
+  with and without news context.
+- Added `scripts/make_offline_demo.py`, a deterministic and explicitly synthetic
+  price/post generator, and `--input-note` provenance labelling in `run`.
+- Added NFR1 `input_lineage` metadata to the manifest (source, window, retrieval,
+  schema, query-mode/hash and synthetic flags) without storing raw query terms.
+- `fetch-prices` now records a UTC `fetched_at`; `run` records allow-listed price
+  snapshot metadata and explicit synthetic limitations.
+- Added `tests/integration/test_offline_demo.py`: deterministic generation,
+  metadata allow-listing, mocked `fetch-prices`, a real CLI end-to-end run and
+  artefact/repeatability checks.
+- Updated README, PHASES, DECISIONS, TEST_PLAN, EXTERNAL_BLOCKERS, PHASE_2_PROGRESS
+  and the traceability matrix to describe the verified workflows honestly.
+- Extended CI push triggers to `arena/**` so this working branch is verified by
+  GitHub Actions without pushing to another branch.
 
 ## Pending tasks
 
 1. Audit all R/NFR/A requirements against code and tests; write
    `docs/FINAL_REQUIREMENTS_AUDIT.md`.
-2. Add a deterministic, clearly labelled offline demo generator and a realistic
-   CLI end-to-end integration test that checks every generated artefact.
-3. Produce `docs/SUBMISSION_SUMMARY.md`, `docs/FINAL_VERIFICATION_REPORT.md` and
+2. Produce `docs/SUBMISSION_SUMMARY.md`, `docs/FINAL_VERIFICATION_REPORT.md` and
    `docs/DEMO_WALKTHROUGH.md`.
-4. Run the full supported verification suite and an offline end-to-end run.
-5. Commit and push verified milestones; verify the remote SHA and available CI.
-6. Perform the final engineering review (secrets, generated files, links, CI).
+3. Fix stale canonical-document statements (for example the Phase 1 status counts
+   and the ARCHITECTURE sentiment-change claim) and complete the final review for
+   secrets, generated files, broken links and CI compatibility.
+4. Run the full supported verification suite and capture the final end-to-end run.
+5. Commit and push the final documentation; verify the remote SHA and CI.
 
 ## Latest verified test results
 
-Verification at the Phase 1 working tree (2026-10-27 UTC, Python 3.11.2):
+Verification at the offline-demo working tree (2026-10-27 UTC, Python 3.11.2):
 
-- `pytest -q`: 161 passed, 0 failed, 0 skipped.
-- `pytest tests/unit/test_tavily_news.py tests/unit/test_fetch_news_cli.py -q`:
-  21 passed on 2026-10-27.
+- `pytest -q`: 165 passed, 0 failed, 0 skipped.
+- `pytest tests/integration/test_offline_demo.py -q`: 4 passed on 2026-10-27.
 - `ruff check src tests scripts`: clean.
 - `scripts/validate_docs.py`: 38 links, 11 test-count claims, 28 matrix rows OK.
 - `scripts/validate_dataset_registry.py`: 12 records OK.
 - `git diff --check`: clean.
-- `python -m xsentiment fetch-news --help`: command registered; no request made.
+- Offline CLI run on 210 synthetic bars and 209 synthetic posts produced six
+  non-empty artefacts under `reports/generated/offline-demo/` with 6 folds,
+  2,160 out-of-sample predictions, 18 per-horizon metric rows and a valid
+  one-page outlook. These are software-demonstration numbers, not market results.
 
 No live Tavily, Exa, Apify or Coinbase request was made during this verification.
 
 ## Latest commit / latest pushed commit
 
-- The Phase 1 checkpoint is about to be committed to
-  `arena/cf79e7b7-x-sentiment-price-predictor`; its SHA is recorded in the final
-  verification report after the commit and push.
-- Pushes are restricted to that branch by the execution environment. PR #14's
-  `feat/sentiment-features-and-forecasting` head is therefore not modified by this
-  session; see the final verification report for the exact remote state.
+- Phase 1 checkpoint commit: `2620dc34d76a38a14b7815e76d207fb32edc1a33`.
+- That commit is pushed to `arena/cf79e7b7-x-sentiment-price-predictor`; remote
+  and local SHAs match.
+- GitHub Actions run `40534245216` for that commit completed successfully with
+  lint, registry validation, documentation validation and pytest all green.
+- PR #14 remains at checkpoint `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`; this
+  session is not permitted to push to its `feat/sentiment-features-and-forecasting`
+  head branch.
+- The offline-demo checkpoint is about to be committed and pushed; its SHA will be
+  recorded in the final verification report.
 
 ## External blockers
 
