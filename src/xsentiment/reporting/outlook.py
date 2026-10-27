@@ -102,6 +102,7 @@ def build_outlook(
     scorer: dict[str, str] | None = None,
     news_context: Sequence[str] = (),
     ridge_lambda: float = DEFAULT_RIDGE_LAMBDA,
+    caller_limitations: Sequence[str] = (),
 ) -> OutlookReport:
     """Fit every model on all labelled rows and predict the most recent cutoff."""
     labelled = [row for row in rows if row.has_full_horizon and row.reference_close is not None]
@@ -170,6 +171,11 @@ def build_outlook(
             "The most recent row already has realised labels; it is the latest cutoff in "
             "the supplied data rather than a live future forecast."
         )
+
+    for note in caller_limitations:
+        text = str(note).strip()
+        if text and text not in limitations:
+            limitations.append(text)
 
     predictions.sort(key=lambda item: (horizon_order[item.horizon], item.model))
     return OutlookReport(

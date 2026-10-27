@@ -133,9 +133,11 @@ Status: implemented; the sentiment panel is empty until an accepted X source exi
   states explicitly when no scored posts are available.
 - `outlook.md` reports the cutoff, last completed close, coverage counts, per-horizon
   model outputs, contextual news and its limitations.
-- News remains context-only and is supplied from an optional file (`--news-file`); a
-  bounded, opt-in Tavily adapter exists in `src/xsentiment/ingestion/tavily_news.py`
-  with mocked-contract tests only — no Tavily or Exa call has been made and no news
+- News remains context-only. `xsentiment fetch-news --confirm-live-call` writes a
+  normalized JSONL snapshot from one bounded Tavily request using `TAVILY_API_KEY`;
+  the offline `run --news-file` step then consumes it. The adapter, CLI gate, bounds,
+  redaction, single-request behaviour and prediction/metric invariance are covered by
+  mocked-transport tests only — no Tavily or Exa call has been made and no news
   feature exists.
 - The R10 sentiment-change series is implemented as a third chart panel:
   `sentiment_change_points` draws the day-over-day change
@@ -151,8 +153,9 @@ and explicitly labelled until an accepted X source exists.
 
 ## Phase 8 — Reproducibility and submission
 Status: in progress; offline reproducibility verified on a fresh clone.
-- Done: offline reproducible CLI (`fetch-prices`, `run`), run manifest with input hashes,
-  commit-able report/chart/outlook artefacts, 149 offline tests (current head; see
+- Done: offline reproducible CLI (`fetch-prices`, `fetch-news` when authorized,
+  `persist`, `run`), run manifest with input hashes, commit-able report/chart/outlook
+  artefacts, 161 offline tests at this revision (2026-10-27; see
   [TEST_PLAN.md](TEST_PLAN.md)), lint, registry and documentation validation.
 - Fresh-clone verification (2026-10-27): a clean checkout of this branch from GitHub,
   installed strictly from the committed `pyproject.toml` on Python 3.12.4, passed the 130

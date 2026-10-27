@@ -1,17 +1,19 @@
 # Test Plan
 A passing suite proves only the cases it actually exercises. The current suite is
-**152 offline tests, all passing** (`pytest` -> `152 passed`, 0 failed, 0 skipped,
-0 xfailed), last run on 2026-10-26 UTC from a clean virtual environment installed
-with `pip install -e '.[dev,storage]'`. That run used Python 3.13 because that was the
-only interpreter available in the verification environment; CI runs the same command
-set on Python 3.11, which is the supported baseline in `pyproject.toml`. CI runs lint,
-registry validation, documentation validation and pytest with only the `dev` and
-`storage` extras installed.
+**161 offline tests, all passing** (`pytest` -> `161 passed`, 0 failed, 0 skipped,
+0 xfailed), last run on 2026-10-27 UTC in a clean Python 3.11.2 virtual environment
+installed with `pip install -e '.[dev,storage,analysis]'`. CI runs the same command
+set on Python 3.11, which is the supported baseline in `pyproject.toml`, with the
+`dev` and `storage` extras; the offline pipeline itself needs no analysis extras.
+CI runs lint, registry validation, documentation validation and pytest.
 
-The suite collects 152 cases from 150 test functions across 20 modules in
-`tests/unit/`: one function is parametrized into three cases. The immediately preceding
-revision (commit `2448ef8`) had 149 tests; the three added here cover the test-count
-regression check described below.
+The suite collects 161 cases from 159 test functions across 21 modules in
+`tests/unit/`: one function is parametrized into three cases. The checkpoint revision
+(commit `5af5bc7`) had 152 tests; the nine added in `test_fetch_news_cli.py` cover
+`fetch-news` registration, the live-call gate, environment-only credentials, request
+bounds, single-request behaviour, mocked HTTP errors, credential redaction, JSONL
+normalization and the two-step `run --news-file` integration. Earlier figures
+(149, 152) are historical results for their own revisions.
 
 **This file is the single authoritative source for the current count.** Counts quoted
 elsewhere in the repository must be tied to a date or a commit and are historical
@@ -24,7 +26,9 @@ results for that revision. `scripts/validate_docs.py` enforces that rule, and
   price features, dataset assembly, fold generation, models, metrics, strategy,
   evaluation, chart/outlook/report rendering, input loaders.
 - Adapter contracts: mocked provider responses, pagination, timeout/error behaviour,
-  normalization and secret redaction; no billing and no live provider call.
+  normalization and secret redaction; no billing and no live provider call. The
+  Tavily adapter is exercised both directly and through `fetch-news` with an
+  `httpx.MockTransport`, including one-request-only and oversized-response cases.
 - Integration: the pipeline is exercised end to end in memory with synthetic snapshots.
   `tests/unit/test_storage_join.py` uses an in-memory SQLite database and exercises
   idempotent upserts plus both joins. The run CLI's use of persisted data **is** covered,
@@ -90,6 +94,10 @@ results for that revision. `scripts/validate_docs.py` enforces that rule, and
 - Pipeline/CLI: input loaders reject malformed snapshots with line references, the run
   writes every documented artefact, manifest hashes match the inputs, prediction records
   match the manifest count, a zero-post run still completes, and CLI errors exit non-zero.
+  `fetch-news` refuses a live request without `--confirm-live-call`, reads only
+  `TAVILY_API_KEY`, and writes JSONL that `run --news-file` accepts. Matching runs with
+  and without that file must produce byte-identical `predictions.jsonl` and
+  `metrics.json`; only the outlook and report context may differ.
 - Manifest provenance (NFR1): the run records the actual checked-out git revision
   automatically; missing git metadata records an explicit unavailable state with a
   reason; caller-supplied provenance is never silently overwritten; no secret is

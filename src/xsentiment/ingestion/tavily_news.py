@@ -1,9 +1,10 @@
 """Optional Tavily news adapter: explicit credentials, bounded calls, context only.
 
 News is contextual information for the outlook. It never becomes a model
-feature (D-005) and never passes through the pipeline automatically: the CLI
-opt-in (``--tavily-news``) is the only trigger, and a missing key is an
-explicit, graceful condition rather than a silent no-op.
+feature (D-005) and never passes through the pipeline automatically: the
+separate ``xsentiment fetch-news --confirm-live-call`` command is the only live
+trigger, and a later ``run --news-file`` consumes the resulting JSONL. A missing
+key is an explicit, graceful condition rather than a silent no-op.
 
 The adapter enforces the project's safety policy (NFR4):
 
@@ -30,8 +31,8 @@ from xsentiment.config.settings import get_settings
 from xsentiment.errors import PayloadTooLargeError
 
 _SEARCH_URL = "https://api.tavily.com/search"
-_MAX_QUERY_CHARS = 400
-_MAX_RESULTS_CEILING = 20
+MAX_QUERY_CHARS = 400
+MAX_RESULTS_CEILING = 20
 
 
 class NewsCredentialsMissingError(ValueError):
@@ -119,8 +120,8 @@ class TavilyNewsAdapter:
                 "Accept": "application/json",
             },
         )
-        if not 1 <= max_results <= _MAX_RESULTS_CEILING:
-            raise NewsProviderError(f"max_results must be within 1..{_MAX_RESULTS_CEILING}")
+        if not 1 <= max_results <= MAX_RESULTS_CEILING:
+            raise NewsProviderError(f"max_results must be within 1..{MAX_RESULTS_CEILING}")
         self._max_results = max_results
         self._max_body_bytes = max_body_bytes or settings.http_max_response_bytes
 
@@ -148,8 +149,8 @@ class TavilyNewsAdapter:
             )
         if not isinstance(query, str) or not query.strip():
             raise NewsProviderError("a non-empty search query is required")
-        if len(query) > _MAX_QUERY_CHARS:
-            raise NewsProviderError(f"search query must not exceed {_MAX_QUERY_CHARS} characters")
+        if len(query) > MAX_QUERY_CHARS:
+            raise NewsProviderError(f"search query must not exceed {MAX_QUERY_CHARS} characters")
         moment = (retrieved_at or datetime.now(UTC)).astimezone(UTC)
 
         body = await self._post(query)

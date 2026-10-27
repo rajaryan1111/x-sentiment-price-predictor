@@ -9,7 +9,9 @@ close forecasts at horizons `n+0` through `n+5`.
 > gate.** No live X corpus has been accepted, no Apify Actor has been run, and no
 > sentiment result is claimed. The database schema, idempotent repositories and
 > cutoff join now exist and are unit-tested (R15 partial); the `run` CLI still
-> joins file snapshots in memory. The two assessment PDFs were read in full on
+> joins file snapshots in memory. `fetch-news` is an opt-in, mocked-verified Tavily
+> CLI step; no live Tavily or Exa request has been made, so live provider behaviour
+> is unverified. The two assessment PDFs were read in full on
 > 2026-10-26; the linked Google Doc is a 12-entry dataset-link compilation, not a
 > tweet corpus. The pipeline runs end to end today with zero posts and reports
 > sentiment as unavailable rather than inventing it. CI passing is not evidence of
@@ -78,8 +80,37 @@ python -m xsentiment run \
   --now 2026-10-26T00:00:00+00:00
 ```
 
-Add `--posts posts.jsonl` (normalized post records) to include sentiment, and
-`--news-file news.jsonl` for contextual news lines that never enter the features.
+Add `--posts posts.jsonl` (normalized post records) to include sentiment. News is a
+deliberately separate, two-step workflow: the only live-capable command is
+`fetch-news`, and `run --news-file` is entirely offline.
+
+```bash
+# Inspect the gated command; --help makes no provider request.
+python -m xsentiment fetch-news --help
+
+# Only after authorizing one provider call and setting TAVILY_API_KEY in the
+# environment or a local, ignored .env file. The flag is mandatory; there is no
+# --api-key argument and the adapter performs one bounded request with no retry.
+python -m xsentiment fetch-news \
+  --query "BTC-USD Bitcoin market news" \
+  --max-results 5 \
+  --out data/news-context.jsonl \
+  --confirm-live-call
+
+# Consume the resulting JSONL offline. News appears in the outlook only.
+python -m xsentiment run \
+  --prices data/btc-usd-daily-2026-04-29_2026-10-25.json \
+  --news-file data/news-context.jsonl \
+  --out reports/btc-usd-180d-with-news \
+  --now 2026-10-26T00:00:00+00:00
+```
+
+Each JSONL line carries `title`, `url`, `published_at` (or an explicit note when the
+provider omits it), `retrieved_at`, `source`, `provider`, `payload_sha256`, `query`
+and a rendered `context_line`. Credentials are never written to the file, logged or
+passed on the command line. The CLI is verified with mocked HTTP transports; **no live
+Tavily or Exa call was made in this repository's verification**, and the command
+must not be run without an approved key and spend authorization.
 
 Profile a local candidate corpus without printing post text or uploading it:
 
@@ -160,14 +191,15 @@ From `reports/btc-usd-180d/`, computed by the commands above:
   UTC, no missing or duplicate timestamps; unfinished current day excluded.
 - **X posts:** 0. No permitted post-level dataset is accepted yet, so sentiment is
   reported unavailable and the candidate model is flagged as not identifiable.
-- **Verified fresh-clone reproduction (2026-10-27):** a clean checkout of this branch,
-  installed strictly from the committed `pyproject.toml` on Python 3.12.4, ran the 130
-  offline tests that existed at that revision (commit `ed2c5a4`; the suite is 149 tests at
-  the current branch head — see [TEST_PLAN.md](TEST_PLAN.md) for the authoritative current
-  count), both validators and the documented commands above after refetching the
-  public snapshot — whose SHA-256 matched the committed provenance exactly — and
-  reproduced every metric within 5e-13 (platform float noise only). No credentials,
-  paid services or network X calls are needed for this offline reproduction.
+- **Historical fresh-clone reproduction (2026-10-27, commit `ed2c5a4`):** a clean
+  checkout installed from the committed `pyproject.toml` on Python 3.12.4 ran the 130
+  offline tests that existed at that revision, both validators and the documented
+  commands after refetching the public snapshot — whose SHA-256 matched the committed
+  provenance exactly — and reproduced every metric within 5e-13 (platform float noise
+  only). That refetch is not part of the current sandbox verification, whose outbound
+  network is restricted; the current [TEST_PLAN.md](TEST_PLAN.md) records 161 offline
+  tests at this revision (2026-10-27). No credentials, paid services or network X calls
+  are needed for the offline test suite.
 - **Mean MAE across horizons:** naive persistence **$1,828.36**, price-only ridge
   **$2,264.62** (+23.86% worse), sentiment-plus-price identical to price-only
   because no sentiment was available.
@@ -204,7 +236,8 @@ dataset has been accepted, licensed or profiled for 180-day text coverage.
   upserts and descriptive/cutoff joins, tested with in-memory SQLite; `xsentiment
   persist` and `xsentiment run --database-url` evaluate from persisted rows
   (manifest records `input_source = persisted_storage`); verified offline.
-- `src/xsentiment/main.py` — `fetch-prices` and `run` CLI entry points.
+- `src/xsentiment/main.py` — `fetch-prices`, `fetch-news`, `persist` and `run` CLI
+  entry points; `fetch-news` is the only live-capable, gated command.
 - `scripts/validate_docs.py` — Phase 1 documentation validator: link resolution,
   unique requirement IDs, matrix completeness and status-summary consistency.
 - `scripts/persist_and_join.py` — optional local persistence and cutoff-join report;
@@ -225,11 +258,14 @@ dataset has been accepted, licensed or profiled for 180-day text coverage.
 - Compare against naive and price-only baselines before claiming any value from
   sentiment, and report risk metrics only from out-of-sample strategy returns.
 - News (Tavily/Exa) stays context for the outlook unless a clarification changes the
-  feature policy; see [DECISIONS.md](DECISIONS.md) D-005. A bounded Tavily adapter
-  exists (`src/xsentiment/ingestion/tavily_news.py`, opt-in with `TAVILY_API_KEY`,
-  context-only, never a model feature, no automatic retry) and is verified against
-  mocked responses only; no live call has been made, so live provider behaviour is
-  unverified.
+  feature policy; see [DECISIONS.md](DECISIONS.md) D-005. The bounded adapter
+  (`src/xsentiment/ingestion/tavily_news.py`) is reachable only through
+  `xsentiment fetch-news --confirm-live-call`, reads `TAVILY_API_KEY` from the
+  environment, performs one bounded request without automatic retry, and writes
+  normalized JSONL. `run --news-file` consumes that file offline and records its
+  hash and context-only policy in the manifest. Both steps are verified against
+  mocked HTTP transports only; no live call has been made, so live provider behaviour
+  is unverified.
 
 ## Branch strategy
 

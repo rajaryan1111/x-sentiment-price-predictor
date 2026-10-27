@@ -169,6 +169,10 @@ def load_news_context(path: str | Path) -> list[str]:
             raise ValueError(f"news line {number} is missing a title")
         url = str(payload.get("url") or "").strip()
         published = str(payload.get("published_at") or "").strip()
+        if not published:
+            # A missing publication time stays visibly missing; it is never inferred
+            # from the retrieval time or replaced with a fabricated date.
+            published = str(payload.get("published_at_note") or "").strip()
         details = " — ".join(part for part in (published, url) if part)
         context.append(f"{title} ({details})" if details else title)
     return context
@@ -303,6 +307,7 @@ def run_forecast_pipeline(
         scorer=scorer_id,
         news_context=news_context,
         ridge_lambda=ridge_lambda,
+        caller_limitations=limitations,
     )
 
     run_provenance: dict[str, object] = dict(provenance or {})
