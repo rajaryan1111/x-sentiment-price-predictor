@@ -5,9 +5,9 @@ actually been verified, and the next safe command. It is not a completion claim.
 
 ## Current phase
 
-Phases 0, 1 and the offline implementation/e2e work are complete and pushed.
-Remaining: final requirements audit, submission documents, final engineering
-review, final full verification and delivery.
+All implementation, audit, verification and submission-document work is complete.
+Remaining: commit the final documentation-only changes, push to the working
+branch, verify the remote SHA and final CI run, then deliver the final report.
 
 ## Recovery state (2026-10-27 UTC)
 
@@ -44,52 +44,55 @@ review, final full verification and delivery.
 - Added `tests/integration/test_offline_demo.py`: deterministic generation,
   metadata allow-listing, mocked `fetch-prices`, a real CLI end-to-end run and
   artefact/repeatability checks.
-- Updated README, PHASES, DECISIONS, TEST_PLAN, EXTERNAL_BLOCKERS, PHASE_2_PROGRESS
-  and the traceability matrix to describe the verified workflows honestly.
+- Corrected stale canonical-document claims about R15, the sentiment-change chart,
+  Phase 1 status counts, absent PDFs and the persisted-input CLI.
+- Added decisions D-027, updated the traceability matrix and produced
+  `docs/FINAL_REQUIREMENTS_AUDIT.md`, `docs/SUBMISSION_SUMMARY.md`,
+  `docs/FINAL_VERIFICATION_REPORT.md` and `docs/DEMO_WALKTHROUGH.md`.
 - Extended CI push triggers to `arena/**` so this working branch is verified by
   GitHub Actions without pushing to another branch.
 
 ## Pending tasks
 
-1. Audit all R/NFR/A requirements against code and tests; write
-   `docs/FINAL_REQUIREMENTS_AUDIT.md`.
-2. Produce `docs/SUBMISSION_SUMMARY.md`, `docs/FINAL_VERIFICATION_REPORT.md` and
-   `docs/DEMO_WALKTHROUGH.md`.
-3. Fix stale canonical-document statements (for example the Phase 1 status counts
-   and the ARCHITECTURE sentiment-change claim) and complete the final review for
-   secrets, generated files, broken links and CI compatibility.
-4. Run the full supported verification suite and capture the final end-to-end run.
-5. Commit and push the final documentation; verify the remote SHA and CI.
+1. Commit and push the final documentation-only changes.
+2. Verify the local/remote SHA match and watch the final GitHub Actions run.
+3. Report the final delivery SHA, CI status and readiness assessment.
 
 ## Latest verified test results
 
-Verification at the offline-demo working tree (2026-10-27 UTC, Python 3.11.2):
+Final verification on 2026-10-27 UTC (Python 3.11.2, code revision `20a0e96`):
 
-- `pytest -q`: 165 passed, 0 failed, 0 skipped.
-- `pytest tests/integration/test_offline_demo.py -q`: 4 passed on 2026-10-27.
+- `pytest -q`: 165 passed in 5.01s, 0 failed, 0 skipped.
+- Targeted adapter/CLI/integration runs: 12, 9 and 4 passed respectively on
+  2026-10-27 at code revision `20a0e96`.
+- `python -m compileall -q src tests scripts`: OK.
 - `ruff check src tests scripts`: clean.
-- `scripts/validate_docs.py`: 38 links, 11 test-count claims, 28 matrix rows OK.
+- `scripts/validate_docs.py`: 63 links, 13 test-count claims, 28 matrix rows OK.
 - `scripts/validate_dataset_registry.py`: 12 records OK.
 - `git diff --check`: clean.
-- Offline CLI run on 210 synthetic bars and 209 synthetic posts produced six
-  non-empty artefacts under `reports/generated/offline-demo/` with 6 folds,
-  2,160 out-of-sample predictions, 18 per-horizon metric rows and a valid
-  one-page outlook. These are software-demonstration numbers, not market results.
+- Fresh offline CLI run on 210 synthetic bars and 209 synthetic posts produced six
+  non-empty artefacts under `reports/generated/final-verification/` with 6 folds,
+  2,160 out-of-sample predictions, 18 per-horizon metric rows, valid one-page
+  outlook and explicit synthetic labelling. These are software-demonstration
+  numbers, not market results.
+- Historical `reports/btc-usd-180d/` metrics, manifest and report were
+  cross-checked for internal consistency; raw rows were not refetched because the
+  sandbox network allowlist excludes Coinbase.
 
 No live Tavily, Exa, Apify or Coinbase request was made during this verification.
 
 ## Latest commit / latest pushed commit
 
-- Phase 1 checkpoint commit: `2620dc34d76a38a14b7815e76d207fb32edc1a33`.
-- That commit is pushed to `arena/cf79e7b7-x-sentiment-price-predictor`; remote
-  and local SHAs match.
-- GitHub Actions run `40534245216` for that commit completed successfully with
-  lint, registry validation, documentation validation and pytest all green.
+- Phase 1 checkpoint: `2620dc34d76a38a14b7815e76d207fb32edc1a33`, pushed and
+  verified by GitHub Actions run `40534245216` (all four checks green).
+- Offline-demo checkpoint: `20a0e9641a4ed8705d65bf5c93d3ce50c56cbcaf`, pushed
+  and verified by GitHub Actions run `40536670278` (all four checks green).
 - PR #14 remains at checkpoint `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`; this
   session is not permitted to push to its `feat/sentiment-features-and-forecasting`
   head branch.
-- The offline-demo checkpoint is about to be committed and pushed; its SHA will be
-  recorded in the final verification report.
+- The final documentation commit changes no Python source or test file. Its own
+  SHA cannot be stored inside that same commit, so the delivery SHA and its CI
+  run are reported in the final response rather than guessed here.
 
 ## External blockers
 
@@ -105,4 +108,7 @@ is available. No live provider call is authorized.
 .venv/bin/python scripts/validate_docs.py
 .venv/bin/python scripts/validate_dataset_registry.py
 git diff --check
+git add <documentation-files-only>
+git commit -m "docs: finalize internship submission and verification evidence"
+git push origin arena/cf79e7b7-x-sentiment-price-predictor
 ```

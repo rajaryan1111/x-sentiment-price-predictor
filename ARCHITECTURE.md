@@ -16,7 +16,8 @@ Configuration/secrets -> source adapters (X/Apify, BTC prices, optional news con
 - Validation: expanding walk-forward splits with a purge gap equal to the longest horizon, train-fold-only transforms and leakage guards.
 - Backtesting: forecasts-to-returns strategy simulation and risk metrics from out-of-sample predictions only.
 - Reporting: metric tables, SVG charts, one-page outlook and report assembly.
-- Pipeline: offline run orchestration plus JSON/JSONL input loaders and the `fetch-prices` / `run` CLI.
+- Pipeline: offline run orchestration plus JSON/JSONL input loaders and the
+  `fetch-prices`, gated `fetch-news`, `persist` and `run` CLI commands.
 - Dashboard: presentation only; authoritative metrics come from the pipeline.
 - Scripts: explicit bounded entry points; no paid/network side effects on import.
 - Tests: offline unit tests and mocked provider contracts by default.
@@ -34,5 +35,5 @@ Secrets via environment/approved secret manager; raw/private data out of Git; re
 Implemented and verified on real public price data: Coinbase daily adapter (180/180 bars refetched 2026-10-26); normalized X contract with raw-timestamp/offset provenance; deduplication, coverage, point-in-time alignment and horizon-label primitives with unfinished-day exclusion; VADER sentiment scoring; price features and supervised dataset; naive, price-only and candidate ridge models; purged walk-forward evaluation with per-horizon MAE/RMSE; predeclared long/flat strategy with Sharpe/Sortino/drawdown and disclosure; SVG charts; one-page outlook; evaluation report; and an offline CLI. The offline suite size is recorded in [TEST_PLAN.md](TEST_PLAN.md), which is the authoritative source for the current count.
 Implemented and verified offline: versioned price/post tables, idempotent repositories, descriptive/cutoff joins, and a persisted-input CLI path (`xsentiment persist`, `run --database-url` with `input_source = persisted_storage` provenance; R15).
 Implemented but not live-verified: configurable Apify X adapter with response-envelope handling, offset pagination and query provenance (mocked only; no Actor selected or run; ticker/cashtag/keyword inputs not exercised against a real Actor).
-Not evidenced complete: live X ingestion, accepted licensing/coverage, and sentiment-backed evaluation remain blocked.
-Not evidenced complete: real X collection, accepted license/coverage for X data, a live Tavily/Exa call, the sentiment-versus-price comparison, a sentiment-change chart, and any claim that a model beats the naive baseline (the current measurement is the opposite).
+Implemented and verified offline: a gated Tavily news adapter and CLI writing normalized JSONL, with `run --news-file` context-only integration; an SVG chart with price, sentiment-level and day-over-day sentiment-change panels; and a deterministic synthetic offline demo generator with a full CLI end-to-end test.
+Not evidenced complete: live X ingestion, accepted licensing/coverage, sentiment-backed evaluation on real X text, a real-data sentiment-versus-price comparison, a real-data sentiment-change chart, a live Tavily/Exa call, and any claim that a model beats the naive baseline (the current price-only measurement is the opposite).

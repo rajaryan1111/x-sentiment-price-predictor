@@ -7,13 +7,15 @@ close forecasts at horizons `n+0` through `n+5`.
 > **Status: prices, features, models, evaluation and reporting are implemented and
 > verified on real public Coinbase data. X data access remains an open external
 > gate.** No live X corpus has been accepted, no Apify Actor has been run, and no
-> sentiment result is claimed. The database schema, idempotent repositories and
-> cutoff join now exist and are unit-tested (R15 partial); the `run` CLI still
-> joins file snapshots in memory. `fetch-news` is an opt-in, mocked-verified Tavily
+> sentiment result is claimed. The database schema, idempotent repositories,
+> cutoff join and persisted-input CLI path are implemented and verified offline
+> (R15); a database holding accepted real X rows is not available. `fetch-news`
+> is an opt-in, mocked-verified Tavily
 > CLI step; no live Tavily or Exa request has been made, so live provider behaviour
 > is unverified. The two assessment PDFs were read in full on
-> 2026-10-26; the linked Google Doc is a 12-entry dataset-link compilation, not a
-> tweet corpus. The pipeline runs end to end today with zero posts and reports
+> 2026-10-26 but are not committed to this checkout; the linked Google Doc is a
+> 12-entry dataset-link compilation, not a tweet corpus. The pipeline runs end to
+> end today with zero posts and reports
 > sentiment as unavailable rather than inventing it. CI passing is not evidence of
 > data access, model quality or profitability.
 

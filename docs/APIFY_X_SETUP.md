@@ -14,7 +14,7 @@ Actor input schemas vary, so there is deliberately no universal default query pa
 Example shell configuration:
 
 ```bash
-export APIFY_API_TOKEN='set-locally-without-sharing-it'
+read -rsp "Apify token: " APIFY_API_TOKEN; echo; export APIFY_API_TOKEN
 export APIFY_ACTOR_ID='owner~reviewed-actor-name'
 ```
 
