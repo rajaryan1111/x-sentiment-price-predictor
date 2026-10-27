@@ -13,9 +13,12 @@ response. The verified code checkpoint's CI run is already green and linked belo
 The final engineering commit is
 `15478906bbc2cb6c5806f366141b5cd35cac0523` ("harden: stream news response ceiling
 and finalize delivery evidence"); GitHub Actions run `40566013522` completed
-`success` on that exact SHA. A subsequent documentation-only checkpoint adds
-`docs/EMPLOYER_CLARIFICATIONS.md` and records this delivery evidence without
-changing code or forecasting methodology.
+`success` on that exact SHA. Subsequent documentation-only checkpoints add
+`docs/EMPLOYER_CLARIFICATIONS.md`, record this delivery evidence and synchronize
+the checkpoint/promotion docs without changing code or forecasting methodology:
+commit `a19ee2f` (CI run `40569320293` success) and this final checkpoint. The
+current documentation HEAD SHA and its CI result are reported in the final
+execution response because a commit cannot contain its own SHA.
 
 ### Re-verification of this pass (2026-10-28)
 
@@ -79,7 +82,9 @@ python -m compileall -q src tests scripts -> COMPILEALL_OK
 git diff --check -> CLEAN
 ```
 
-`scripts/validate_docs.py` and `scripts/validate_dataset_registry.py` outputs:
+`scripts/validate_docs.py` and `scripts/validate_dataset_registry.py` outputs at
+code checkpoint `8bc4f7f` (before the employer-clarifications document was added;
+the later re-run at `a19ee2f` verified 97 links and 16 test-count claims, also OK):
 
 ```text
 Checked 69 relative Markdown links across the repository.
@@ -196,18 +201,23 @@ posts. No sentiment improvement is claimed.
 
 ## 7. GitHub delivery and CI
 
-At the 2026-10-28 re-verification (remote refs re-fetched):
+At the 2026-10-28 re-verification (remote refs re-fetched). The Arena head below
+is the final engineering checkpoint `1547890`; subsequent documentation-only
+checkpoints (`a19ee2f` and later) sit on top of it. The feature/base/PR refs are
+unchanged.
 
 ```text
-origin/arena/cf79e7b7-x-sentiment-price-predictor 15478906bbc2cb6c5806f366141b5cd35cac0523
+origin/arena/cf79e7b7-x-sentiment-price-predictor 1547890 -> a19ee2f -> (this doc checkpoint)
 origin/feat/sentiment-features-and-forecasting     5af5bc7a50c4b56edc1efe3aae4fce2501bdc656
 origin/docs/canonical-source-of-truth               36b7b486bb60b54f3f19201f2e548b11e5f93197
 PR #14 head                                        5af5bc7a50c4b56edc1efe3aae4fce2501bdc656
 ```
 
 Ancestry re-verified: PR base is an ancestor of the feature branch, and the
-feature branch is an ancestor of the Arena branch (4 Arena-only commits at this
-checkpoint); `git diff --check 5af5bc7..1547890` is clean. PR #14 is open, draft,
+feature branch is an ancestor of the Arena branch (4 Arena-only commits at the
+final engineering checkpoint `1547890`, plus the later documentation commits —
+recompute live, do not rely on a fixed count); `git diff --check
+5af5bc7..1547890` is clean. PR #14 is open, draft,
 mergeable and clean, but its head is still the older feature-branch checkpoint.
 `gh pr checks 14` reports its single `test` check as pass on that older head; that
 result does **not** cover the final work. The GitHub branch API again reported
@@ -222,6 +232,8 @@ Verified GitHub Actions runs on the Arena branch:
   URL: <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40540034819>
 - `40566013522` for `1547890` — success, all four checks green.
   URL: <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40566013522>
+- `40569320293` for `a19ee2f` — success, all four checks green (documentation
+  checkpoint). URL: <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40569320293>
 
 The final engineering commit `15478906bbc2cb6c5806f366141b5cd35cac0523` is
 pushed to the same Arena branch and its CI run above is green. Any later

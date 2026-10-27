@@ -9,18 +9,25 @@ A fresh read-only inspection plus a full re-verification was performed at the
 start of this pass. Findings:
 
 - Working tree is clean on `arena/cf79e7b7-x-sentiment-price-predictor`.
-- Local HEAD and remote Arena head both =
-  `15478906bbc2cb6c5806f366141b5cd35cac0523`.
-- GitHub Actions run `40566013522` completed `success` on that exact SHA.
+- The verified engineering checkpoint is
+  `15478906bbc2cb6c5806f366141b5cd35cac0523` (GitHub Actions run `40566013522`
+  completed `success` on that exact SHA). On top of it sit documentation-only
+  checkpoints: `a19ee2f` (employer clarifications and delivery evidence; CI run
+  `40569320293` success) and this checkpoint. Local HEAD equals the remote Arena
+  head; that current documentation SHA and its CI run are reported in the final
+  execution response because a commit cannot contain its own SHA.
 - PR #14 is open, draft, mergeable and clean. Its head remains
   `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656` on
   `feat/sentiment-features-and-forecasting`; base remains
   `36b7b486bb60b54f3f19201f2e548b11e5f93197`. `gh pr checks 14` passes only on
   that older head, not on the final work.
 - Ancestry re-verified: PR base is an ancestor of the feature branch, and the
-  feature branch is an ancestor of the Arena branch (4 Arena-only commits at this
-  checkpoint). `git diff --check 5af5bc7..1547890` is clean; the 27-file diff is
-  the verified implementation, tests, CI config and documentation.
+  feature branch is an ancestor of the Arena branch. The Arena branch is ahead by
+  the verified engineering commits plus documentation checkpoints (the live
+  `feat-only/arena-only` count was `0 5` at the `a19ee2f` checkpoint and grows
+  with each documentation commit — recompute, do not rely on a fixed number).
+  `git diff --check 5af5bc7..1547890` is clean; the diff is the verified
+  implementation, tests, CI config and documentation.
 - Branch protection: GitHub again reported `protected=false` and zero rulesets.
   The block on promotion is this Arena session's fixed-branch push policy, not a
   GitHub rule; promotion must be done from an authorized normal clone.
@@ -101,7 +108,9 @@ documentation-only checkpoint):
   integration): `27 passed`; the network-isolation regression alone: `1 passed`.
 - `ruff check src tests scripts`: All checks passed.
 - `python -m compileall -q src tests scripts`: OK.
-- `scripts/validate_docs.py`: 69 links, 14 test-count claims, 28 matrix rows OK.
+- `scripts/validate_docs.py`: after the new documentation, 97 links, 16
+  test-count claims, 28 matrix rows OK (the earlier pre-clarifications run
+  verified 69 links / 14 claims — both passed).
 - `scripts/validate_dataset_registry.py`: 12 records OK.
 - `git diff --check`: clean.
 - Offline demo run twice from a clean `reports/generated/verify-2026-10-28/`
@@ -122,6 +131,8 @@ No live Tavily, Exa, Apify or Coinbase request was made.
 - `8bc4f7ffc45ece3402060578fe14aa5c4a89bef7` — prior submission documentation; CI run `40540034819` success.
 - `15478906bbc2cb6c5806f366141b5cd35cac0523` — harden: stream news response
   ceiling and finalize delivery evidence; CI run `40566013522` success.
+- `a19ee2f` — docs: add employer clarifications and record final delivery
+  evidence; CI run `40569320293` success.
 - PR #14 head remains at checkpoint `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`.
 - This checkpoint's own documentation commit cannot contain its own SHA; its
   exact SHA and CI result are reported in the final execution response.
@@ -150,7 +161,7 @@ No live provider call is authorized.
 .venv/bin/python -m compileall -q src tests scripts
 git diff --check
 git add <verified documentation files>
-git commit -m "docs: add employer clarifications and record final delivery evidence"
+git commit -m "docs: synchronize final delivery evidence and checkpoint"
 git push origin arena/cf79e7b7-x-sentiment-price-predictor
 ```
 

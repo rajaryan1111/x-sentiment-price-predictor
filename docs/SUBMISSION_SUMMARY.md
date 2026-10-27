@@ -202,9 +202,11 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
   delivery evidence). A later documentation-only checkpoint adds
   [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md); it changes no code.
 - GitHub Actions runs `40534245216`, `40536670278` and `40540034819` passed all
-  four checks on the earlier commits, and run `40566013522` completed `success`
-  on the final engineering SHA `15478906bbc2cb6c5806f366141b5cd35cac0523`. These
-  are Arena-branch checks; PR #14's head still needs its own fresh CI after the
+  four checks on the earlier commits; run `40566013522` completed `success` on the
+  final engineering SHA `15478906bbc2cb6c5806f366141b5cd35cac0523`; and run
+  `40569320293` passed on the `a19ee2f` documentation checkpoint (with further
+  documentation commits reported in the execution response). These are
+  Arena-branch checks; PR #14's head still needs its own fresh CI after the
   authorized fast-forward. The exact promotion commands are in
   [PR14_PROMOTION.md](PR14_PROMOTION.md).
 

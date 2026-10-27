@@ -19,13 +19,16 @@ Arena session, which may push only to
   `15478906bbc2cb6c5806f366141b5cd35cac0523` ("harden: stream news response
   ceiling and finalize delivery evidence"). GitHub Actions run `40566013522`
   completed `success` for that exact SHA. A later documentation-only checkpoint
-  may add `docs/EMPLOYER_CLARIFICATIONS.md` and delivery-evidence updates; always
-  promote the **current** Arena head with the dynamic `$ARENA` ref below, not a
-  hard-coded SHA.
+  added `docs/EMPLOYER_CLARIFICATIONS.md` and delivery-evidence updates
+  (commit `a19ee2f`, CI run `40569320293` success); further documentation
+  checkpoints may follow. The count is intentionally **not** hard-coded here: it
+  grows with each documentation commit. Always promote the **current** Arena head
+  with the dynamic `$ARENA` ref below, not a hard-coded SHA.
 - Full ancestry: PR base is an ancestor of the feature branch; the feature branch
-  is an ancestor of the Arena branch. No merge commit is needed. As of this
-  verification the Arena branch was 4 commits ahead of the feature branch (plus
-  any later documentation commits); Step 2 recomputes this live.
+  is an ancestor of the Arena branch. No merge commit is needed. The Arena branch
+  is ahead by the verified engineering commits plus one or more documentation
+  checkpoints — do not rely on a fixed count. Step 2 recomputes `feat-only` /
+  `arena-only` live and requires `feat-only = 0`.
 - GitHub branch API reported `protected=false` for the feature branch and zero
   repository rulesets. Re-check before pushing; a changed protection rule may
   require a maintainer with bypass rights. The restriction that stops *this
