@@ -218,7 +218,9 @@ network access during the offline CLI run. No live Tavily or Exa call was made.â
 - Submission: repository, report, audit, verification evidence and demo are
   ready; email delivery and employer clarifications are external.
 
-**Show:** [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md) and
+**Show:** [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md),
+[EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md) (consolidated questions
+and unsent email draft) and
 [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
 
 ## Commands deliberately not demonstrated

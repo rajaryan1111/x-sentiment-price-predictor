@@ -195,19 +195,58 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
   This session's environment permits pushing only to that branch, so PR #14's
   head was deliberately not modified. Verified code checkpoints:
   `2620dc34d76a38a14b7815e76d207fb32edc1a33` (gated news CLI),
-  `20a0e9641a4ed8705d65bf5c93d3ce50c56cbcaf` (offline demo and lineage) and
-  `8bc4f7ffc45ece3402060578fe14aa5c4a89bef7` (submission documentation).
+  `20a0e9641a4ed8705d65bf5c93d3ce50c56cbcaf` (offline demo and lineage),
+  `8bc4f7ffc45ece3402060578fe14aa5c4a89bef7` (submission documentation) and the
+  final engineering checkpoint
+  `15478906bbc2cb6c5806f366141b5cd35cac0523` (streaming news ceiling and final
+  delivery evidence). A later documentation-only checkpoint adds
+  [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md); it changes no code.
 - GitHub Actions runs `40534245216`, `40536670278` and `40540034819` passed all
-  four checks on those commits. The final hardening/documentation commit and its
-  CI result are reported in the final execution response because a commit cannot
-  contain its own SHA; the exact promotion commands are in
+  four checks on the earlier commits, and run `40566013522` completed `success`
+  on the final engineering SHA `15478906bbc2cb6c5806f366141b5cd35cac0523`. These
+  are Arena-branch checks; PR #14's head still needs its own fresh CI after the
+  authorized fast-forward. The exact promotion commands are in
   [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 10. Submission documents
 
 - [FINAL_REQUIREMENTS_AUDIT.md](FINAL_REQUIREMENTS_AUDIT.md) — all 28 requirement IDs.
 - [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) — commands, outputs and artefacts.
-- [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md) — timed evaluator demonstration.
+- [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md) — timed 5–7 minute evaluator demonstration.
 - [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md) — exact unresolved questions.
+- [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md) — consolidated question set, provider/credential authorization checklist and an unsent ready-to-send email draft.
 - [EXECUTION_CHECKPOINT.md](EXECUTION_CHECKPOINT.md) — recovery state and next commands.
 - [PR14_PROMOTION.md](PR14_PROMOTION.md) — safe fast-forward delivery procedure for PR #14.
+
+## 11. Final submission checklist
+
+Engineering-owned items are done and CI-verified; the remaining items require
+employer/user action and must not be marked done until confirmed.
+
+- [x] Reproducible pipeline, gated news CLI, offline demo, database join, chart,
+  outlook and evaluation report implemented and tested.
+- [x] `README.md`, architecture, data policy, tech stack and reproduction
+  commands present; `TEST_PLAN.md` is the authoritative test count.
+- [x] Full offline verification suite, both documentation validators and Ruff
+  green; offline demo reproducible byte-for-byte; network-isolation regression
+  present.
+- [x] Requirements audit (28 IDs), traceability matrix, external blockers and
+  employer clarifications updated with honest statuses.
+- [x] GitHub repository link, draft PR #14 link and Markdown evaluation report
+  (Sharpe, Sortino, max drawdown) available.
+- [x] Timed 5–7 minute demo script and submission-package documents present.
+- [ ] PR #14 head advanced to the final Arena SHA from an authorized normal
+  clone, with fresh PR-specific CI green (B8;
+  [PR14_PROMOTION.md](PR14_PROMOTION.md)).
+- [ ] Accepted licensed 180-day X corpus / Actor / spend cap provided (B1/B3),
+  and sentiment-enhanced evaluation run with real metrics (R2, R9).
+- [ ] Provider tokens / Actor IDs delivered through an approved private channel
+  (B2/Q6) — never in email, chat or Git.
+- [ ] Employer clarifications answered: deadline (Q1), `n+0` (Q2), live news
+  (Q3), news feature policy (Q4), X source (Q5), spend cap (Q7), submission
+  format and recipient (Q8/Q9).
+- [ ] A live Tavily/news call is performed **only** if the employer confirms it
+  is required and authorizes one bounded, capped request.
+- [ ] Final packet produced in the confirmed format (Markdown/PDF, any required
+  video or screenshots) and sent through the agreed channel with a recorded
+  date, only after explicit user authorization.

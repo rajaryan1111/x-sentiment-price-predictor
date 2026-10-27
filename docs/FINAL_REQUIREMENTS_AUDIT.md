@@ -151,11 +151,15 @@ external data/authorization gates into completion.
 | A4 | T* | Ingest the most recent and relevant news with Tavily to complement X sentiment; Exa appears in the submission line | PARTIAL | C/T/M: `main.py` `fetch-news` and `run --news-file`, `tavily_news.py`, `pipeline/forecast_run.py`; adapter and CLI tests use mocked HTTP and prove context-only behaviour, streaming size bounds, redaction in errors/caller notes, no retry, offline network isolation and unchanged predictions/metrics. | Live Tavily behaviour and a real news snapshot require an approved key, authorization and confirmation that live news is mandatory (B6). |
 | A5 | T* | The brief offers a machine learning / reinforcement learning pipeline | COMPLETE | C/T: `models/baseline.py` and `forecasting.py` implement supervised multi-horizon ML with naive and price-only baselines; no RL environment is defined or claimed. | RL is not implemented; the brief does not define an RL environment. Reopen only on explicit employer instruction. |
 | A6 | T* | Reference inventory of historical Twitter/X datasets with verified download links | PARTIAL | C/T/A: `data/registry/historical_twitter_x_datasets.json` and `scripts/validate_dataset_registry.py`; structural validator checks platform identity, ID-only caveats, coverage limitations and the explicit `not-reverified` state. | Registry entries are transcribed; live provider pages, current availability and licence terms were not independently re-verified. |
-| A7 | T* | Submit the repository link, provider tokens and Actor IDs, and the evaluation report by email to gilad@crowdwisdomtrading.com | PARTIAL | A: repository URL, Markdown evaluation report and the four submission documents exist. No email was sent and no provider identifiers/tokens were delivered. | Email delivery, provider identifiers/tokens and a sentiment-backed evaluation require user authorization and R2/A2. |
+| A7 | T* | Submit the repository link, provider tokens and Actor IDs, and the evaluation report by email to gilad@crowdwisdomtrading.com | PARTIAL | A: repository URL, Markdown evaluation report and the full submission-document set (including a consolidated employer-clarifications document and an unsent ready-to-send email draft) exist. No email was sent and no provider identifiers/tokens were delivered. | Email delivery, provider identifiers/tokens and a sentiment-backed evaluation require user authorization and R2/A2. |
 
 ## 8. External blockers and their requirement impact
 
-The exact questions and owners remain in [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md).
+The exact questions and owners remain in [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md),
+and the consolidated, ready-to-send question set, provider/credential authorization
+checklist and (unsent) email draft are in
+[EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md). No employer answer has
+been received, and no submission email has been sent.
 In summary:
 
 - **B1/B3** approved X source, dataset/Actor selection, licence and spend cap —

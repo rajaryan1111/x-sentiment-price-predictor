@@ -44,16 +44,25 @@ submission packet (A7). The database join (R15) is recorded as verified complete
 
 ## Delivery status (2026-10-28)
 
-The latest verified work is on `arena/cf79e7b7-x-sentiment-price-predictor`; PR
-#14's head remains `5af5bc7` on `feat/sentiment-features-and-forecasting`. GitHub
-reported the feature branch as unprotected with zero rulesets, but this Arena
-session is restricted to pushing only to the Arena branch. An authorized normal
-clone should use the fast-forward-only procedure in
+The latest verified engineering commit is
+`15478906bbc2cb6c5806f366141b5cd35cac0523` on
+`arena/cf79e7b7-x-sentiment-price-predictor`; GitHub Actions run `40566013522`
+passed on that SHA. A later documentation-only checkpoint adds
+[docs/EMPLOYER_CLARIFICATIONS.md](docs/EMPLOYER_CLARIFICATIONS.md) (consolidated
+employer questions, provider/credential authorization checklist and an unsent
+ready-to-send email draft). PR #14's head remains `5af5bc7` on
+`feat/sentiment-features-and-forecasting`. GitHub reported the feature branch as
+unprotected with zero rulesets, but this Arena session is restricted to pushing
+only to the Arena branch. An authorized normal clone should use the
+fast-forward-only procedure in
 [docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md) to advance PR #14's head, then
-wait for fresh CI. Do not merge the PR without explicit approval.
+wait for fresh PR-specific CI. Do not merge the PR without explicit approval.
 
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
 [Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),
+[final requirements audit](docs/FINAL_REQUIREMENTS_AUDIT.md),
+[submission summary](docs/SUBMISSION_SUMMARY.md),
+[employer clarifications](docs/EMPLOYER_CLARIFICATIONS.md),
 [historical dataset registry](docs/data-sources.md),
 [Apify setup](docs/APIFY_X_SETUP.md),
 [Phase 2 data-quality workstream](docs/PHASE_2_PROGRESS.md).

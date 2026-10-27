@@ -10,6 +10,30 @@ here; because a commit cannot contain its own SHA or CI run URL, the final commi
 SHA and its GitHub Actions result are reported separately in the execution
 response. The verified code checkpoint's CI run is already green and linked below.
 
+The final engineering commit is
+`15478906bbc2cb6c5806f366141b5cd35cac0523` ("harden: stream news response ceiling
+and finalize delivery evidence"); GitHub Actions run `40566013522` completed
+`success` on that exact SHA. A subsequent documentation-only checkpoint adds
+`docs/EMPLOYER_CLARIFICATIONS.md` and records this delivery evidence without
+changing code or forecasting methodology.
+
+### Re-verification of this pass (2026-10-28)
+
+The full suite was re-run from the existing `.venv` on the final engineering
+tree before the documentation-only checkpoint. On 2026-10-28 the full suite
+reported `167 passed in 5.58s` (0 failed, 0 skipped). On 2026-10-28 the
+targeted Tavily adapter, gated news CLI and offline demo integration tests
+reported `27 passed`, and the network-isolation regression alone reported
+`1 passed`; Ruff, both documentation validators, `compileall` and
+`git diff --check` were clean. The offline demo was
+executed twice from a clean directory (`reports/generated/verify-2026-10-28/`):
+each run wrote six non-empty artefacts, 6 folds, 2,160 predictions, 18 finite
+metric rows, horizons `n+0`..`n+5` and the three models; `predictions.jsonl` and
+`metrics.json` were byte-identical across the two runs. `fetch-news --help` made
+no network request; no live provider call was made; no provider credential is set
+(only empty `.env.example` placeholders); and `git ls-files reports/generated`
+returned `0` tracked generated files.
+
 ## 1. Environment
 
 - Python: **3.11.2** in a newly created isolated `.venv`.
@@ -172,18 +196,23 @@ posts. No sentiment improvement is claimed.
 
 ## 7. GitHub delivery and CI
 
-At verification time:
+At the 2026-10-28 re-verification (remote refs re-fetched):
 
 ```text
-origin/arena/cf79e7b7-x-sentiment-price-predictor 8bc4f7ffc45ece3402060578fe14aa5c4a89bef7
+origin/arena/cf79e7b7-x-sentiment-price-predictor 15478906bbc2cb6c5806f366141b5cd35cac0523
 origin/feat/sentiment-features-and-forecasting     5af5bc7a50c4b56edc1efe3aae4fce2501bdc656
 origin/docs/canonical-source-of-truth               36b7b486bb60b54f3f19201f2e548b11e5f93197
 PR #14 head                                        5af5bc7a50c4b56edc1efe3aae4fce2501bdc656
 ```
 
-PR #14 is open, draft, mergeable and clean, but its head is still the older
-feature-branch checkpoint. `gh pr checks 14` reports its single `test` check as
-pass on that older head; that result does **not** cover the final work.
+Ancestry re-verified: PR base is an ancestor of the feature branch, and the
+feature branch is an ancestor of the Arena branch (4 Arena-only commits at this
+checkpoint); `git diff --check 5af5bc7..1547890` is clean. PR #14 is open, draft,
+mergeable and clean, but its head is still the older feature-branch checkpoint.
+`gh pr checks 14` reports its single `test` check as pass on that older head; that
+result does **not** cover the final work. The GitHub branch API again reported
+`protected=false` and zero rulesets; the restriction is this session's fixed-branch
+push policy.
 
 Verified GitHub Actions runs on the Arena branch:
 
@@ -191,16 +220,19 @@ Verified GitHub Actions runs on the Arena branch:
 - `40536670278` for `20a0e96` — success, all four checks green.
 - `40540034819` for `8bc4f7f` — success, all four checks green.
   URL: <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40540034819>
+- `40566013522` for `1547890` — success, all four checks green.
+  URL: <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40566013522>
 
-The final delivery commit is pushed to the same Arena branch and triggers the
-same workflow because CI push filters include `arena/**`. Its SHA and run URL are
-verified after push and reported in the final execution response.
+The final engineering commit `15478906bbc2cb6c5806f366141b5cd35cac0523` is
+pushed to the same Arena branch and its CI run above is green. Any later
+documentation-only commit triggers the same workflow because CI push filters
+include `arena/**`; its SHA and run result are reported in the final execution
+response. These are Arena-branch checks — PR #14's older head still needs fresh
+PR-specific CI after the authorized fast-forward.
 
-GitHub branch API reported `protected=false` for the feature branch and zero
-repository rulesets. The restriction is therefore this Arena session's
-fixed-branch policy, not GitHub branch protection. The exact fast-forward-only
-promotion commands for an authorized normal clone are in
-`docs/PR14_PROMOTION.md`. PR #14 must not be merged without explicit approval.
+The exact fast-forward-only promotion commands for an authorized normal clone
+are in `docs/PR14_PROMOTION.md`. PR #14 must not be merged without explicit
+approval.
 
 ## 8. Known limitations and external blockers
 
@@ -231,8 +263,11 @@ promotion commands for an authorized normal clone are in
 - `docs/DEMO_WALKTHROUGH.md`
 - `docs/EXECUTION_CHECKPOINT.md`
 - `docs/EXTERNAL_BLOCKERS.md`
+- `docs/EMPLOYER_CLARIFICATIONS.md` — consolidated questions, provider
+  authorization checklist and unsent ready-to-send email draft
 - `docs/PR14_PROMOTION.md`
 - `docs/REQUIREMENTS_TRACEABILITY.md`
 - `reports/btc-usd-180d/` committed historical real-price artefacts
 - `reports/generated/final-2026-10-28/run-a` and `run-b` ignored synthetic demo
-  artefacts from the current verification run
+  artefacts from the earlier verification run, and
+  `reports/generated/verify-2026-10-28/run-a` and `run-b` from this pass

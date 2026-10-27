@@ -5,7 +5,9 @@ requirement IDs, why engineering cannot resolve it, the exact information or
 action needed, the verification that becomes possible once it is provided, and
 any budget, credential or privacy constraint. Nothing on this page is inferred;
 every item states a question that must be answered by a person outside this
-repository.
+repository. A concise, copy-paste question set, the provider/credential
+authorization checklist and an **unsent** ready-to-send email draft are
+consolidated in [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md).
 
 | # | Blocker | Requirement IDs | Why engineering cannot resolve it | Exact information or action needed | Verification once provided | Constraints |
 | --- | --- | --- | --- | --- | --- | --- |

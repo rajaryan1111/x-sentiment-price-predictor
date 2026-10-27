@@ -15,13 +15,21 @@ Arena session, which may push only to
 
 - PR #14 head / feature branch: `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`.
 - PR base: `36b7b486bb60b54f3f19201f2e548b11e5f93197`.
-- Arena branch verified code checkpoint: `8bc4f7ffc45ece3402060578fe14aa5c4a89bef7`,
-  with the final documentation/security checkpoint added afterwards.
+- Arena branch verified engineering checkpoint:
+  `15478906bbc2cb6c5806f366141b5cd35cac0523` ("harden: stream news response
+  ceiling and finalize delivery evidence"). GitHub Actions run `40566013522`
+  completed `success` for that exact SHA. A later documentation-only checkpoint
+  may add `docs/EMPLOYER_CLARIFICATIONS.md` and delivery-evidence updates; always
+  promote the **current** Arena head with the dynamic `$ARENA` ref below, not a
+  hard-coded SHA.
 - Full ancestry: PR base is an ancestor of the feature branch; the feature branch
-  is an ancestor of the Arena branch. No merge commit is needed.
+  is an ancestor of the Arena branch. No merge commit is needed. As of this
+  verification the Arena branch was 4 commits ahead of the feature branch (plus
+  any later documentation commits); Step 2 recomputes this live.
 - GitHub branch API reported `protected=false` for the feature branch and zero
   repository rulesets. Re-check before pushing; a changed protection rule may
-  require a maintainer with bypass rights.
+  require a maintainer with bypass rights. The restriction that stops *this
+  Arena session* is its fixed-branch push policy, not GitHub protection.
 - CI on the Arena branch is green. PR #14's current green check belongs to its
   older head and must be rerun after the head branch advances.
 

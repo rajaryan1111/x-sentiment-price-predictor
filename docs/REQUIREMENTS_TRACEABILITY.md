@@ -36,7 +36,7 @@ deadline), the row records the provisional interpretation rather than employer i
 | `NFR1`–`NFR6` | Non-functional requirements | PRD.md §Non-functional requirements |
 | `A1`–`A7` | Assessment-specific items that are not R/NFR (timeline, credentials, submitted resources, delivery) | this document |
 | `O1`–`O13` | Open decisions and their provisional interpretations | PHASE_1_REQUIREMENTS.md §7 |
-| `D-001`–`D-028` | Decision-log entries with rationale | DECISIONS.md |
+| `D-001`–`D-029` | Decision-log entries with rationale | DECISIONS.md |
 
 Allowed status vocabulary, used verbatim in the table:
 **Verified complete**, **Partially complete**, **Not implemented**,
@@ -127,4 +127,9 @@ The brief asks for an email to `gilad@crowdwisdomtrading.com` containing:
    drawdown.
 
 A7 tracks the delivery. The repository and Markdown report already exist; the token/Actor
-identifiers and a sentiment-backed evaluation do not.
+identifiers and a sentiment-backed evaluation do not. A consolidated, unsent question set
+and email draft addressed to this recorded recipient, plus the provider/credential
+authorization checklist, are in [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md).
+The brief's request to email raw tokens conflicts with the never-commit/never-email-secrets
+policy (D-012, D-029), so the draft asks the employer to name a private credential channel
+instead; no email has been sent.
