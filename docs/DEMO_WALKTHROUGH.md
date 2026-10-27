@@ -1,7 +1,7 @@
 # Demo walkthrough (5–7 minutes)
 
 This script is for an internship evaluator. Every command below was verified on
-2026-10-27 from a clean Python 3.11 virtual environment on branch
+2026-10-28 from a clean Python 3.11 virtual environment on branch
 `arena/cf79e7b7-x-sentiment-price-predictor`. The demonstration uses **explicitly
 synthetic** data and mocked provider tests. It does not use live X, Tavily, Exa,
 Apify or Coinbase data, and it makes no claim about real forecasting performance.
@@ -55,10 +55,10 @@ python scripts/validate_docs.py
 python scripts/validate_dataset_registry.py
 ```
 
-**Expected:** the full offline suite passes; Ruff reports “All checks passed!”;
-the docs validator reports valid links/requirement rows; the registry validator
-reports 12 records. [TEST_PLAN.md](../TEST_PLAN.md) is the authoritative current
-test count.
+**Expected:** on 2026-10-28, the full offline suite passes with 167 tests; Ruff
+reports “All checks passed!”; the docs validator reports valid links/requirement
+rows; the registry validator reports 12 records. [TEST_PLAN.md](../TEST_PLAN.md)
+is the authoritative current test count.
 
 **Say:** “CI runs these same four checks on every push to the working branch.
 CI is evidence of code health, not of data access or profitability.”
@@ -204,9 +204,10 @@ python -m pytest tests/unit/test_fetch_news_cli.py tests/integration/test_offlin
 
 **Say:** “The news CLI tests use mocked HTTP. They prove that a live call is
 blocked without `--confirm-live-call`, credentials come from the environment,
-errors are redacted, JSONL can be loaded by `run --news-file`, and adding news
-context leaves predictions and metrics byte-identical. No live Tavily or Exa call
-was made.”
+errors and caller notes are redacted, oversized responses are rejected while
+streaming, JSONL can be loaded by `run --news-file`, and adding news context
+leaves predictions and metrics byte-identical. A separate regression blocks
+network access during the offline CLI run. No live Tavily or Exa call was made.”
 
 **Close with:**
 

@@ -171,6 +171,34 @@ def test_oversized_response_hits_the_configured_ceiling() -> None:
         run_search(handler, max_results=1, max_body_bytes=1024)
 
 
+def test_response_ceiling_stops_streaming_before_the_whole_body_is_buffered() -> None:
+    class ChunkedBody(httpx.AsyncByteStream):
+        def __init__(self) -> None:
+            self.chunks_yielded = 0
+
+        async def __aiter__(self):
+            for _ in range(5):
+                self.chunks_yielded += 1
+                yield b"x" * 400
+
+        async def aclose(self) -> None:
+            return None
+
+    body = ChunkedBody()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            stream=body,
+            headers={"content-type": "application/json"},
+        )
+
+    with pytest.raises(PayloadTooLargeError, match="ceiling"):
+        run_search(handler, max_results=1, max_body_bytes=512)
+
+    assert body.chunks_yielded < 5
+
+
 def test_missing_credentials_is_an_explicit_condition() -> None:
     async def execute() -> None:
         adapter = TavilyNewsAdapter(api_key=None, client=transporting(success_handler))

@@ -71,7 +71,7 @@ Status: rule. A normalized post requires non-empty text, while text remains stor
 Status: resolved 2026-10-26. Both assessment PDFs were supplied and read in full: `CWT X sentiment Agent - intern task.pdf` (2 pages) and `Historical Twitter_X Datasets_ Verified Download Links.pdf` (2 pages). Their SHA-256 hashes and page counts are recorded in docs/REQUIREMENTS_TRACEABILITY.md. The requirement matrix and canonical documents were reconciled against the actual wording. The PDFs are not committed to the repository; the hashes identify the inspected copies. The earlier transcription-only limitation is closed. Remaining ambiguities are the n+0 convention (D-004), the news role (D-005), the ML/RL slash (D-006) and the exact deadline (D-014), each recorded rather than guessed.
 
 ## D-024 Identifier and phase-label scheme
-Status: agreed. Requirement IDs are `R1`–`R15` (functional, defined in PRD.md and PHASE_1_REQUIREMENTS.md), `NFR1`–`NFR6` (non-functional), `A1`–`A7` (assessment-specific items such as the timeline, credentials, supplied resources and submission delivery), `O1`–`O13` (open decisions) and `D-001`–`D-027` (decisions). Each ID is unique within its namespace and means the same requirement in every document; a definition may be repeated in the PRD, the detailed trace and the matrix, but no two requirements share an ID. Phase numbering has three distinct schemes mapped in PHASES.md; canonical Phase 1 is the requirements and scope baseline, and the repository's "Phase 2 data quality/alignment" workstream is canonical Phase 3, not canonical Phase 2.
+Status: agreed. Requirement IDs are `R1`–`R15` (functional, defined in PRD.md and PHASE_1_REQUIREMENTS.md), `NFR1`–`NFR6` (non-functional), `A1`–`A7` (assessment-specific items such as the timeline, credentials, supplied resources and submission delivery), `O1`–`O13` (open decisions) and `D-001`–`D-028` (decisions). Each ID is unique within its namespace and means the same requirement in every document; a definition may be repeated in the PRD, the detailed trace and the matrix, but no two requirements share an ID. Phase numbering has three distinct schemes mapped in PHASES.md; canonical Phase 1 is the requirements and scope baseline, and the repository's "Phase 2 data quality/alignment" workstream is canonical Phase 3, not canonical Phase 2.
 
 ## D-025 Database join requirement
 Status: implemented, verified offline. The verified brief says the system will "join the datasets in a database." The storage package has versioned `price_bars` and `x_posts` tables, idempotent upserts keyed by product/timestamp and post ID, and two tested joins: a descriptive same-UTC-day SQL join (not usable as a historical feature) and a leakage-safe cutoff join that uses only posts published and first observed by the cutoff plus the last completed prior close. The end-to-end pipeline now consumes the persisted path: `xsentiment persist` upserts snapshot inputs and `xsentiment run --database-url` reads the same rows from storage, recording `input_source = persisted_storage` in the manifest. `tests/unit/test_phase3_ingestion_e2e.py` drives a mocked adapter through persistence and the cutoff join and runs the persisted-input CLI, so R15 is Verified complete for this offline path; a database holding real X rows still depends on R2. Raw post text and private data remain out of Git; the database is a local ignored artefact.
@@ -91,3 +91,14 @@ flags) and `fetch-prices` records a UTC `fetched_at`. `scripts/make_offline_demo
 generates deterministic, explicitly labelled synthetic inputs so the full CLI can
 be demonstrated without credentials; its outputs are ignored by Git and its
 metrics must never be reported as real-data results. No live provider call was made.
+
+## D-028 Streaming news ceiling and offline network isolation
+Status: implemented and verified offline (2026-10-28). The Tavily adapter now
+enforces `HTTP_MAX_RESPONSE_BYTES` while reading the response stream instead of
+buffering the whole body first, while preserving the single-request/no-retry
+policy. A streaming regression test proves that an oversized response stops chunk
+consumption early. The offline demo now has a regression that blocks socket and
+HTTP client entry points during a real `run` CLI execution, so accidental network
+use cannot silently turn the reproducible demo into a live-data run. These changes
+harden robustness only; they do not alter forecasting methodology, feature policy
+or the context-only role of news. No live provider call was made.

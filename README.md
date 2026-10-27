@@ -39,8 +39,18 @@ contracts and status, and they list what is verified versus still open.
 Phase 1 deliverable: the authoritative [requirements traceability matrix](docs/REQUIREMENTS_TRACEABILITY.md)
 (every requirement with its acceptance criterion, verification method, evidence, status,
 gap and external blocker, checked by `python scripts/validate_docs.py`). The matrix also
-records the verified assignment PDFs (page counts and SHA-256), the 12 dataset candidates,and the requirements that remain partial, including provider access (R2) and the email
+records the verified assignment PDFs (page counts and SHA-256), the 12 dataset candidates, and the requirements that remain partial, including provider access (R2) and the email
 submission packet (A7). The database join (R15) is recorded as verified complete offline.
+
+## Delivery status (2026-10-28)
+
+The latest verified work is on `arena/cf79e7b7-x-sentiment-price-predictor`; PR
+#14's head remains `5af5bc7` on `feat/sentiment-features-and-forecasting`. GitHub
+reported the feature branch as unprotected with zero rulesets, but this Arena
+session is restricted to pushing only to the Arena branch. An authorized normal
+clone should use the fast-forward-only procedure in
+[docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md) to advance PR #14's head, then
+wait for fresh CI. Do not merge the PR without explicit approval.
 
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
 [Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),
@@ -92,7 +102,8 @@ python -m xsentiment fetch-news --help
 
 # Only after authorizing one provider call and setting TAVILY_API_KEY in the
 # environment or a local, ignored .env file. The flag is mandatory; there is no
-# --api-key argument and the adapter performs one bounded request with no retry.
+# --api-key argument and the adapter performs one bounded streaming request
+# with an enforced response ceiling and no retry.
 python -m xsentiment fetch-news \
   --query "BTC-USD Bitcoin market news" \
   --max-results 5 \
@@ -225,8 +236,8 @@ From `reports/btc-usd-180d/`, computed by the commands above:
   commands after refetching the public snapshot — whose SHA-256 matched the committed
   provenance exactly — and reproduced every metric within 5e-13 (platform float noise
   only). That refetch is not part of the current sandbox verification, whose outbound
-  network is restricted; the current [TEST_PLAN.md](TEST_PLAN.md) records 165 offline
-  tests at this revision (2026-10-27). No credentials, paid services or network X calls
+  network is restricted; the current [TEST_PLAN.md](TEST_PLAN.md) records 167 offline
+  tests at this revision (2026-10-28). No credentials, paid services or network X calls
   are needed for the offline test suite or the synthetic demo run.
 - **Mean MAE across horizons:** naive persistence **$1,828.36**, price-only ridge
   **$2,264.62** (+23.86% worse), sentiment-plus-price identical to price-only
@@ -291,8 +302,8 @@ dataset has been accepted, licensed or profiled for 180-day text coverage.
   feature policy; see [DECISIONS.md](DECISIONS.md) D-005. The bounded adapter
   (`src/xsentiment/ingestion/tavily_news.py`) is reachable only through
   `xsentiment fetch-news --confirm-live-call`, reads `TAVILY_API_KEY` from the
-  environment, performs one bounded request without automatic retry, and writes
-  normalized JSONL. `run --news-file` consumes that file offline and records its
+  environment, performs one bounded streaming request with an enforced response ceiling
+  and no automatic retry, and writes normalized JSONL. `run --news-file` consumes that file offline and records its
   hash and context-only policy in the manifest. Both steps are verified against
   mocked HTTP transports only; no live call has been made, so live provider behaviour
   is unverified.

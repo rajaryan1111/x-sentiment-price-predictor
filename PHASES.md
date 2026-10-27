@@ -155,7 +155,7 @@ and explicitly labelled until an accepted X source exists.
 Status: in progress; offline reproducibility verified on a fresh clone.
 - Done: offline reproducible CLI (`fetch-prices`, `fetch-news` when authorized,
   `persist`, `run`), run manifest with input hashes, commit-able report/chart/outlook
-  artefacts, 165 offline tests at this revision (2026-10-27; see
+  artefacts, 167 offline tests at this revision (2026-10-28; see
   [TEST_PLAN.md](TEST_PLAN.md)), lint, registry and documentation validation. An
   offline demo generator and a full CLI end-to-end integration test are included.
 - Fresh-clone verification (2026-10-27): a clean checkout of this branch from GitHub,

@@ -1,6 +1,6 @@
 # Final requirements audit
 
-**Status:** evidence-based audit of the checkout on 2026-10-27. This document does
+**Status:** evidence-based audit independently re-verified on 2026-10-28. This document does
 not replace the canonical [requirements traceability matrix](REQUIREMENTS_TRACEABILITY.md);
 it independently classifies every requirement against code, tests, committed
 artefacts and the verified offline run.
@@ -54,7 +54,8 @@ treated as market evidence.
 
 Total: **28 requirements**. Externally blocked or clarification-dependent
 rows: R2, A1, A2 and A3. Additional partial rows depend indirectly on the same
-accepted-X-data gate.
+accepted-X-data gate. PR #14 delivery is separately gated by the session branch
+policy B8, not by an unimplemented requirement.
 
 This audit is intentionally more conservative than the canonical matrix for R8:
 the six horizons are implemented, but the `n+0` target convention is still a
@@ -63,16 +64,51 @@ verified as offline engineering, not as live provider or real-X acceptance.
 
 ## 4. Verification basis
 
-- Full offline suite, Ruff, `scripts/validate_docs.py`,
-  `scripts/validate_dataset_registry.py` and `git diff --check` were run on
-  2026-10-27; see [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
+- On 2026-10-28, the full offline suite, Ruff, `scripts/validate_docs.py`,
+  `scripts/validate_dataset_registry.py`, `python -m compileall -q src tests scripts`
+  and `git diff --check` were rerun from a fresh Python 3.11.2 virtual environment;
+  see [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). The suite now
+  has 167 passing tests at this revision.
 - A real CLI end-to-end run used deterministic synthetic inputs from
   `scripts/make_offline_demo.py`; `tests/integration/test_offline_demo.py`
   validates all six artefacts, six horizons, three models, finite metrics,
-  prediction records, input lineage and byte-identical repeatability.
+  prediction records, input lineage, byte-identical repeatability and absence of
+  network access. `tests/unit/test_tavily_news.py` proves the news response ceiling
+  is enforced while streaming; `tests/unit/test_fetch_news_cli.py` proves secret
+  redaction in provider errors and caller notes.
 - GitHub Actions verified the pushed working branch with the same four checks;
   run URLs are recorded in the verification report.
 - No live Tavily, Exa, Apify or Coinbase request was made during this audit.
+
+## 4.1 Independent evidence cross-check (2026-10-28)
+
+Documentation claims were not counted as implementation evidence. For every
+requirement row, the named source path and automated-test path were checked
+against the actual working tree. The concrete checks were:
+
+- `pytest --collect-only -q` collected 167 cases at this revision; the full suite
+  then passed with zero failures and zero skips on 2026-10-28.
+- `tests/unit/test_coinbase_prices.py`, `test_contracts.py`,
+  `test_phase2_pipeline.py`, `test_dataset.py`, `test_features.py`,
+  `test_walk_forward.py`, `test_models.py`, `test_evaluation.py`,
+  `test_metrics.py`, `test_strategy.py` and `test_reporting.py` were used to
+  verify price validation, timestamps, alignment, sentiment/price features,
+  leakage-safe targets, folds, models, metrics, risk and reporting.
+- `tests/unit/test_storage_join.py` and `test_phase3_ingestion_e2e.py` verify the
+  database join and persisted-input CLI. `tests/unit/test_apify_x.py`,
+  `test_tavily_news.py`, `test_fetch_news_cli.py`, `test_retry.py` and
+  `tests/integration/test_offline_demo.py` verify bounded adapters, gated news,
+  redaction, streaming size limits, no-network operation and end-to-end artefacts.
+- `scripts/validate_docs.py` and `scripts/validate_dataset_registry.py` verify
+  documentation structure and the 12-entry dataset registry; they do **not**
+  verify external URLs, licences or real provider behaviour.
+- Committed `reports/btc-usd-180d/` artefacts were cross-checked for internal
+  metric/manifest/report consistency. The original PDFs and raw price snapshot
+  remain unavailable, so primary-source wording and live re-fetch were not
+  re-verified in this checkout.
+
+This cross-check supports the implementation statuses below; it does not convert
+external data/authorization gates into completion.
 
 ## 5. Functional requirements (R1–R15)
 
@@ -91,7 +127,7 @@ verified as offline engineering, not as live provider or real-X acceptance.
 | R11 | T* | Produce a one-page summary of the current sentiment outlook for the asset | PARTIAL | C/T/A: `reporting/outlook.py` and `check_outlook_page`; report tests enforce sections, line ceiling, disclaimer and explicit unavailable states. Caller limitations now appear in the outlook as well as the report. | The page contract is complete; real sentiment and live news content are unavailable by design. |
 | R12 | T* | Produce an evaluation report in PDF or Markdown including Sharpe ratio, Sortino ratio and maximum drawdown | COMPLETE | C/T/A/H: `backtesting/metrics.py`, `strategy.py`, `reporting/report.py`; known-value metric/strategy tests and committed `reports/btc-usd-180d/evaluation-report.md` with Sharpe, Sortino, max drawdown, fees and withheld-metric reasons. | Risk metrics come from a short, single-asset historical sample and a predeclared strategy; no sentiment variant is available. |
 | R13 | T* | Provide a reproducibility package: setup, commands, provider and Actor identifiers, query configuration, snapshots or hashes and secure secrets | PARTIAL | C/T/A: README, `.env.example`, `scripts/make_offline_demo.py`, manifest provenance and `input_lineage`; docs validator, dataset validator and offline demo test. Query modes/hashes are recorded without raw query terms. | Actor identifiers, real query configuration and a secure credential transfer route remain external (R2, A2, B2). |
-| R14 | T* | Provide automated tests for schemas, timestamps, alignment, features, targets, leakage, metrics and reports | COMPLETE | C/T/CI: `tests/unit/` and `tests/integration/` cover schemas, timestamps, alignment, features, targets, leakage, metrics, reports, storage, mocked providers and CLI; `TEST_PLAN.md` is the authoritative current count; GitHub Actions runs lint, both validators and pytest. | CI verifies the offline suite; it cannot verify live provider behaviour or real X acceptance. |
+| R14 | T* | Provide automated tests for schemas, timestamps, alignment, features, targets, leakage, metrics and reports | COMPLETE | C/T/CI: `tests/unit/` and `tests/integration/` cover schemas, timestamps, alignment, features, targets, leakage, metrics, reports, storage, mocked providers, CLI, streaming response bounds, secret redaction and offline network isolation; on 2026-10-28 the suite has 167 passing tests at this revision; `TEST_PLAN.md` is the authoritative current count; GitHub Actions runs lint, both validators and pytest. | CI verifies the offline suite; it cannot verify live provider behaviour or real X acceptance. |
 | R15 | T* | Join the X-post and price datasets in a database | COMPLETE | C/T/A: `storage/models.py`, `repositories.py`, `main.py`; `test_storage_join.py` and `test_phase3_ingestion_e2e.py` verify a versioned schema, idempotent upserts, descriptive/cutoff joins and a complete `run --database-url` with `input_source = persisted_storage`. | The offline database path is complete; a database holding licensed real X rows depends on R2. |
 
 ## 6. Non-functional requirements (NFR1–NFR6)
@@ -101,7 +137,7 @@ verified as offline engineering, not as live provider or real-X acceptance.
 | NFR1 | T* | Reproducibility metadata: code revision, source/version, query/window, retrieval time, schema, non-secret run ID | COMPLETE | C/T/A: `pipeline/forecast_run.py` `_code_revision`, `_input_lineage`, `_manifest` and `load_price_snapshot_metadata`; `main.py` writes UTC `fetched_at`. Manifest records revision, run ID, versions, hashes, windows, retrieval, schema and non-secret query identity. | Price provider retrieval time is explicit when `fetch-prices` writes `fetched_at`; older or synthetic snapshots record an explicit unavailable reason instead of inventing one. |
 | NFR2 | T* | Temporal integrity: timezone-aware timestamps, event time distinct from first-observed time | COMPLETE | C/T: `ingestion/contracts.py` requires timezone-aware `created_at` and `retrieved_at`, forbids backdated retrieval and normalizes offsets to UTC; contract and loader tests cover naive and offset cases. | Real provider payloads are unprofiled, but the contract is enforced in code and tests. |
 | NFR3 | T* | Security: no tokens, cookies, private exports or large raw datasets in Git | COMPLETE | C/T/A: `.gitignore`, `.env.example`, secret-scan review, metadata allow-listing and CLI redaction tests. No live credential, raw private export or generated dataset is tracked in this checkout. | Git history outside this checkout cannot be independently rescanned here; no secret was introduced by this work. |
-| NFR4 | T* | Robustness: bounded timeouts, payloads, concurrency and cost; no automatic retry of paid launches | PARTIAL | C/T/M: `config/settings.py`, `ingestion/http.py`, `apify_x.py`, `tavily_news.py`, `retry.py`; tests enforce timeouts, response ceilings, cost/item caps, no launch retry and one-request news behaviour. | Live paid-run and billing semantics remain untested by design; no authorization exists to exercise them. |
+| NFR4 | T* | Robustness: bounded timeouts, payloads, concurrency and cost; no automatic retry of paid launches | PARTIAL | C/T/M: `config/settings.py`, `ingestion/http.py`, `apify_x.py`, `tavily_news.py`, `retry.py`; tests enforce timeouts, a streaming response ceiling, cost/item caps, no launch retry, one-request news behaviour and offline network isolation. | Live paid-run and billing semantics remain untested by design; no authorization exists to exercise them. |
 | NFR5 | T* | Auditability: exclusions recorded with reasons; post text never logged by default | COMPLETE | C/T: `local_dataset_profile.py` and reporting modules record counts/exclusion reasons without printing post text; chart empty states are explicit; profiler/report tests cover the no-text guarantee. | No real post text exists to test the no-print guarantee against; fixtures and profiler behaviour are verified. |
 | NFR6 | T* | Honest reporting: fixtures and in-sample values never presented as real out-of-sample results | COMPLETE | C/T/A: report/outlook separate measured, unavailable and synthetic states; docs validator rejects unqualified stale test-count claims; offline demo labels synthetic prices/posts in inputs, manifest, report and outlook. | Enforcement combines code, tests and documentation convention; not every free-text sentence can be machine-verified. |
 
@@ -112,7 +148,7 @@ verified as offline engineering, not as live provider or real-X acceptance.
 | A1 | T* | Submit within the stated timeline (the brief says both one week and 5–7 days) | NOT_VERIFIED | X: no employer message or calendar due date exists in the repository. The brief is recorded as saying both one week and 5–7 days. | Exact calendar deadline and timezone require employer clarification. Primary-source wording is also not re-verifiable from this checkout. |
 | A2 | T* | Provide the APIFY/Tavily/Exa tokens and Actor IDs used for scraping | BLOCKED_EXTERNAL | C/A: `.env.example` has placeholders only; no Actor ID or token exists and no private credential channel is defined. | Requires approved Actor/provider selection and a private credential channel; secrets must never be committed or shared in chat. |
 | A3 | T* | Use the historical tweets resource linked by the assessment | BLOCKED_EXTERNAL | C/T/A: `local_dataset_profile.py`, `profile_local_x_dataset.py`, dataset registry and validator; the linked Google Doc is a 12-entry link list, not a tweet corpus, and no accepted candidate exists. | Requires candidate dataset selection, licence/terms review, download, schema/text check and 180-day coverage profile. |
-| A4 | T* | Ingest the most recent and relevant news with Tavily to complement X sentiment; Exa appears in the submission line | PARTIAL | C/T/M: `main.py` `fetch-news` and `run --news-file`, `tavily_news.py`, `pipeline/forecast_run.py`; adapter and CLI tests use mocked HTTP and prove context-only behaviour, redaction, bounds and unchanged predictions/metrics. | Live Tavily behaviour and a real news snapshot require an approved key, authorization and confirmation that live news is mandatory (B6). |
+| A4 | T* | Ingest the most recent and relevant news with Tavily to complement X sentiment; Exa appears in the submission line | PARTIAL | C/T/M: `main.py` `fetch-news` and `run --news-file`, `tavily_news.py`, `pipeline/forecast_run.py`; adapter and CLI tests use mocked HTTP and prove context-only behaviour, streaming size bounds, redaction in errors/caller notes, no retry, offline network isolation and unchanged predictions/metrics. | Live Tavily behaviour and a real news snapshot require an approved key, authorization and confirmation that live news is mandatory (B6). |
 | A5 | T* | The brief offers a machine learning / reinforcement learning pipeline | COMPLETE | C/T: `models/baseline.py` and `forecasting.py` implement supervised multi-horizon ML with naive and price-only baselines; no RL environment is defined or claimed. | RL is not implemented; the brief does not define an RL environment. Reopen only on explicit employer instruction. |
 | A6 | T* | Reference inventory of historical Twitter/X datasets with verified download links | PARTIAL | C/T/A: `data/registry/historical_twitter_x_datasets.json` and `scripts/validate_dataset_registry.py`; structural validator checks platform identity, ID-only caveats, coverage limitations and the explicit `not-reverified` state. | Registry entries are transcribed; live provider pages, current availability and licence terms were not independently re-verified. |
 | A7 | T* | Submit the repository link, provider tokens and Actor IDs, and the evaluation report by email to gilad@crowdwisdomtrading.com | PARTIAL | A: repository URL, Markdown evaluation report and the four submission documents exist. No email was sent and no provider identifiers/tokens were delivered. | Email delivery, provider identifiers/tokens and a sentiment-backed evaluation require user authorization and R2/A2. |
@@ -129,14 +165,18 @@ In summary:
 - **B5** exact calendar deadline — leaves A1 NOT_VERIFIED.
 - **B6** live Tavily requirement and news feature policy — leaves A4 PARTIAL.
 - **B7** submission format/email authorization — leaves A7 PARTIAL.
+- **B8** session branch policy — PR #14's head cannot be advanced from this
+  restricted Arena session; see [PR14_PROMOTION.md](PR14_PROMOTION.md). This is a
+  delivery permission blocker, not an implementation defect.
 
 ## 9. Defensible conclusion
 
 The implementable engineering pipeline is complete and reproducible offline,
-including the previously missing gated news CLI, input-lineage provenance, a
-full CLI end-to-end demonstration and CI verification. The assignment is not
-fully satisfiable in this environment because no accepted X corpus, provider
-credential, paid-call authorization, employer clarification or submission email
-exists. Those limitations are recorded here rather than hidden. See
+including the gated news CLI, streaming response bound, input-lineage provenance,
+a full CLI end-to-end demonstration, offline network isolation and CI verification.
+The assignment is not fully satisfiable in this environment because no accepted X
+corpus, provider credential, paid-call authorization, employer clarification,
+PR-head promotion permission or submission email exists. Those limitations are
+recorded here rather than hidden. See
 [SUBMISSION_SUMMARY.md](SUBMISSION_SUMMARY.md) for the evaluator-facing summary
 and [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md) for the timed demonstration.

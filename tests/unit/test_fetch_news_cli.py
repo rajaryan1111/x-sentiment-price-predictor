@@ -382,6 +382,7 @@ def test_fetch_news_jsonl_feeds_run_without_changing_predictions_or_metrics(
     now = (START + timedelta(days=121)).isoformat()
     with_news = tmp_path / "run-with-news"
     without_news = tmp_path / "run-without-news"
+    input_note = f"synthetic offline test fixture with {KEY}"
     common = [
         "--prices",
         str(prices),
@@ -390,7 +391,7 @@ def test_fetch_news_jsonl_feeds_run_without_changing_predictions_or_metrics(
         "--now",
         now,
         "--input-note",
-        "synthetic offline test fixture",
+        input_note,
     ]
 
     assert cli.main(["run", *common, "--news-file", str(news_path), "--out", str(with_news)]) == 0
@@ -409,12 +410,17 @@ def test_fetch_news_jsonl_feeds_run_without_changing_predictions_or_metrics(
     assert provenance["news_snapshot_sha256"] == sha256_file(news_path)
     assert provenance["news_context_items"] == 2
     assert provenance["news_context_policy"] == "outlook_context_only_not_a_model_feature"
-    assert provenance["input_note"] == "synthetic offline test fixture"
+    assert provenance["input_note"] == "synthetic offline test fixture with [REDACTED]"
     assert manifest["dataset"]["rows_with_sentiment"] > 0
     assert manifest["evaluation"]["predictions"] > 0
 
     outlook = (with_news / "outlook.md").read_text(encoding="utf-8")
+    report = (with_news / "evaluation-report.md").read_text(encoding="utf-8")
     assert HEADLINE in outlook
     assert "never enters model features" in outlook
     assert "synthetic offline test fixture" in outlook
+    assert "[REDACTED]" in outlook
+    assert KEY not in outlook
+    assert KEY not in report
+    assert KEY not in (with_news / "manifest.json").read_text(encoding="utf-8")
     assert HEADLINE not in (without_news / "outlook.md").read_text(encoding="utf-8")

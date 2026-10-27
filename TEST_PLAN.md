@@ -1,20 +1,23 @@
 # Test Plan
 A passing suite proves only the cases it actually exercises. The current suite is
-**165 offline tests, all passing** (`pytest` -> `165 passed`, 0 failed, 0 skipped,
-0 xfailed), last run on 2026-10-27 UTC in a clean Python 3.11.2 virtual environment
+**167 offline tests, all passing** (`pytest` -> `167 passed`, 0 failed, 0 skipped,
+0 xfailed), last run on 2026-10-28 UTC in a clean Python 3.11.2 virtual environment
 installed with `pip install -e '.[dev,storage,analysis]'`. CI runs the same command
 set on Python 3.11, which is the supported baseline in `pyproject.toml`, with the
 `dev` and `storage` extras; the offline pipeline itself needs no analysis extras.
 CI runs lint, registry validation, documentation validation and pytest.
 
-The suite collects 165 cases from 163 test functions across 22 modules in
+The suite collects 167 cases from 165 test functions across 22 modules in
 `tests/unit/` and `tests/integration/`: one function is parametrized into three cases.
 The checkpoint revision (commit `5af5bc7`) had 152 tests; nine added in
-`test_fetch_news_cli.py` cover the gated news CLI, and four added in
+`test_fetch_news_cli.py` cover the gated news CLI, four added in
 `tests/integration/test_offline_demo.py` cover deterministic synthetic input
 generation, snapshot metadata allow-listing, mocked `fetch-prices` retrieval
-metadata and a complete offline CLI run with artefact validation and repeatability.
-Earlier figures (149, 152, 161) are historical results for their own revisions.
+metadata and a complete offline CLI run with artefact validation and repeatability,
+one added in `test_tavily_news.py` proves the response ceiling is enforced while
+streaming, and one added in `tests/integration/test_offline_demo.py` blocks network
+access during an offline run. Earlier figures (149, 152, 161, 165) are historical
+results for their own revisions.
 
 **This file is the single authoritative source for the current count.** Counts quoted
 elsewhere in the repository must be tied to a date or a commit and are historical
@@ -44,8 +47,10 @@ results for that revision. `scripts/validate_docs.py` enforces that rule, and
   explicitly labelled synthetic price/post snapshots, drives the real `run` CLI,
   validates every artefact (manifest lineage, six horizons, three models, finite
   metrics, prediction records, chart/outlook/report sections) and proves a repeat
-  run produces byte-identical predictions and metrics. A separately documented
-  historical real-data run uses public Coinbase candles; it is not refetched in CI.
+  run produces byte-identical predictions and metrics. A separate regression blocks
+  socket and HTTP client entry points during an offline run, so a future accidental
+  network request fails the suite. A separately documented historical real-data run
+  uses public Coinbase candles; it is not refetched in CI.
 - CI: Ruff, registry structural validation, documentation validation (`scripts/validate_docs.py`)
   and pytest. No network call is made by the suite; `fetch-prices` is exercised manually,
   not in CI.
@@ -167,10 +172,12 @@ From repo root:
 
 ```bash
 python -m pip install -e ".[dev,storage]"
+python -m pytest -q
 ruff check src tests scripts
 python scripts/validate_dataset_registry.py
 python scripts/validate_docs.py
-pytest
+python -m compileall -q src tests scripts
+git diff --check
 ```
 
 Live-provider tests remain opt-in and must not run in ordinary CI.

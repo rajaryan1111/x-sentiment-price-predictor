@@ -7,11 +7,13 @@ claim about real BTC prices, real X posts or live provider behaviour.
 
 import json
 import math
+import socket
 import subprocess
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import httpx
 import pytest
 
 from xsentiment import main as cli
@@ -275,3 +277,41 @@ def test_offline_demo_end_to_end_writes_real_application_artifacts(tmp_path: Pat
         repeated / "predictions.jsonl"
     ).read_bytes()
     assert (output / "metrics.json").read_bytes() == (repeated / "metrics.json").read_bytes()
+
+
+def test_offline_demo_run_makes_no_network_connection(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    prices, posts, snapshot = generate(tmp_path)
+    output = tmp_path / "run-no-network"
+    now = snapshot["recommended_now"]
+
+    def forbidden(*args: object, **kwargs: object) -> None:
+        raise AssertionError("the offline run attempted a network connection")
+
+    monkeypatch.setattr(socket.socket, "connect", forbidden)
+    monkeypatch.setattr(socket, "create_connection", forbidden)
+    monkeypatch.setattr(socket, "getaddrinfo", forbidden)
+    for client in (httpx.AsyncClient, httpx.Client):
+        for method in ("request", "stream", "send"):
+            monkeypatch.setattr(client, method, forbidden)
+
+    assert (
+        cli.main(
+            [
+                "run",
+                "--prices",
+                str(prices),
+                "--posts",
+                str(posts),
+                "--out",
+                str(output),
+                "--now",
+                now,
+                "--input-note",
+                "offline network-isolation regression",
+            ]
+        )
+        == 0
+    )
+    assert (output / "manifest.json").stat().st_size > 0

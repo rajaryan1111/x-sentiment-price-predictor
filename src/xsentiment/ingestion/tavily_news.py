@@ -8,8 +8,8 @@ key is an explicit, graceful condition rather than a silent no-op.
 
 The adapter enforces the project's safety policy (NFR4):
 
-* one bounded POST with the configured timeout and response ceiling, never
-  automatically retried;
+* one bounded POST with the configured timeout and a streaming response
+  ceiling enforced while chunks arrive, never automatically retried;
 * every normalized item keeps headline, URL, publication time when the
   provider actually carries one, retrieval time, source identity and a payload
   hash; nothing is invented, and malformed items are excluded with a reason;
@@ -198,7 +198,10 @@ class TavilyNewsAdapter:
         try:
             # One bounded POST: news search is contextual, read-only and passed
             # to the provider as sent, so it is never automatically retried.
-            response = await self._client.post(
+            # Stream the body so an oversized response is rejected before the
+            # whole payload is buffered in memory.
+            async with self._client.stream(
+                "POST",
                 _SEARCH_URL,
                 json={
                     "query": query,
@@ -206,7 +209,20 @@ class TavilyNewsAdapter:
                     "search_depth": "basic",
                 },
                 headers={"Authorization": f"Bearer {self._api_key}"},
-            )
+            ) as response:
+                if response.status_code != 200:
+                    raise NewsProviderError(f"tavily returned HTTP {response.status_code}")
+                chunks: list[bytes] = []
+                total = 0
+                async for chunk in response.aiter_bytes():
+                    total += len(chunk)
+                    if total > self._max_body_bytes:
+                        raise PayloadTooLargeError(
+                            f"tavily response exceeded the configured ceiling of "
+                            f"{self._max_body_bytes} bytes"
+                        )
+                    chunks.append(chunk)
+                body_bytes = b"".join(chunks)
         except httpx.TimeoutException as exc:
             raise NewsProviderError(
                 "tavily request timed out within the configured boundary"
@@ -215,16 +231,9 @@ class TavilyNewsAdapter:
             raise NewsProviderError(
                 f"tavily request failed with HTTP transport error {exc.__class__.__name__}"
             ) from exc
-        if response.status_code != 200:
-            raise NewsProviderError(f"tavily returned HTTP {response.status_code}")
-        if len(response.content) > self._max_body_bytes:
-            raise PayloadTooLargeError(
-                f"tavily response exceeded the configured ceiling of "
-                f"{self._max_body_bytes} bytes"
-            )
         try:
-            body = response.json()
-        except (json.JSONDecodeError, ValueError) as exc:
+            body = json.loads(body_bytes.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
             raise NewsProviderError("tavily response body is not valid JSON") from exc
         if not isinstance(body, dict):
             raise NewsProviderError("tavily response body is not a JSON object")

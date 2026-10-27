@@ -16,6 +16,7 @@ repository.
 | B5 | Exact calendar submission deadline | A1, A7, O11 | The brief states both "one week" and "5–7 days" with no calendar date; no date can be inferred from files | State the due date (and timezone) and the delivery channel | The submission packet is assembled and sent with a recorded date | Email recipient on record: gilad@crowdwisdomtrading.com |
 | B6 | Is live Tavily news mandatory for submission? | A4, O7, O12 | The adapter, gated `fetch-news` CLI, JSONL hand-off and offline `run --news-file` wiring are implemented and mocked-verified. A live call still requires an approved API key and employer authorisation, and the brief's news role (context vs feature) is unsettled | Answer (a) whether live Tavily ingestion is required for submission, and (b) whether news may ever be a model feature | If live news is required: authorize one bounded `fetch-news --confirm-live-call` search with the approved key (B2), record the observed provider response shape, keep news context-only unless the feature policy is formally changed, then run `--news-file` offline | No key is requested in chat; no call without authorisation |
 | B7 | Submission format and packet expectations | A7 | The brief asks for an evaluation report "PDF or Markdown" and an email; whether a PDF is additionally required is unconfirmed | Confirm the accepted format(s) and any required attachments beyond repository link, credentials/Actor IDs and the evaluation report | The packet is produced in the confirmed format from existing evidence | Nothing is emailed without explicit authorization |
+| B8 | PR #14 head promotion permission | A7, delivery only | This Arena session is restricted to pushing only to `arena/cf79e7b7-x-sentiment-price-predictor`; GitHub itself reports the feature branch unprotected with zero rulesets | An authorized user in a normal clone must run the fast-forward-only procedure in [PR14_PROMOTION.md](PR14_PROMOTION.md) | The remote feature branch and PR #14 head equal the final Arena SHA, and fresh CI passes on that head | Never force-push, rewrite history, merge PR #14, or push to the base branch |
 
 ## What is NOT on this list
 
@@ -28,8 +29,11 @@ implementation-verified in-repo, so they do not need employer input:
   render remains, which is governed by B1.
 - R11 one-page outlook contract: machine-checked (`check_outlook_page`).
 - CI pull-request triggers: fixed to cover the actual PR base branches.
-- Tavily adapter and gated `fetch-news` CLI (D-005, O12): implemented,
-  mocked-verified, context-only, and wired to the offline `run --news-file` step.
+- Tavily adapter and gated `fetch-news` CLI (D-005, O12, D-028): implemented,
+  mocked-verified, context-only, streaming-size-bounded, and wired to the offline
+  `run --news-file` step.
+- Offline demo network isolation (D-028): a regression now blocks socket and HTTP
+  client calls during a real offline `run` execution.
 
 None of the above may be reclassified as "complete" in the real-data sense
 until B1/B2/B3 unblock the accepted X corpus; the traceability matrix keeps

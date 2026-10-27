@@ -4,7 +4,7 @@
 **Repository:** <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 **Assessment PR:** <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
 **Verified working branch:** `arena/cf79e7b7-x-sentiment-price-predictor`
-**Status on 2026-10-27:** ready with documented external limitations. No PR was merged.
+**Status on 2026-10-28:** ready with documented external limitations. No PR was merged.
 
 ## 1. Assignment objective
 
@@ -128,13 +128,15 @@ cross-checked for internal consistency, not recomputed from raw rows.
 persistence on forecast error. No claim is made that sentiment improves forecasting;
 that question remains untestable without accepted X data.
 
-### Current offline verification (2026-10-27)
+### Current offline verification (2026-10-28)
 
 A real CLI run on 210 synthetic bars and 209 synthetic posts produced six
 non-empty artefacts, six walk-forward folds, 2,160 out-of-sample predictions and
 18 per-horizon metric rows. Repeat execution produced byte-identical predictions
-and metrics. These numbers demonstrate pipeline operation only; they are not
-market or sentiment evidence. Full verification evidence is in
+and metrics. The current offline suite has 167 passing tests; new regressions prove
+that an oversized news response is rejected while streaming and that an offline
+run makes no network connection. These results demonstrate pipeline operation only;
+they are not market or sentiment evidence. Full verification evidence is in
 [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
 
 ## 7. Key limitations
@@ -147,7 +149,9 @@ market or sentiment evidence. Full verification evidence is in
   deadline, whether live Tavily news is mandatory or the final submission format.
 - The assignment PDFs and the raw historical price snapshot are not in this
   checkout; recorded hashes and committed artefacts are used instead.
-- No submission email was sent and PR #14 was not merged.
+- No submission email was sent and PR #14 was not merged. This Arena session may
+  push only to the working branch, so PR #14's head still needs the authorized
+  fast-forward procedure in [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 8. Reproduction instructions
 
@@ -190,11 +194,14 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 - Verified working branch: `arena/cf79e7b7-x-sentiment-price-predictor`.
   This session's environment permits pushing only to that branch, so PR #14's
   head was deliberately not modified. Verified code checkpoints:
-  `2620dc34d76a38a14b7815e76d207fb32edc1a33` (gated news CLI) and
-  `20a0e9641a4ed8705d65bf5c93d3ce50c56cbcaf` (offline demo and lineage).
-- GitHub Actions runs `40534245216` and `40536670278` passed all four checks on
-  those commits. The final documentation commit and its CI result are recorded in
-  [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
+  `2620dc34d76a38a14b7815e76d207fb32edc1a33` (gated news CLI),
+  `20a0e9641a4ed8705d65bf5c93d3ce50c56cbcaf` (offline demo and lineage) and
+  `8bc4f7ffc45ece3402060578fe14aa5c4a89bef7` (submission documentation).
+- GitHub Actions runs `40534245216`, `40536670278` and `40540034819` passed all
+  four checks on those commits. The final hardening/documentation commit and its
+  CI result are reported in the final execution response because a commit cannot
+  contain its own SHA; the exact promotion commands are in
+  [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 10. Submission documents
 
@@ -203,3 +210,4 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 - [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md) — timed evaluator demonstration.
 - [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md) — exact unresolved questions.
 - [EXECUTION_CHECKPOINT.md](EXECUTION_CHECKPOINT.md) — recovery state and next commands.
+- [PR14_PROMOTION.md](PR14_PROMOTION.md) — safe fast-forward delivery procedure for PR #14.
