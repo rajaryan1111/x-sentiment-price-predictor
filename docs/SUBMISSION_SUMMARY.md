@@ -4,7 +4,7 @@
 **Repository:** <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 **Assessment PR:** <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
 **Verified working branch:** `arena/cf79e7b7-x-sentiment-price-predictor`
-**Status on 2026-10-28:** ready with documented external limitations. No PR was merged.
+**Status on 2026-10-28:** READY WITH DOCUMENTED LIMITATIONS for local engineering work; not assignment-complete or delivered. Current verification details are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). No PR was merged.
 
 ## 1. Assignment objective
 
@@ -128,16 +128,19 @@ cross-checked for internal consistency, not recomputed from raw rows.
 persistence on forecast error. No claim is made that sentiment improves forecasting;
 that question remains untestable without accepted X data.
 
-### Current offline verification (2026-10-28)
+### Local verification state (2026-10-28)
 
-A real CLI run on 210 synthetic bars and 209 synthetic posts produced six
-non-empty artefacts, six walk-forward folds, 2,160 out-of-sample predictions and
-18 per-horizon metric rows. Repeat execution produced byte-identical predictions
-and metrics. The current offline suite has 167 passing tests; new regressions prove
-that an oversized news response is rejected while streaming and that an offline
-run makes no network connection. These results demonstrate pipeline operation only;
-they are not market or sentiment evidence. Full verification evidence is in
-[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
+The final local verification is recorded in
+[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md): 187 suite tests and
+64 focused Apify/Tavily/news CLI/pipeline tests passed, along with Ruff, compileall,
+registry/docs validation and diff checks; these edits remain uncommitted with no
+CI run. Two real CLI runs on 210 synthetic bars and 209 synthetic posts produced
+six artefacts, six walk-forward folds, 2,160 predictions and 18 metric rows, with
+byte-identical outputs across all six files. Security regressions cover
+credential-bearing news URLs, timezone-aware/withheld publication dates,
+caller-supplied news files, Apify provenance URLs, streaming bounds and offline
+no-network execution. Synthetic results are software evidence, not market or
+sentiment performance evidence.
 
 ## 7. Key limitations
 
@@ -147,8 +150,8 @@ they are not market or sentiment evidence. Full verification evidence is in
   authorization. No live provider call was made.
 - The employer has not confirmed the `n+0` target convention, exact calendar
   deadline, whether live Tavily news is mandatory or the final submission format.
-- The assignment PDFs and the raw historical price snapshot are not in this
-  checkout; recorded hashes and committed artefacts are used instead.
+- The assignment PDFs are not in this checkout. The raw 180-day price snapshot is
+  present locally but ignored and untracked (SHA-256 `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`); it was not refetched in this network-restricted sandbox.
 - No submission email was sent and PR #14 was not merged. This Arena session may
   push only to the working branch, so PR #14's head still needs the authorized
   fast-forward procedure in [PR14_PROMOTION.md](PR14_PROMOTION.md).
@@ -222,18 +225,19 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 
 ## 11. Final submission checklist
 
-Engineering-owned items are done and CI-verified; the remaining items require
-employer/user action and must not be marked done until confirmed.
+Local engineering verification on the current uncommitted worktree passed; no CI
+run covers these changes. External data, authorization and delivery items remain pending.
 
 - [x] Reproducible pipeline, gated news CLI, offline demo, database join, chart,
   outlook and evaluation report implemented and tested.
 - [x] `README.md`, architecture, data policy, tech stack and reproduction
   commands present; `TEST_PLAN.md` is the authoritative test count.
-- [x] Full offline verification suite, both documentation validators and Ruff
-  green; offline demo reproducible byte-for-byte; network-isolation regression
-  present.
+- [x] Final offline suite on 2026-10-28 (187 passed, focused set 64 passed), validators, Ruff,
+  compileall, diff check and two-run synthetic demo verified on the current local
+  worktree; changes remain uncommitted and fresh CI on them is pending.
 - [x] Requirements audit (28 IDs), traceability matrix, external blockers and
-  employer clarifications updated with honest statuses.
+  employer clarifications reconciled to 11 complete, 14 partial, 2 externally
+  blocked and 1 needing clarification.
 - [x] GitHub repository link, draft PR #14 link and Markdown evaluation report
   (Sharpe, Sortino, max drawdown) available.
 - [x] Timed 5–7 minute demo script and submission-package documents present.

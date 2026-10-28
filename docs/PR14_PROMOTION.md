@@ -13,28 +13,29 @@ Arena session, which may push only to
 
 ## Verified state on 2026-10-28
 
-- PR #14 head / feature branch: `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`.
-- PR base: `36b7b486bb60b54f3f19201f2e548b11e5f93197`.
-- Arena branch verified engineering checkpoint:
-  `15478906bbc2cb6c5806f366141b5cd35cac0523` ("harden: stream news response
-  ceiling and finalize delivery evidence"). GitHub Actions run `40566013522`
-  completed `success` for that exact SHA. A later documentation-only checkpoint
-  added `docs/EMPLOYER_CLARIFICATIONS.md` and delivery-evidence updates
-  (commit `a19ee2f`, CI run `40569320293` success); further documentation
-  checkpoints may follow. The count is intentionally **not** hard-coded here: it
-  grows with each documentation commit. Always promote the **current** Arena head
-  with the dynamic `$ARENA` ref below, not a hard-coded SHA.
-- Full ancestry: PR base is an ancestor of the feature branch; the feature branch
-  is an ancestor of the Arena branch. No merge commit is needed. The Arena branch
-  is ahead by the verified engineering commits plus one or more documentation
-  checkpoints — do not rely on a fixed count. Step 2 recomputes `feat-only` /
-  `arena-only` live and requires `feat-only = 0`.
+- Re-inspected remote feature / PR #14 head: `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`.
+- Re-inspected PR base `docs/canonical-source-of-truth`:
+  `36b7b486bb60b54f3f19201f2e548b11e5f93197`.
+- Re-inspected remote Arena branch: `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
+  GitHub Actions run `40570468109` completed `success` for that exact SHA:
+  <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40570468109>.
+  The current local security/documentation changes are uncommitted on top of that
+  Arena base and therefore have no CI evidence yet.
+- Current PR #14 metadata: OPEN, DRAFT, mergeable; `gh pr checks 14` reports two
+  passing CI runs `40398880548` (push) and `40398888540` (pull_request), both for
+  the older head `5af5bc7`, not for the local changes. Run URLs:
+  <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40398880548>
+  and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40398888540>.
+- Full ancestry was rechecked: base is an ancestor of feature, feature is an
+  ancestor of Arena, and `git rev-list --left-right --count feature...arena`
+  returns `0 7`. Step 2 recomputes these refs live and refuses if feature is not
+  an ancestor of Arena.
 - GitHub branch API reported `protected=false` for the feature branch and zero
   repository rulesets. Re-check before pushing; a changed protection rule may
   require a maintainer with bypass rights. The restriction that stops *this
   Arena session* is its fixed-branch push policy, not GitHub protection.
-- CI on the Arena branch is green. PR #14's current green check belongs to its
-  older head and must be rerun after the head branch advances.
+- CI on the Arena branch is green at `c0cd3c1`. The two current PR checks are
+  green on the older head `5af5bc7`; both must be rerun after the head advances.
 
 ## Do not
 
@@ -71,10 +72,12 @@ diverged and a fast-forward is not safe.
 ## Step 2 — confirm the feature branch has not unexpectedly advanced
 
 ```bash
+# Reconfirm PR metadata rather than assuming the remembered feature SHA is current.
 EXPECTED_FEAT=5af5bc7a50c4b56edc1efe3aae4fce2501bdc656
 ACTUAL_FEAT=$(git rev-parse "$FEAT")
 test "$ACTUAL_FEAT" = "$EXPECTED_FEAT" || {
-  echo "STOP: feature branch is now $ACTUAL_FEAT, not $EXPECTED_FEAT" >&2
+  echo "STOP: feature branch is now $ACTUAL_FEAT, not the verified $EXPECTED_FEAT" >&2
+  echo "Re-inspect PR #14, review the new commits, then update EXPECTED_FEAT only if safe." >&2
   exit 1
 }
 
@@ -84,6 +87,8 @@ RIGHT=${COUNTS##*$'\t'}
 echo "feat-only=$LEFT arena-only=$RIGHT"
 test "$LEFT" -eq 0 || { echo "STOP: feature branch has diverged" >&2; exit 1; }
 test "$RIGHT" -ge 1 || { echo "STOP: arena branch is not ahead" >&2; exit 1; }
+# The known Arena-only commits include the current documented HEAD. The number
+# is not fixed because additional verified, authorized Arena commits may exist.
 
 git log --oneline --decorate "$FEAT..$ARENA"
 git diff --check "$FEAT..$ARENA"

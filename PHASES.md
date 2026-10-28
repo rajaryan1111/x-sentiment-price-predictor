@@ -155,9 +155,9 @@ and explicitly labelled until an accepted X source exists.
 Status: in progress; offline reproducibility verified on a fresh clone.
 - Done: offline reproducible CLI (`fetch-prices`, `fetch-news` when authorized,
   `persist`, `run`), run manifest with input hashes, commit-able report/chart/outlook
-  artefacts, 167 offline tests at this revision (2026-10-28; see
-  [TEST_PLAN.md](TEST_PLAN.md)), lint, registry and documentation validation. An
-  offline demo generator and a full CLI end-to-end integration test are included.
+  artefacts, an offline demo generator and full CLI end-to-end integration test.
+  Final current-tree test and quality-gate evidence is tracked in
+  [TEST_PLAN.md](TEST_PLAN.md) and [FINAL_VERIFICATION_REPORT.md](docs/FINAL_VERIFICATION_REPORT.md); do not treat an interrupted prior-run result as current.
 - Fresh-clone verification (2026-10-27): a clean checkout of this branch from GitHub,
   installed strictly from the committed `pyproject.toml` on Python 3.12.4, passed the 130
   offline tests that existed at that revision (commit `ed2c5a4`), `ruff`, the documentation
@@ -169,9 +169,4 @@ Status: in progress; offline reproducibility verified on a fresh clone.
 - Remaining (external only): the licence/registration audit of the eventual X source,
   the secure credential route, employer confirmation of the submission deadline, an
   accepted real X corpus, and the email submission packet required by the brief (A7).
-- Deliverable checklist: repository link and reproducible package — **ready** (fresh-clone
-  verified); evaluation report with per-horizon MAE/RMSE, sample counts and risk metrics —
-  **ready** (`reports/btc-usd-180d/evaluation-report.md`); chart and outlook with honest
-  unavailable states — **ready**; provider tokens/Actor identifiers — **blocked** (none
-  exist until R2/A2 unblock); a sentiment-backed evaluation, the email packet and the
-  exact calendar deadline — **blocked / needs employer clarification** (R2, A1, A7).
+- Deliverable checklist: repository link and reproducible package — **partially verified** (fresh-clone evidence is historical); evaluation report with per-horizon MAE/RMSE, sample counts and risk metrics — **available** (`reports/btc-usd-180d/evaluation-report.md`, historical real-price artifact); chart and outlook with honest unavailable states — **available**; provider tokens/Actor identifiers — **blocked** (none exist until R2/A2 unblock); sentiment-backed evaluation and email packet — **blocked**; exact calendar deadline — **needs employer clarification** (A1, A7).

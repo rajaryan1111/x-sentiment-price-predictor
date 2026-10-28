@@ -41,6 +41,7 @@ from xsentiment.ingestion.tavily_news import (
     NewsResult,
     NormalizedNewsItem,
     TavilyNewsAdapter,
+    sanitize_news_text,
 )
 from xsentiment.pipeline.forecast_run import (
     load_candles,
@@ -146,19 +147,26 @@ def _validate_news_request(query: str, max_results: int) -> None:
 def _news_record(result: NewsResult, item: NormalizedNewsItem) -> dict[str, object]:
     """One JSONL context item, carrying provenance but no credential values."""
     published = item.published_at.isoformat() if item.published_at is not None else None
+    title = sanitize_news_text(_redact_credentials(item.headline))
+    url = _redact_credentials(item.url)
+    source = sanitize_news_text(_redact_credentials(item.source))
+    publication = (
+        item.published_at.date().isoformat()
+        if item.published_at is not None
+        else item.published_at_note or "publication timestamp unavailable"
+    )
     return {
-        "title": item.headline,
-        "url": item.url,
+        "title": title,
+        "url": url,
         "published_at": published,
-        "published_at_note": (
-            None if published else "publication date not supplied by the provider"
-        ),
+        "published_at_raw": item.published_at_raw,
+        "published_at_note": item.published_at_note,
         "retrieved_at": item.retrieved_at.isoformat(),
-        "source": item.source,
+        "source": source,
         "provider": item.provider,
         "payload_sha256": item.payload_sha256,
-        "query": result.query,
-        "context_line": item.context_line(),
+        "query": sanitize_news_text(_redact_credentials(result.query)),
+        "context_line": _redact_credentials(f"{title} ({publication}, {url})"),
     }
 
 

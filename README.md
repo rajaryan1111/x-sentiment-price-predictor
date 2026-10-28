@@ -44,19 +44,17 @@ submission packet (A7). The database join (R15) is recorded as verified complete
 
 ## Delivery status (2026-10-28)
 
-The latest verified engineering commit is
-`15478906bbc2cb6c5806f366141b5cd35cac0523` on
-`arena/cf79e7b7-x-sentiment-price-predictor`; GitHub Actions run `40566013522`
-passed on that SHA. A later documentation-only checkpoint adds
-[docs/EMPLOYER_CLARIFICATIONS.md](docs/EMPLOYER_CLARIFICATIONS.md) (consolidated
-employer questions, provider/credential authorization checklist and an unsent
-ready-to-send email draft). PR #14's head remains `5af5bc7` on
-`feat/sentiment-features-and-forecasting`. GitHub reported the feature branch as
-unprotected with zero rulesets, but this Arena session is restricted to pushing
-only to the Arena branch. An authorized normal clone should use the
-fast-forward-only procedure in
-[docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md) to advance PR #14's head, then
-wait for fresh PR-specific CI. Do not merge the PR without explicit approval.
+Repository state last verified 2026-10-28: local HEAD and remote Arena ref are
+`c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`; Arena CI run
+`40570468109` succeeded on that exact SHA. This resumed worktree has uncommitted
+changes not covered by that CI. PR #14 remains OPEN and DRAFT at head
+`5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`, base
+`36b7b486bb60b54f3f19201f2e548b11e5f93197`; its two currently green checks are
+for that older head. The active session can push only to the Arena branch. Once
+these changes are finalized and checked, an authorized normal clone should use the
+fast-forward-only procedure in [docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md)
+to advance PR #14 and obtain fresh PR-specific CI. No merge or draft-state change
+has been made.
 
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
 [Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),
@@ -245,9 +243,14 @@ From `reports/btc-usd-180d/`, computed by the commands above:
   commands after refetching the public snapshot — whose SHA-256 matched the committed
   provenance exactly — and reproduced every metric within 5e-13 (platform float noise
   only). That refetch is not part of the current sandbox verification, whose outbound
-  network is restricted; the current [TEST_PLAN.md](TEST_PLAN.md) records 167 offline
-  tests at this revision (2026-10-28). No credentials, paid services or network X calls
-  are needed for the offline test suite or the synthetic demo run.
+  network is restricted. The earlier [TEST_PLAN.md](TEST_PLAN.md) records 167 offline
+  tests at that checkpoint; this resumed local tree (base HEAD `c0cd3c1` plus
+  uncommitted security regressions) passes the full suite; the exact collection
+  count is in [TEST_PLAN.md](TEST_PLAN.md). The first full-suite run found five
+  documentation-validation failures, which were repaired before the passing rerun.
+  See [FINAL_VERIFICATION_REPORT.md](docs/FINAL_VERIFICATION_REPORT.md) for evidence.
+  No credentials, paid services or network X calls are needed for the offline test
+  suite or the synthetic demo run.
 - **Mean MAE across horizons:** naive persistence **$1,828.36**, price-only ridge
   **$2,264.62** (+23.86% worse), sentiment-plus-price identical to price-only
   because no sentiment was available.

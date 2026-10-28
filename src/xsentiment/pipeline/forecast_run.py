@@ -36,6 +36,7 @@ from xsentiment.features.sentiment import (
 )
 from xsentiment.ingestion.contracts import XPostRecord
 from xsentiment.ingestion.prices import PriceCandle
+from xsentiment.ingestion.tavily_news import sanitize_news_text, sanitize_news_url
 from xsentiment.models.evaluation import (
     DEFAULT_MIN_TRAIN_SAMPLES,
     DEFAULT_TEST_SAMPLES,
@@ -198,13 +199,15 @@ def load_news_context(path: str | Path) -> list[str]:
         title = str(payload.get("title") or payload.get("headline") or "").strip()
         if not title:
             raise ValueError(f"news line {number} is missing a title")
-        url = str(payload.get("url") or "").strip()
-        published = str(payload.get("published_at") or "").strip()
+        title = sanitize_news_text(title)
+        url = sanitize_news_url(str(payload.get("url") or "").strip())
+        source = sanitize_news_text(str(payload.get("source") or "").strip())
+        published = sanitize_news_text(str(payload.get("published_at") or "").strip())
         if not published:
             # A missing publication time stays visibly missing; it is never inferred
             # from the retrieval time or replaced with a fabricated date.
-            published = str(payload.get("published_at_note") or "").strip()
-        details = " — ".join(part for part in (published, url) if part)
+            published = sanitize_news_text(str(payload.get("published_at_note") or "").strip())
+        details = " — ".join(part for part in (published, source, url) if part)
         context.append(f"{title} ({details})" if details else title)
     return context
 

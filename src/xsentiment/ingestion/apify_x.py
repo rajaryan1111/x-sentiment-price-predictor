@@ -19,6 +19,7 @@ import httpx
 
 from xsentiment.config.settings import Settings, get_settings
 from xsentiment.ingestion.contracts import XPostRecord
+from xsentiment.ingestion.tavily_news import sanitize_news_url
 
 APIFY_API_BASE = "https://api.apify.com/v2"
 TERMINAL_STATUSES = {"SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"}
@@ -295,7 +296,11 @@ def normalize_apify_post(
             ("authorFollowers", "author_followers", "followersCount", "followers_count"),
             fallback=author,
         ),
-        provenance_url=_first_text(item, ("url", "twitterUrl", "tweetUrl", "permalink")),
+        provenance_url=(
+            sanitize_news_url(url)
+            if (url := _first_text(item, ("url", "twitterUrl", "tweetUrl", "permalink")))
+            else None
+        ),
         sentiment_score=None,
         source_name="apify_x",
         source_platform="x",

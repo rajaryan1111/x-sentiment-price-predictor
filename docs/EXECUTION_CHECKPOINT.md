@@ -5,55 +5,45 @@ the exact next safe commands, and the blockers. It is not a completion claim.
 
 ## Current verified state — re-inspected 2026-10-28
 
-A fresh read-only inspection plus a full re-verification was performed at the
-start of this pass. Findings:
+The local tree was reviewed and the already-present changes were preserved. Current
+observations:
 
-- Working tree is clean on `arena/cf79e7b7-x-sentiment-price-predictor`.
-- The verified engineering checkpoint is
-  `15478906bbc2cb6c5806f366141b5cd35cac0523` (GitHub Actions run `40566013522`
-  completed `success` on that exact SHA). On top of it sit documentation-only
-  checkpoints: `a19ee2f` (employer clarifications and delivery evidence; CI run
-  `40569320293` success) and this checkpoint. Local HEAD equals the remote Arena
-  head; that current documentation SHA and its CI run are reported in the final
-  execution response because a commit cannot contain its own SHA.
-- PR #14 is open, draft, mergeable and clean. Its head remains
-  `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656` on
-  `feat/sentiment-features-and-forecasting`; base remains
-  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. `gh pr checks 14` passes only on
-  that older head, not on the final work.
-- Ancestry re-verified: PR base is an ancestor of the feature branch, and the
-  feature branch is an ancestor of the Arena branch. The Arena branch is ahead by
-  the verified engineering commits plus documentation checkpoints (the live
-  `feat-only/arena-only` count was `0 5` at the `a19ee2f` checkpoint and grows
-  with each documentation commit — recompute, do not rely on a fixed number).
-  `git diff --check 5af5bc7..1547890` is clean; the diff is the verified
-  implementation, tests, CI config and documentation.
-- Branch protection: GitHub again reported `protected=false` and zero rulesets.
-  The block on promotion is this Arena session's fixed-branch push policy, not a
-  GitHub rule; promotion must be done from an authorized normal clone.
-- No provider credential is set in this environment (empty `.env.example`
-  placeholders only); no live provider call was made.
-- The recovery stash `stash@{0}: recovery backup 2026-10-28: worktree identical to
-  8bc4f7f` is still present. Its contents are already fully preserved in commit
-  `8bc4f7f` and its descendants, so it is a redundant safety backup; it is
-  retained, not dropped.
-- No assignment PDFs, raw historical price snapshot, accepted X corpus, employer
-  answers or submission confirmation are present.
+- Local branch: `feat/sentiment-features-and-forecasting`; HEAD is
+  `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` with 22 modified, uncommitted files
+  at the time of this checkpoint update. No untracked files. Remote Arena currently
+  equals this base SHA; local edits are not part of either remote ref.
+- PR #14 is OPEN and DRAFT, mergeable. Head
+  `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`, base
+  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Its visible passing checks apply
+  only to that older PR head.
+- Ref ancestry re-verified: base is ancestor of PR feature, and PR feature is
+  ancestor of Arena. Remote feature...Arena count is `0 7`. This worktree is on the
+  feature-named local branch but ahead of its upstream; no push or commit has been
+  made during this resumed pass. The environment's branch policy allows pushes
+  only to Arena, so do not push this feature-named branch.
+- Fresh final local verification on 2026-10-28: `.venv/bin/python -m pytest -q`
+  -> 187 passed in 4.06s, focused Apify/Tavily/news CLI/pipeline tests -> 64 passed
+  in 1.86s; Ruff, compileall, registry validator (12 records), docs validator
+  (104 links, all 28 matrix rows), and `git diff --check` passed. A new two-run
+  synthetic CLI demo produced 210 bars, 209 posts, six folds, 2,160 predictions,
+  18 metric rows and six byte-identical artifacts. Exact hashes and commands are in
+  `FINAL_VERIFICATION_REPORT.md`. These results do not establish real X performance;
+  current work remains uncommitted and has no CI result.
+- Provider credentials were checked only for presence; no paid/live provider call
+  was made. No accepted X corpus, original assessment PDFs, employer responses or
+  submission confirmation are available in this checkout.
+- Earlier CI evidence is only for its exact earlier commits. This uncommitted tree
+  has no CI result. See `FINAL_VERIFICATION_REPORT.md` for the current record.
 
 ## Current phase
 
-All implementable software, audit, verification and submission-document work is
-complete and CI-verified on the Arena branch. This pass added the missing
-employer-clarifications document and synchronized delivery evidence (final commit
-SHA and CI run). Remaining actions are external:
-
-1. Push this documentation-only checkpoint to the Arena branch and confirm its CI.
-2. Have an authorized normal clone fast-forward PR #14's head branch using
-   [PR14_PROMOTION.md](PR14_PROMOTION.md); this restricted session must not do it.
-3. Wait for fresh PR-specific CI, then (optionally, with approval) mark the draft
-   ready — never merge without explicit approval.
-4. Deliver the final execution report with scores, blockers and exact remaining
-   commands.
+Local offline engineering checks and the two-run synthetic demo pass on the
+current tree as reported in `FINAL_VERIFICATION_REPORT.md`. No fresh CI run covers
+these edits. The verified external PR head is still older; this session may not
+push to the feature branch. If commit/push is
+permitted, advance only the authorized Arena branch, verify its exact-SHA CI, then
+have an authorized normal clone fast-forward PR #14 per
+[PR14_PROMOTION.md](PR14_PROMOTION.md). Do not change PR draft status or merge it.
 
 ## Recovery history (2026-10-28)
 
@@ -81,62 +71,49 @@ SHA and CI run). Remaining actions are external:
   ceiling is enforced while streaming; added a streaming regression and an
   offline network-isolation regression; strengthened caller-note redaction tests.
 - Updated `TEST_PLAN.md`, README, canonical docs, `DECISIONS.md` (D-028, D-029),
-  the traceability matrix and the final audit with real evidence.
+  the traceability matrix and the final audit with checkpoint-specific evidence.
 - Created [PR14_PROMOTION.md](PR14_PROMOTION.md) and, in this pass,
   [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md) (consolidated
   questions, provider/credential authorization checklist, unsent email draft).
 - Updated `FINAL_VERIFICATION_REPORT.md`, `SUBMISSION_SUMMARY.md` (with a final
   submission checklist), `DEMO_WALKTHROUGH.md` and `EXTERNAL_BLOCKERS.md`.
-- This pass re-verified the whole suite and offline demo; found no new genuine
-  code defect and changed no forecasting methodology.
+- This resumed pass implemented Tavily URL/text credential sanitization, timezone-
+  aware publication timestamp handling with naive/malformed dates withheld,
+  sanitization of caller-supplied news JSONL, and centralized sanitization of Apify
+  normalized provenance URLs with regression coverage. The final local suite and
+  checks passed; see the verification report for exact commands, results and output.
+- Repeated the labelled synthetic offline CLI demo twice; all six artifacts were
+  byte-identical. This is pipeline evidence only, not real market or X performance
+  evidence.
 
 ## Pending tasks
 
-1. Commit and push this documentation-only checkpoint to the Arena branch; watch CI.
-2. Authorized promotion of PR #14 head from a normal clone (cannot be done here).
-3. Employer-side X/data, credential, clarification and email actions (see
+1. Review and, if authorized, commit/push only the verified changes to the Arena ref; inspect CI on that exact SHA.
+2. Have an authorized normal clone promote the Arena head to PR #14 and wait for fresh PR-specific CI.
+3. Resolve employer-side X/data, credential, clarification and email blockers (see
    [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md)).
 
 ## Latest verified test results
 
-Re-verification on 2026-10-28 (Python 3.11.2, tree at `1547890` before the
-documentation-only checkpoint):
-
-- Full suite: `pytest -q` -> `167 passed in 5.58s`, 0 failed, 0 skipped,
-  0 xfailed. `TEST_PLAN.md` is the authoritative current count.
-- Targeted on 2026-10-28 (Tavily adapter + gated news CLI + offline demo
-  integration): `27 passed`; the network-isolation regression alone: `1 passed`.
-- `ruff check src tests scripts`: All checks passed.
-- `python -m compileall -q src tests scripts`: OK.
-- `scripts/validate_docs.py`: all relative Markdown links resolve, 16
-  test-count claims and 28 matrix rows OK (the link count grows with each added
-  doc — the earlier pre-clarifications run verified 69 links / 14 claims; the
-  post-clarifications runs verified ~98 links / 16 claims; all passed).
-- `scripts/validate_dataset_registry.py`: 12 records OK.
-- `git diff --check`: clean.
-- Offline demo run twice from a clean `reports/generated/verify-2026-10-28/`
-  directory: 210 labelled synthetic bars, 209 labelled synthetic posts, six
-  non-empty artefacts per run, 6 folds, 2,160 predictions, 18 finite metric rows,
-  valid one-page outlook, day-over-day change chart, explicit synthetic labels,
-  and byte-identical repeat `predictions.jsonl` and `metrics.json`. A separate
-  regression proved the run makes no network request.
-- `git ls-files reports/generated | wc -l` -> `0`; secret-pattern scan found only
-  mock keys and field names, no real secret.
-
-No live Tavily, Exa, Apify or Coinbase request was made.
+On the 2026-10-28 uncommitted worktree, `.venv/bin/python -m pytest -q` passed
+187 tests in 4.06s, and the focused Apify/Tavily/news CLI/pipeline command passed 64
+in 1.86s. Ruff, compileall, registry validation (12 records), docs validation (104
+links, 28 requirement rows), and `git diff --check` passed. The two-run synthetic
+demo generated six byte-identical artifacts, six folds, 2,160 predictions and 18
+metric rows. Exact hashes and commands are in `FINAL_VERIFICATION_REPORT.md`. No
+live Tavily, Exa, Apify or Coinbase request was made.
 
 ## Latest commit / latest pushed commit
 
-- `2620dc34d76a38a14b7815e76d207fb32edc1a33` — gated news CLI; CI run `40534245216` success.
-- `20a0e9641a4ed8705d65bf5c93d3ce50c56cbcaf` — offline demo and lineage; CI run `40536670278` success.
-- `8bc4f7ffc45ece3402060578fe14aa5c4a89bef7` — prior submission documentation; CI run `40540034819` success.
-- `15478906bbc2cb6c5806f366141b5cd35cac0523` — harden: stream news response
-  ceiling and finalize delivery evidence; CI run `40566013522` success.
-- `a19ee2f` — docs: add employer clarifications and record final delivery
-  evidence; CI run `40569320293` success.
-- PR #14 head remains at checkpoint `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`.
-- This checkpoint's own documentation commit cannot contain its own SHA; its
-  exact SHA and CI result are reported in the final execution response.
+- Base local HEAD and remote Arena are
+  `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`; no commit has been created for the
+  current worktree and no CI run covers it.
+- Current remote feature/PR head remains `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`;
+  PR base remains `36b7b486bb60b54f3f19201f2e548b11e5f93197`.
+- The latest verified CI before local edits is Arena `c0cd3c1`, run
+  `40570468109` (success). Fresh CI for the current uncommitted local changes is
+  absent. The current PR-head checks are run IDs `40398880548` and `40398888540`,
+  both passing on the older PR head `5af5bc7`; no check covers this local tree.
 
 ## External blockers
 
@@ -152,19 +129,13 @@ No live Tavily, Exa, Apify or Coinbase request was made.
 
 No live provider call is authorized.
 
-## Exact next commands on this branch
+## Exact next commands
 
-```bash
-.venv/bin/python -m pytest -q
-.venv/bin/ruff check src tests scripts
-.venv/bin/python scripts/validate_docs.py
-.venv/bin/python scripts/validate_dataset_registry.py
-.venv/bin/python -m compileall -q src tests scripts
-git diff --check
-git add <verified documentation files>
-git commit -m "docs: synchronize final delivery evidence and checkpoint"
-git push origin arena/cf79e7b7-x-sentiment-price-predictor
-```
+After full local verification, the environment policy permits pushing only to
+Arena (not to PR #14's feature head). If and only if staging and pushing are
+allowed in the current session, explicitly stage the reviewed paths, commit them
+and verify the resulting Arena CI; otherwise perform the normal-clone promotion
+in `PR14_PROMOTION.md`.
 
 Then follow [PR14_PROMOTION.md](PR14_PROMOTION.md) from an authorized normal
 clone. Do not push to `feat/sentiment-features-and-forecasting` from this

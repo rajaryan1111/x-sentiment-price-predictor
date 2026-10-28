@@ -1,10 +1,12 @@
 # Demo walkthrough (5–7 minutes)
 
-This script is for an internship evaluator. Every command below was verified on
-2026-10-28 from a clean Python 3.11 virtual environment on branch
-`arena/cf79e7b7-x-sentiment-price-predictor`. The demonstration uses **explicitly
-synthetic** data and mocked provider tests. It does not use live X, Tavily, Exa,
-Apify or Coinbase data, and it makes no claim about real forecasting performance.
+This script is for an internship evaluator. Commands below describe the workflow;
+verification should be repeated on the exact checkout being demonstrated. The
+currently described offline demonstration uses **explicitly synthetic** data and
+mocked provider tests. It does not use live X, Tavily, Exa, Apify or Coinbase data,
+and it makes no claim about real forecasting performance. Consult
+[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) for the exact current
+verification state before presenting.
 
 ## Before the demo
 
@@ -55,10 +57,10 @@ python scripts/validate_docs.py
 python scripts/validate_dataset_registry.py
 ```
 
-**Expected:** on 2026-10-28, the full offline suite passes with 167 tests; Ruff
-reports “All checks passed!”; the docs validator reports valid links/requirement
-rows; the registry validator reports 12 records. [TEST_PLAN.md](../TEST_PLAN.md)
-is the authoritative current test count.
+**Expected:** the full offline suite passes with the current count in
+[TEST_PLAN.md](../TEST_PLAN.md); Ruff reports “All checks passed!”; the docs
+validator reports valid links/requirement rows; the registry validator reports
+12 records. Results must be refreshed on the exact checkout being demonstrated.
 
 **Say:** “CI runs these same four checks on every push to the working branch.
 CI is evidence of code health, not of data access or profitability.”

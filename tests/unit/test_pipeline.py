@@ -171,6 +171,37 @@ def test_news_context_is_optional_and_validated(tmp_path: Path) -> None:
         load_news_context(empty_title)
 
 
+def test_news_context_sanitizes_supplied_urls_and_text_fields(tmp_path: Path) -> None:
+    path = tmp_path / "unsafe-news.jsonl"
+    path.write_text(
+        json.dumps(
+            {
+                "title": "Bearer title-secret https://user:pw@example.invalid/a?api_key=title-url-secret",
+                "source": "wire token=source-secret",
+                "url": "https://user:pw@example.invalid/b?signature=url-secret&id=42#token=fragment-secret",
+                "published_at": "2026-10-25T10:00:00+00:00",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    (context,) = load_news_context(path)
+
+    for secret in (
+        "title-secret",
+        "pw",
+        "title-url-secret",
+        "source-secret",
+        "url-secret",
+        "fragment-secret",
+    ):
+        assert secret not in context
+    assert "wire" in context
+    assert "id=42" in context
+    assert "[REDACTED]" in context
+
+
 def test_pipeline_writes_every_documented_artefact(tmp_path: Path) -> None:
     prices = write_prices(tmp_path / "prices.json", 120)
     posts = write_posts(tmp_path / "posts.jsonl", snapshot_candles(120))

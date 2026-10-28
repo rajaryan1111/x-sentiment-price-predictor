@@ -46,16 +46,18 @@ treated as market evidence.
 
 | Status | Count | Requirement IDs |
 | --- | ---: | --- |
-| COMPLETE | 12 | R1, R3, R6, R12, R14, R15, NFR1, NFR2, NFR3, NFR5, NFR6, A5 |
-| PARTIAL | 12 | R4, R5, R7, R8, R9, R10, R11, R13, NFR4, A4, A6, A7 |
-| BLOCKED_EXTERNAL | 3 | R2, A2, A3 |
+| COMPLETE | 11 | R1, R3, R6, R12, R15, NFR1, NFR2, NFR3, NFR5, NFR6, A5 |
+| PARTIAL | 14 | R4, R5, R7, R8, R9, R10, R11, R13, R14, NFR4, A3, A4, A6, A7 |
+| BLOCKED_EXTERNAL | 2 | R2, A2 |
 | NOT_IMPLEMENTED | 0 | None |
 | NOT_VERIFIED | 1 | A1 |
 
 Total: **28 requirements**. Externally blocked or clarification-dependent
-rows: R2, A1, A2 and A3. Additional partial rows depend indirectly on the same
-accepted-X-data gate. PR #14 delivery is separately gated by the session branch
-policy B8, not by an unimplemented requirement.
+rows: R2, A1 and A2. A3 is partially complete because the assessment resource is
+identified as a dataset-link index but no candidate has been accepted. Additional
+partial rows depend indirectly on the accepted-X-data gate. PR #14 delivery is
+separately gated by the session branch policy B8, not by an unimplemented
+requirement.
 
 This audit is intentionally more conservative than the canonical matrix for R8:
 the six horizons are implemented, but the `n+0` target convention is still a
@@ -64,30 +66,40 @@ verified as offline engineering, not as live provider or real-X acceptance.
 
 ## 4. Verification basis
 
-- On 2026-10-28, the full offline suite, Ruff, `scripts/validate_docs.py`,
-  `scripts/validate_dataset_registry.py`, `python -m compileall -q src tests scripts`
-  and `git diff --check` were rerun from a fresh Python 3.11.2 virtual environment;
-  see [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). The suite now
-  has 167 passing tests at this revision.
-- A real CLI end-to-end run used deterministic synthetic inputs from
-  `scripts/make_offline_demo.py`; `tests/integration/test_offline_demo.py`
-  validates all six artefacts, six horizons, three models, finite metrics,
-  prediction records, input lineage, byte-identical repeatability and absence of
-  network access. `tests/unit/test_tavily_news.py` proves the news response ceiling
-  is enforced while streaming; `tests/unit/test_fetch_news_cli.py` proves secret
-  redaction in provider errors and caller notes.
-- GitHub Actions verified the pushed working branch with the same four checks;
-  run URLs are recorded in the verification report.
-- No live Tavily, Exa, Apify or Coinbase request was made during this audit.
+- On 2026-10-28, the final local uncommitted suite passed 187 tests in 4.06s, and
+  the focused Apify/Tavily/news CLI/pipeline command passed 64 tests in 1.86s. Ruff,
+  compileall, registry validation (12 records), docs validation (104 links, 28
+  requirement rows) and `git diff --check` passed. The fresh two-run synthetic demo
+  matched all six output artifacts byte-for-byte. Exact commands and hashes are in
+  [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). These local changes
+  remain uncommitted and no CI covers them.
+- The final local synthetic demo generated six artefacts, six folds, 2,160 predictions
+  and 18 metric rows from 210 synthetic bars and 209 synthetic posts. Two independent
+  CLI runs matched byte-for-byte on all six artifacts, including manifest. This is
+  synthetic software evidence only, not market or X evidence. The integration test
+  covers all six artefacts, horizons, models, finite metrics, lineage, repeatability
+  and no-network behavior. Tavily streaming and redaction regressions are covered by
+  the unit/CLI tests.
+- Historical GitHub Actions evidence applies only to its specific prior Arena SHAs;
+  this resumed working tree is uncommitted and has no CI evidence. Current PR-head
+  checks are on the older `5af5bc7` commit only; see the verification report.
+- No live Tavily, Exa, Apify or Coinbase request was made during this audit. The implementation-only URL/timestamp and Apify URL regression checks passed locally; no live provider compatibility is inferred.
 
 ## 4.1 Independent evidence cross-check (2026-10-28)
+
+The line-by-line audit below was inherited from the prior checkpoint. This resumed
+pass rechecked implementation paths and added news URL/timestamp plus Apify
+provenance-URL sanitization tests. The exact current tree remains uncommitted on top
+of `c0cd3c1`; no final commit SHA or CI result exists.
 
 Documentation claims were not counted as implementation evidence. For every
 requirement row, the named source path and automated-test path were checked
 against the actual working tree. The concrete checks were:
 
-- `pytest --collect-only -q` collected 167 cases at this revision; the full suite
-  then passed with zero failures and zero skips on 2026-10-28.
+- On 2026-10-28, the final `.venv/bin/python -m pytest -q` run passed 187 tests in
+  4.06s on the local uncommitted tree. Exact focused and full-suite results are in
+  `FINAL_VERIFICATION_REPORT.md`; earlier documentation-validator failures were
+  corrected before this final passing run.
 - `tests/unit/test_coinbase_prices.py`, `test_contracts.py`,
   `test_phase2_pipeline.py`, `test_dataset.py`, `test_features.py`,
   `test_walk_forward.py`, `test_models.py`, `test_evaluation.py`,
@@ -127,7 +139,7 @@ external data/authorization gates into completion.
 | R11 | T* | Produce a one-page summary of the current sentiment outlook for the asset | PARTIAL | C/T/A: `reporting/outlook.py` and `check_outlook_page`; report tests enforce sections, line ceiling, disclaimer and explicit unavailable states. Caller limitations now appear in the outlook as well as the report. | The page contract is complete; real sentiment and live news content are unavailable by design. |
 | R12 | T* | Produce an evaluation report in PDF or Markdown including Sharpe ratio, Sortino ratio and maximum drawdown | COMPLETE | C/T/A/H: `backtesting/metrics.py`, `strategy.py`, `reporting/report.py`; known-value metric/strategy tests and committed `reports/btc-usd-180d/evaluation-report.md` with Sharpe, Sortino, max drawdown, fees and withheld-metric reasons. | Risk metrics come from a short, single-asset historical sample and a predeclared strategy; no sentiment variant is available. |
 | R13 | T* | Provide a reproducibility package: setup, commands, provider and Actor identifiers, query configuration, snapshots or hashes and secure secrets | PARTIAL | C/T/A: README, `.env.example`, `scripts/make_offline_demo.py`, manifest provenance and `input_lineage`; docs validator, dataset validator and offline demo test. Query modes/hashes are recorded without raw query terms. | Actor identifiers, real query configuration and a secure credential transfer route remain external (R2, A2, B2). |
-| R14 | T* | Provide automated tests for schemas, timestamps, alignment, features, targets, leakage, metrics and reports | COMPLETE | C/T/CI: `tests/unit/` and `tests/integration/` cover schemas, timestamps, alignment, features, targets, leakage, metrics, reports, storage, mocked providers, CLI, streaming response bounds, secret redaction and offline network isolation; on 2026-10-28 the suite has 167 passing tests at this revision; `TEST_PLAN.md` is the authoritative current count; GitHub Actions runs lint, both validators and pytest. | CI verifies the offline suite; it cannot verify live provider behaviour or real X acceptance. |
+| R14 | T* | Provide automated tests for schemas, timestamps, alignment, features, targets, leakage, metrics and reports | PARTIAL | C/T: `tests/unit/` and `tests/integration/` cover schemas, timestamps, alignment, features, targets, leakage, metrics, reports, storage, mocked providers, CLI, streaming response bounds, URL and provider-text sanitization, publication-date handling and offline network isolation. The current local suite and quality gates are verified on 2026-10-28; exact results are in `FINAL_VERIFICATION_REPORT.md`. | The current changes are uncommitted, so no GitHub Actions run covers them; offline tests do not verify live provider behavior or real X acceptance. Obtain CI on the authorized Arena SHA and promoted PR head. |
 | R15 | T* | Join the X-post and price datasets in a database | COMPLETE | C/T/A: `storage/models.py`, `repositories.py`, `main.py`; `test_storage_join.py` and `test_phase3_ingestion_e2e.py` verify a versioned schema, idempotent upserts, descriptive/cutoff joins and a complete `run --database-url` with `input_source = persisted_storage`. | The offline database path is complete; a database holding licensed real X rows depends on R2. |
 
 ## 6. Non-functional requirements (NFR1–NFR6)
@@ -147,8 +159,8 @@ external data/authorization gates into completion.
 | --- | --- | --- | --- | --- | --- |
 | A1 | T* | Submit within the stated timeline (the brief says both one week and 5–7 days) | NOT_VERIFIED | X: no employer message or calendar due date exists in the repository. The brief is recorded as saying both one week and 5–7 days. | Exact calendar deadline and timezone require employer clarification. Primary-source wording is also not re-verifiable from this checkout. |
 | A2 | T* | Provide the APIFY/Tavily/Exa tokens and Actor IDs used for scraping | BLOCKED_EXTERNAL | C/A: `.env.example` has placeholders only; no Actor ID or token exists and no private credential channel is defined. | Requires approved Actor/provider selection and a private credential channel; secrets must never be committed or shared in chat. |
-| A3 | T* | Use the historical tweets resource linked by the assessment | BLOCKED_EXTERNAL | C/T/A: `local_dataset_profile.py`, `profile_local_x_dataset.py`, dataset registry and validator; the linked Google Doc is a 12-entry link list, not a tweet corpus, and no accepted candidate exists. | Requires candidate dataset selection, licence/terms review, download, schema/text check and 180-day coverage profile. |
-| A4 | T* | Ingest the most recent and relevant news with Tavily to complement X sentiment; Exa appears in the submission line | PARTIAL | C/T/M: `main.py` `fetch-news` and `run --news-file`, `tavily_news.py`, `pipeline/forecast_run.py`; adapter and CLI tests use mocked HTTP and prove context-only behaviour, streaming size bounds, redaction in errors/caller notes, no retry, offline network isolation and unchanged predictions/metrics. | Live Tavily behaviour and a real news snapshot require an approved key, authorization and confirmation that live news is mandatory (B6). |
+| A3 | T* | Use the historical tweets resource linked by the assessment | PARTIAL | C/T/A: `local_dataset_profile.py`, `profile_local_x_dataset.py`, dataset registry and validator; the assessment-linked Google Doc is a 12-entry link compilation, not a post corpus. Current project `data/` contains a BTC price snapshot and the registry, but no X post-text corpus. | Requires employer-approved candidate selection, licence/terms review, permitted download, schema/text check and 180-day coverage profile. |
+| A4 | T* | Ingest the most recent and relevant news with Tavily to complement X sentiment; Exa appears in the submission line | PARTIAL | C/T/M: `main.py` `fetch-news` and `run --news-file`, `tavily_news.py`, `pipeline/forecast_run.py`; mocked tests cover URL component sanitization before JSONL persistence, UTC-offset parsing, naive/malformed timestamp withholding, context-only behaviour, streaming bounds, no retry, offline network isolation and unchanged predictions/metrics. | Live Tavily behaviour and a real news snapshot require an approved key, authorization and confirmation that live news is mandatory (B6). |
 | A5 | T* | The brief offers a machine learning / reinforcement learning pipeline | COMPLETE | C/T: `models/baseline.py` and `forecasting.py` implement supervised multi-horizon ML with naive and price-only baselines; no RL environment is defined or claimed. | RL is not implemented; the brief does not define an RL environment. Reopen only on explicit employer instruction. |
 | A6 | T* | Reference inventory of historical Twitter/X datasets with verified download links | PARTIAL | C/T/A: `data/registry/historical_twitter_x_datasets.json` and `scripts/validate_dataset_registry.py`; structural validator checks platform identity, ID-only caveats, coverage limitations and the explicit `not-reverified` state. | Registry entries are transcribed; live provider pages, current availability and licence terms were not independently re-verified. |
 | A7 | T* | Submit the repository link, provider tokens and Actor IDs, and the evaluation report by email to gilad@crowdwisdomtrading.com | PARTIAL | A: repository URL, Markdown evaluation report and the full submission-document set (including a consolidated employer-clarifications document and an unsent ready-to-send email draft) exist. No email was sent and no provider identifiers/tokens were delivered. | Email delivery, provider identifiers/tokens and a sentiment-backed evaluation require user authorization and R2/A2. |
@@ -175,12 +187,14 @@ In summary:
 
 ## 9. Defensible conclusion
 
-The implementable engineering pipeline is complete and reproducible offline,
-including the gated news CLI, streaming response bound, input-lineage provenance,
-a full CLI end-to-end demonstration, offline network isolation and CI verification.
-The assignment is not fully satisfiable in this environment because no accepted X
-corpus, provider credential, paid-call authorization, employer clarification,
-PR-head promotion permission or submission email exists. Those limitations are
+The implementable engineering pipeline is reproducible offline, including the
+gated news CLI, streaming response bound, input-lineage provenance, a full CLI
+end-to-end demonstration and offline network isolation. Local quality gates pass
+on the current working tree; prior CI evidence applies only to its recorded SHA,
+not these uncommitted edits. The assignment is not fully satisfiable in this
+environment because no accepted X corpus, provider credential, paid-call
+authorization, employer clarification, PR-head promotion permission or submission
+email exists. Those limitations are
 recorded here rather than hidden. See
 [SUBMISSION_SUMMARY.md](SUBMISSION_SUMMARY.md) for the evaluator-facing summary
 and [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md) for the timed demonstration.

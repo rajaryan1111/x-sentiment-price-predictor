@@ -7,10 +7,7 @@ import pytest
 from pydantic import SecretStr
 
 from xsentiment.config.settings import Settings
-from xsentiment.ingestion.apify_x import (
-    ApifyXAdapter,
-    normalize_apify_post,
-)
+from xsentiment.ingestion.apify_x import ApifyXAdapter, normalize_apify_post
 
 
 def configured_settings() -> Settings:
@@ -20,6 +17,30 @@ def configured_settings() -> Settings:
         http_timeout_seconds=2,
         http_max_response_bytes=500_000,
     )
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://user:pass@x.com/example/status/123?api_key=post-secret&id=123#token=fragment-secret",
+        "https://x.com/example/status/123?%61ccess_token=post-secret&id=123",
+    ],
+)
+def test_normalize_apify_post_sanitizes_provenance_url(url: str) -> None:
+    record = normalize_apify_post(
+        {
+            "id": "123",
+            "text": "BTC price action is interesting",
+            "createdAt": "2026-10-25T12:30:00Z",
+            "url": url,
+        },
+        retrieved_at=datetime(2026, 10, 26, tzinfo=UTC),
+    )
+
+    assert record.provenance_url is not None
+    for secret in ("pass", "post-secret", "fragment-secret"):
+        assert secret not in record.provenance_url
+    assert "id=123" in record.provenance_url
 
 
 def test_normalize_apify_post_supports_common_schema_and_preserves_nulls() -> None:

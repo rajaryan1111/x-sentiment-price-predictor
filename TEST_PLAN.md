@@ -1,23 +1,22 @@
 # Test Plan
-A passing suite proves only the cases it actually exercises. The current suite is
-**167 offline tests, all passing** (`pytest` -> `167 passed`, 0 failed, 0 skipped,
-0 xfailed), last run on 2026-10-28 UTC in a clean Python 3.11.2 virtual environment
-installed with `pip install -e '.[dev,storage,analysis]'`. CI runs the same command
-set on Python 3.11, which is the supported baseline in `pyproject.toml`, with the
-`dev` and `storage` extras; the offline pipeline itself needs no analysis extras.
+A passing suite proves only the cases it actually exercises. Current collection on
+2026-10-28 is **187 offline tests** using Python 3.11.15 and the existing
+`.[dev,storage,analysis]` environment. The current verification adds 18 collected
+Tavily URL/timestamp and caller-supplied-news sanitization cases plus two Apify
+provenance-URL cases over the previous 167-case checkpoint. The full rerun for this
+exact working tree is recorded in [FINAL_VERIFICATION_REPORT.md](docs/FINAL_VERIFICATION_REPORT.md). CI supports
+Python 3.11 and installs `.[dev,storage]`.
 CI runs lint, registry validation, documentation validation and pytest.
 
-The suite collects 167 cases from 165 test functions across 22 modules in
-`tests/unit/` and `tests/integration/`: one function is parametrized into three cases.
-The checkpoint revision (commit `5af5bc7`) had 152 tests; nine added in
-`test_fetch_news_cli.py` cover the gated news CLI, four added in
-`tests/integration/test_offline_demo.py` cover deterministic synthetic input
-generation, snapshot metadata allow-listing, mocked `fetch-prices` retrieval
-metadata and a complete offline CLI run with artefact validation and repeatability,
-one added in `test_tavily_news.py` proves the response ceiling is enforced while
-streaming, and one added in `tests/integration/test_offline_demo.py` blocks network
-access during an offline run. Earlier figures (149, 152, 161, 165) are historical
-results for their own revisions.
+The previous checkpoint suite collected 167 cases from 165 test functions across
+22 modules in `tests/unit/` and `tests/integration/`. Its history included nine
+news CLI cases, four offline demo integration cases, a streaming response-ceiling
+case and an offline network-isolation case. The security pass adds 18 collected
+Tavily and saved-news-context cases for sensitive URL components, credential-key
+spellings, provider text sanitization, publication timestamp normalization and
+withholding, DST offsets and host-timezone independence.
+Earlier figures (149, 152, 161, 165, 167) are historical results for their
+respective revisions.
 
 **This file is the single authoritative source for the current count.** Counts quoted
 elsewhere in the repository must be tied to a date or a commit and are historical

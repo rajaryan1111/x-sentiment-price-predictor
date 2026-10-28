@@ -11,7 +11,7 @@ Keep the data workstream moving without requiring the project owner to purchase 
 - **Price history:** user-run profile verified 180/180 complete daily BTC-USD bars for 2026-04-29 through 2026-10-25 UTC (half-open end 2026-10-26), with no missing or duplicate timestamps in that checked range.
 - **Provider-neutral contracts, profiler and point-in-time alignment:** implemented and covered by unit tests. The profiler supports deterministic `--as-of` windows, daily coverage gaps, retrieval-column coverage, schema drift and invalid engagement counts.
 - **Apify adapter:** implemented and mocked in tests, including the documented `data` envelope and dataset offset/limit paging; no Actor is selected or run. Do not assume its free allowance will cover an Actor or 180-day search.
-- **Storage:** a versioned price/post schema and leakage-safe cutoff join are implemented and tested against in-memory SQLite; the run CLI still uses file snapshots (R15 partial).
+- **Storage:** a versioned price/post schema, idempotent repositories, descriptive and leakage-safe cutoff joins, and `xsentiment persist` plus `run --database-url` are implemented and fixture-verified end-to-end. This verifies the offline persisted-input path for R15; no accepted real X rows are available to populate it.
 - **Historical X collection:** not complete. The assessment-linked Google Doc was retrieved on 2026-10-26 and is a 12-entry dataset-link compilation, not a tweet corpus. No candidate dataset has been downloaded, profiled, or accepted for use. Uploaded local files contain IDs, date/count summaries, unrelated air-quality/MQTT data or a StockTwits paper; none contains X post text.
 
 ## Zero-budget options to investigate

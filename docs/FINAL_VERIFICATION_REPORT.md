@@ -1,64 +1,74 @@
 # Final verification report
 
-**Verification timestamp:** 2026-10-28 UTC (sandbox clock 2026-10-27 18:59 UTC).
-**Verified code checkpoint:** `8bc4f7ffc45ece3402060578fe14aa5c4a89bef7`.
-**Working branch:** `arena/cf79e7b7-x-sentiment-price-predictor`.
+**Local verification context:** 2026-10-28, Python 3.11.15, branch
+`feat/sentiment-features-and-forecasting`, base HEAD
+`c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` plus modified, uncommitted files.
+This HEAD identifies the base revision only; there is no commit SHA for these edits.
+The remote Arena ref remains at that base SHA, and the working changes have not
+been pushed or run in GitHub Actions.
 
-This report records actual outputs from a fresh Python 3.11.2 environment. The
-final delivery commit contains the hardening changes and documentation described
-here; because a commit cannot contain its own SHA or CI run URL, the final commit
-SHA and its GitHub Actions result are reported separately in the execution
-response. The verified code checkpoint's CI run is already green and linked below.
+## Current local verification (2026-10-28)
 
-The final engineering commit is
-`15478906bbc2cb6c5806f366141b5cd35cac0523` ("harden: stream news response ceiling
-and finalize delivery evidence"); GitHub Actions run `40566013522` completed
-`success` on that exact SHA. Subsequent documentation-only checkpoints add
-`docs/EMPLOYER_CLARIFICATIONS.md`, record this delivery evidence and synchronize
-the checkpoint/promotion docs without changing code or forecasting methodology:
-commit `a19ee2f` (CI run `40569320293` success) and this final checkpoint. The
-current documentation HEAD SHA and its CI result are reported in the final
-execution response because a commit cannot contain its own SHA.
+This verification applies to the working tree based on HEAD
+`c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`, branch
+`feat/sentiment-features-and-forecasting`, with 22 modified tracked files and no
+untracked source files. The changes are uncommitted; no GitHub Actions run covers
+this tree. The exact local content is checked below; historical checkpoint results
+remain separate.
 
-### Re-verification of this pass (2026-10-28)
-
-The full suite was re-run from the existing `.venv` on the final engineering
-tree before the documentation-only checkpoint. On 2026-10-28 the full suite
-reported `167 passed in 5.58s` (0 failed, 0 skipped). On 2026-10-28 the
-targeted Tavily adapter, gated news CLI and offline demo integration tests
-reported `27 passed`, and the network-isolation regression alone reported
-`1 passed`; Ruff, both documentation validators, `compileall` and
-`git diff --check` were clean. The offline demo was
-executed twice from a clean directory (`reports/generated/verify-2026-10-28/`):
-each run wrote six non-empty artefacts, 6 folds, 2,160 predictions, 18 finite
-metric rows, horizons `n+0`..`n+5` and the three models; `predictions.jsonl` and
-`metrics.json` were byte-identical across the two runs. `fetch-news --help` made
-no network request; no live provider call was made; no provider credential is set
-(only empty `.env.example` placeholders); and `git ls-files reports/generated`
-returned `0` tracked generated files.
+- Focused regressions on 2026-10-28:
+  `.venv/bin/python -m pytest -q tests/unit/test_apify_x.py tests/unit/test_tavily_news.py tests/unit/test_fetch_news_cli.py tests/unit/test_pipeline.py`
+  -> **64 passed in 1.86s**.
+- Full suite on 2026-10-28: `.venv/bin/python -m pytest -q` -> **187 passed in 4.06s**,
+  0 failed, 0 skipped, 0 xfailed. The result matches the authoritative collection
+  count in `TEST_PLAN.md`. While correcting this report's wording, several
+  intermediate full-suite runs each failed only the documentation count validator
+  (stale counts, then newly added counts that still lacked a date qualifier); after
+  the date-scoped wording corrections, this final full run passed.
+- Ruff: `.venv/bin/ruff check src tests scripts` -> all checks passed.
+  Compile: `.venv/bin/python -m compileall -q src tests scripts` -> exit 0.
+  Registry: `.venv/bin/python scripts/validate_dataset_registry.py` -> 12 records
+  valid. Docs: `.venv/bin/python scripts/validate_docs.py` -> 104 relative Markdown
+  links, 20 test-count claims inspected, 28 requirement rows: 11 complete,
+  14 partial, 0 not implemented, 2 externally blocked, 1 needing clarification.
+  `git diff --check` -> clean.
+- Two-run synthetic offline CLI demo, output root
+  `reports/generated/final-verify-2026-10-28-82883/` (ignored by Git): generator
+  command `scripts/make_offline_demo.py --generated-at 2026-10-27T00:00:00+00:00`,
+  followed by two `python -m xsentiment run` commands with identical inputs and
+  `--now 2026-07-30T00:00:00+00:00`. It generated 210 labelled synthetic price
+  bars, 209 labelled synthetic posts, six non-empty artefacts per run, six
+  walk-forward folds, 2,160 predictions, and 18 finite horizon/model metric rows.
+  The emitted horizons are `n+0`..`n+5`; models are `naive`, `price_only`, and
+  `sentiment_price`. All six output files matched byte-for-byte between runs:
+  report SHA-256 `9204315aaca110532306db8e6db74a231022f57db7ed7428762f336192a196d6`,
+  outlook `a4ef193ac43e1f17572550278efe1287eb55587d02e9f9f0afead21d516a5c64`,
+  chart `852633606e1236fda94fc2b4c6868637af345c201bc6d95800c4e07ab7c285bc`,
+  manifest `209900c3e79422c5abbe50c56bbc4bc2f68abd55f10a3f93bfadbe5c75e89268`,
+  metrics `b7cf3accde0ef8f25749e2f509923502d9ba97a84e38d3b121e955093c79502f`,
+  and predictions `2885a7399911e29019cdda31bd1b8f9b396798abb280cebf9c35ab7b76f3a5a4`.
+  These synthetic outcomes are software/reproducibility evidence only; no real
+  forecasting conclusion follows.
+- `data/` contains the BTC price snapshot and registry, no post-text X corpus.
+  APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and EXA_API_KEY were checked for
+  presence only; all are unset. No live provider call was made.
 
 ## 1. Environment
 
-- Python: **3.11.2** in a newly created isolated `.venv`.
-- Local install: `pip install -e '.[dev,storage,analysis]'` from the committed
-  `pyproject.toml`. CI installs only `.[dev,storage]` on Python 3.11; the core
-  pipeline does not require the analysis extras.
-- Key installed versions: pytest 8.4.2, ruff 0.17.3, httpx 0.28.1,
-  pydantic 2.14.1, pydantic-settings 2.16.1, python-dotenv 1.2.4,
-  vaderSentiment 3.3.2, SQLAlchemy 2.1.6, aiosqlite 0.22.1, numpy 2.4.6,
-  pandas 3.1.0, scikit-learn 1.9.1, statsmodels 0.15.0, plotly 6.9.0,
-  yfinance 1.7.0, mypy 1.20.2.
-- No build, dashboard build, or configured type-check command exists in
-  `pyproject.toml`, a Makefile, tox/nox, or `.github/workflows/ci.yml`.
-  `mypy` is installed as a dev dependency but is not configured or invoked by CI;
-  an ad hoc run without project settings is therefore not a release gate and is
-  not represented as a passing check. `python -m compileall -q src tests scripts`
-  was run as the additional syntax check.
+- Python: **3.11.15**, existing project `.venv`; confirmed and reused.
+- The shell's bare `python` is unavailable; use `.venv/bin/python`.
+- No packages were installed and no environment was recreated.
+- CI installs `.[dev,storage]` on Python 3.11; the local environment has analysis extras.
+
+## Historical checkpoint records
+
+The historical 167-test run and earlier environment details below describe checkpoint
+`8bc4f7f` only; they are dated evidence, not proof for this local revision.
 
 ## 2. Mandatory verification results
 
-All results below were produced on **2026-10-28 at code checkpoint `8bc4f7f`**
-with the hardening changes applied.
+All results in this historical section were produced on **2026-10-28 at code checkpoint `8bc4f7f`**
+with the hardening changes applied; they do not describe the current uncommitted tree.
 
 - Full suite on 2026-10-28 at code checkpoint `8bc4f7f`: `python -m pytest -q`
   -> **167 passed in 5.20s**, 0 failed, 0 skipped, 0 xfailed. `TEST_PLAN.md`
@@ -127,18 +137,20 @@ No live Tavily, Exa, Apify or Coinbase request was made.
 
 ## 4. Offline end-to-end reproducibility
 
-The documented commands were executed from a clean output directory:
+The documented commands were executed from a clean output directory. This is the
+same run whose SHA-256 hashes are listed under *Current local verification
+(2026-10-28)* above; rerunning it on 2026-10-28 reproduced every hash exactly:
 
 ```bash
 python scripts/make_offline_demo.py \
-  --out reports/generated/final-2026-10-28/inputs/prices.json \
-  --posts-out reports/generated/final-2026-10-28/inputs/posts.jsonl \
+  --out reports/generated/final-verify-2026-10-28-82883/inputs/prices.json \
+  --posts-out reports/generated/final-verify-2026-10-28-82883/inputs/posts.jsonl \
   --generated-at 2026-10-27T00:00:00+00:00
 
 python -m xsentiment run \
-  --prices reports/generated/final-2026-10-28/inputs/prices.json \
-  --posts reports/generated/final-2026-10-28/inputs/posts.jsonl \
-  --out reports/generated/final-2026-10-28/run-a \
+  --prices reports/generated/final-verify-2026-10-28-82883/inputs/prices.json \
+  --posts reports/generated/final-verify-2026-10-28-82883/inputs/posts.jsonl \
+  --out reports/generated/final-verify-2026-10-28-82883/run-a \
   --now 2026-07-30T00:00:00+00:00 \
   --input-note "synthetic offline demo from scripts/make_offline_demo.py"
 ```
@@ -148,8 +160,8 @@ Observed results:
 
 - 210 labelled synthetic daily bars and 209 labelled synthetic posts.
 - Two complete six-artefact run directories, each with non-empty files:
-  `evaluation-report.md` (7,907 bytes), `outlook.md` (3,041),
-  `sentiment-vs-price.svg` (17,647), `manifest.json` (5,672),
+  `evaluation-report.md` (7,924 bytes), `outlook.md` (3,041),
+  `sentiment-vs-price.svg` (17,647), `manifest.json` (5,689),
   `metrics.json` (6,983) and `predictions.jsonl` (454,597).
 - 6 walk-forward folds; 2,160 out-of-sample prediction records matching the
   manifest; horizons `n+0`..`n+5`; models `naive`, `price_only`,
@@ -202,50 +214,41 @@ posts. No sentiment improvement is claimed.
 
 ## 7. GitHub delivery and CI
 
-At the 2026-10-28 re-verification (remote refs re-fetched). The Arena head below
-is the final engineering checkpoint `1547890`; subsequent documentation-only
-checkpoints (`a19ee2f` and later) sit on top of it. The feature/base/PR refs are
-unchanged.
+Remote refs were fetched and the current PR was queried on 2026-10-28:
 
 ```text
-origin/arena/cf79e7b7-x-sentiment-price-predictor 1547890 -> a19ee2f -> (this doc checkpoint)
-origin/feat/sentiment-features-and-forecasting     5af5bc7a50c4b56edc1efe3aae4fce2501bdc656
-origin/docs/canonical-source-of-truth               36b7b486bb60b54f3f19201f2e548b11e5f93197
-PR #14 head                                        5af5bc7a50c4b56edc1efe3aae4fce2501bdc656
+local branch      feat/sentiment-features-and-forecasting
+local HEAD        c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f + uncommitted changes
+remote Arena      c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f
+remote feature    5af5bc7a50c4b56edc1efe3aae4fce2501bdc656
+remote base       36b7b486bb60b54f3f19201f2e548b11e5f93197
+PR #14            OPEN, DRAFT, base docs/canonical-source-of-truth,
+                  head feat/sentiment-features-and-forecasting at 5af5bc7...
 ```
 
-Ancestry re-verified: PR base is an ancestor of the feature branch, and the
-feature branch is an ancestor of the Arena branch (4 Arena-only commits at the
-final engineering checkpoint `1547890`, plus the later documentation commits —
-recompute live, do not rely on a fixed count); `git diff --check
-5af5bc7..1547890` is clean. PR #14 is open, draft,
-mergeable and clean, but its head is still the older feature-branch checkpoint.
-`gh pr checks 14` reports its single `test` check as pass on that older head; that
-result does **not** cover the final work. The GitHub branch API again reported
-`protected=false` and zero rulesets; the restriction is this session's fixed-branch
-push policy.
+The feature branch is an ancestor of the Arena branch, and the base is an
+ancestor of feature. `git rev-list --left-right --count
+origin/feat/sentiment-features-and-forecasting...origin/arena/cf79e7b7-x-sentiment-price-predictor`
+returned `0 7`. This confirms the remote commit series is fast-forwardable, but
+the current uncommitted changes are not yet part of that candidate.
+`gh pr checks 14` currently shows passing `test` jobs for the PR head commit
+`5af5bc7a50c4b56edc1efe3aae4fce2501bdc656` (runs `40398880540` and
+`40398888540`). These checks do not cover Arena `c0cd3c1` or this local work.
+GitHub API reports the feature branch unprotected, Arena unprotected, zero
+repository rulesets. Nevertheless, this execution context is explicitly restricted
+to the Arena push target; do not push to the feature branch from here.
 
-Verified GitHub Actions runs on the Arena branch:
+Prior successful CI evidence exists for Arena commit `c0cd3c1` as reported in the
+prior checkpoint, but the interrupted security/documentation changes have not
+been committed or run by CI. No push, commit, PR update, PR draft-state change or
+merge was made during this resumed pass. The current worktree is on the local
+feature-named branch, but the environment's push policy is Arena-only; there is
+no final commit SHA for these edits.
 
-- `40534245216` for `2620dc3` — success, all four checks green.
-- `40536670278` for `20a0e96` — success, all four checks green.
-- `40540034819` for `8bc4f7f` — success, all four checks green.
-  URL: <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40540034819>
-- `40566013522` for `1547890` — success, all four checks green.
-  URL: <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40566013522>
-- `40569320293` for `a19ee2f` — success, all four checks green (documentation
-  checkpoint). URL: <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40569320293>
-
-The final engineering commit `15478906bbc2cb6c5806f366141b5cd35cac0523` is
-pushed to the same Arena branch and its CI run above is green. Any later
-documentation-only commit triggers the same workflow because CI push filters
-include `arena/**`; its SHA and run result are reported in the final execution
-response. These are Arena-branch checks — PR #14's older head still needs fresh
-PR-specific CI after the authorized fast-forward.
-
-The exact fast-forward-only promotion commands for an authorized normal clone
-are in `docs/PR14_PROMOTION.md`. PR #14 must not be merged without explicit
-approval.
+The safe promotion procedure for an authorized normal clone remains in
+[PR14_PROMOTION.md](PR14_PROMOTION.md); it must use the final Arena SHA after
+these working changes are committed and pushed. PR #14 remains draft and was not
+merged.
 
 ## 8. Known limitations and external blockers
 
@@ -281,6 +284,10 @@ approval.
 - `docs/PR14_PROMOTION.md`
 - `docs/REQUIREMENTS_TRACEABILITY.md`
 - `reports/btc-usd-180d/` committed historical real-price artefacts
-- `reports/generated/final-2026-10-28/run-a` and `run-b` ignored synthetic demo
-  artefacts from the earlier verification run, and
-  `reports/generated/verify-2026-10-28/run-a` and `run-b` from this pass
+- `reports/generated/final-verify-2026-10-28-82883/` — the verified two-run
+  artefact set recorded under *Current local verification (2026-10-28)* and in
+  section 4 (hashes above were re-reproduced).
+- `reports/generated/final-audit-2026-10-28.D0dgOZ/`,
+  `reports/generated/final-resume-2026-10-28/` and
+  `reports/generated/resume-audit-2026-10-28/` ignored synthetic demo artefacts
+  from prior runs (their hashes remain historical until refreshed).

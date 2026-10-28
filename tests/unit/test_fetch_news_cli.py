@@ -64,8 +64,17 @@ def _success_handler(request: httpx.Request) -> httpx.Response:
                     "source": "Example Wire",
                 },
                 {
-                    "title": "Exchange inflows cool, ETF flows tick up",
-                    "url": "https://example.invalid/b",
+                    "title": "Bearer title-secret Exchange inflows cool, ETF flows tick up",
+                    "url": (
+                        "https://user:password@example.invalid/b?"
+                        "X-Amz-Security-Token=aws-secret&article=42#token=fragment-secret"
+                    ),
+                    "published_date": "2026-10-25T10:00:00",
+                },
+                {
+                    "title": "DST boundary timestamp",
+                    "url": "https://example.invalid/dst",
+                    "published_date": "2026-11-01T01:30:00-05:00",
                 },
                 {"title": HEADLINE, "url": "https://example.invalid/a"},
                 {"url": "https://example.invalid/missing-title"},
@@ -282,9 +291,11 @@ def test_fetch_news_writes_normalized_jsonl_with_one_bounded_mocked_request(
     assert "excluded 2 provider result(s)" in captured.err
 
     lines = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
-    assert len(lines) == 2
-    first, second = lines
+    assert len(lines) == 3
+    first, second, dst = lines
     assert first["title"] == HEADLINE
+    assert second["title"] == "[REDACTED] Exchange inflows cool, ETF flows tick up"
+    assert second["provider"] == "tavily"
     assert first["provider"] == "tavily"
     assert first["source"] == "Example Wire"
     assert first["published_at"] == "2026-10-25T10:00:00+00:00"
@@ -294,14 +305,33 @@ def test_fetch_news_writes_normalized_jsonl_with_one_bounded_mocked_request(
     assert len(first["payload_sha256"]) == 64
     assert first["context_line"].startswith(HEADLINE)
     assert second["published_at"] is None
-    assert second["published_at_note"] == "publication date not supplied by the provider"
-    assert KEY not in out.read_text(encoding="utf-8")
+    assert second["published_at_raw"] == "2026-10-25T10:00:00"
+    assert second["published_at_note"] == (
+        "publication timestamp has no timezone; timestamp withheld"
+    )
+    assert second["url"] == (
+        "https://example.invalid/b?X-Amz-Security-Token=%5BREDACTED%5D&article=42"
+    )
+    assert dst["published_at"] == "2026-11-01T06:30:00+00:00"
+    serialized_news = out.read_text(encoding="utf-8")
+    for secret in (KEY, "password", "aws-secret", "fragment-secret"):
+        assert secret not in serialized_news
+    assert "top-secret-token" not in serialized_news
+    assert "title-secret" not in serialized_news
+    assert "article=42" in serialized_news
 
     context = load_news_context(out)
-    assert len(context) == 2
+    assert len(context) == 3
     assert "2026-10-25T10:00:00+00:00" in context[0]
-    assert "publication date not supplied by the provider" in context[1]
-    assert "https://example.invalid/b" in context[1]
+    assert "publication timestamp has no timezone; timestamp withheld" in context[1]
+    assert (
+        "https://example.invalid/b?X-Amz-Security-Token=%5BREDACTED%5D&article=42"
+        in context[1]
+    )
+    assert "2026-11-01" in context[2]
+    for secret in ("password", "aws-secret", "fragment-secret"):
+        assert secret not in context[1]
+    assert "article=42" in context[1]
 
 
 def test_fetch_news_fails_closed_on_http_error_without_a_retry(
@@ -408,7 +438,7 @@ def test_fetch_news_jsonl_feeds_run_without_changing_predictions_or_metrics(
     provenance = manifest["provenance"]
     assert provenance["news_snapshot"] == str(news_path)
     assert provenance["news_snapshot_sha256"] == sha256_file(news_path)
-    assert provenance["news_context_items"] == 2
+    assert provenance["news_context_items"] == 3
     assert provenance["news_context_policy"] == "outlook_context_only_not_a_model_feature"
     assert provenance["input_note"] == "synthetic offline test fixture with [REDACTED]"
     assert manifest["dataset"]["rows_with_sentiment"] > 0
@@ -422,5 +452,15 @@ def test_fetch_news_jsonl_feeds_run_without_changing_predictions_or_metrics(
     assert "[REDACTED]" in outlook
     assert KEY not in outlook
     assert KEY not in report
-    assert KEY not in (with_news / "manifest.json").read_text(encoding="utf-8")
+    artifacts = [
+        (with_news / "manifest.json").read_text(encoding="utf-8"),
+        (with_news / "outlook.md").read_text(encoding="utf-8"),
+        (with_news / "evaluation-report.md").read_text(encoding="utf-8"),
+        (with_news / "sentiment-vs-price.svg").read_text(encoding="utf-8"),
+        (with_news / "metrics.json").read_text(encoding="utf-8"),
+        (with_news / "predictions.jsonl").read_text(encoding="utf-8"),
+    ]
+    for artifact in artifacts:
+        for secret in (KEY, "password", "aws-secret", "fragment-secret"):
+            assert secret not in artifact
     assert HEADLINE not in (without_news / "outlook.md").read_text(encoding="utf-8")
