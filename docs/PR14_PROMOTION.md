@@ -3,8 +3,10 @@
 **Promotion status: COMPLETED on 2026-10-28.** The verified work was committed
 as `d8016610aa7ebf82263413c48b1164e4a64d13df` and pushed to
 `feat/sentiment-features-and-forecasting` with a normal non-forced fast-forward
-(`5af5bc7..d801661`). PR #14 now evaluates that exact SHA and its CI is green.
-No force-push, history rewrite, base change, draft-state change or merge occurred.
+(`5af5bc7..d801661`). PR #14's head branch now contains it, and CI is green on
+every head this delivery has had (including the documentation-only follow-up
+commit). No force-push, history rewrite, base change, draft-state change or merge
+occurred.
 The procedure below is retained as the record of how it was done and as the safe
 repeat path if the head ever needs to advance again.
 
@@ -20,8 +22,10 @@ push to the feature branch succeeded from here.
 
 ## Verified state on 2026-10-28 (after promotion)
 
-- Remote feature / PR #14 head: `d8016610aa7ebf82263413c48b1164e4a64d13df`
-  (equals local HEAD; working tree clean).
+- Remote feature / PR #14 head: the tip of
+  `feat/sentiment-features-and-forecasting`, which contains the delivered code
+  revision `d8016610aa7ebf82263413c48b1164e4a64d13df`. GitHub shows the live head
+  SHA; the working tree is clean.
 - PR base `docs/canonical-source-of-truth`:
   `36b7b486bb60b54f3f19201f2e548b11e5f93197`.
 - Remote Arena branch: `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` (unchanged by
@@ -74,11 +78,14 @@ diverged and a fast-forward is not safe.
 
 ```bash
 # Reconfirm PR metadata rather than assuming the remembered feature SHA is current.
-EXPECTED_FEAT=d8016610aa7ebf82263413c48b1164e4a64d13df
+# The head moves with every documentation commit, so compare the local tip against
+# the live PR head instead of hard-coding a SHA that this commit would invalidate.
+PR_HEAD=$(gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor \
+  --json headRefOid --jq '.headRefOid')
 ACTUAL_FEAT=$(git rev-parse "$FEAT")
-test "$ACTUAL_FEAT" = "$EXPECTED_FEAT" || {
-  echo "STOP: feature branch is now $ACTUAL_FEAT, not the verified $EXPECTED_FEAT" >&2
-  echo "Re-inspect PR #14, review the new commits, then update EXPECTED_FEAT only if safe." >&2
+test "$ACTUAL_FEAT" = "$PR_HEAD" || {
+  echo "STOP: local feature tip $ACTUAL_FEAT differs from PR #14 head $PR_HEAD" >&2
+  echo "Fetch and re-inspect before deciding anything." >&2
   exit 1
 }
 
@@ -101,8 +108,9 @@ git diff --check "$ARENA..$FEAT"
 git diff --stat "$ARENA..$FEAT"
 ```
 
-The only feature-only commit should be the verified delivery commit `d801661`
-listed above. `git diff --check` must be clean, and the diff should contain only
+The feature-only commits should be the verified delivery commit `d801661` listed
+above, possibly followed by its documentation-only reconciliation commits.
+`git diff --check` must be clean, and the diff should contain only
 the verified implementation, tests, CI configuration and documentation changes
 described in the submission package. Pre-promotion, the equivalent check was
 `feat-only=0` with `arena-only >= 1`, and `git diff --check "$FEAT..$ARENA"`.

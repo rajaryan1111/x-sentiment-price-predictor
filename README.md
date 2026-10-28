@@ -44,10 +44,13 @@ submission packet (A7). The database join (R15) is recorded as verified complete
 
 ## Delivery status (2026-10-28)
 
-Repository state last verified 2026-10-28: local HEAD and remote feature/PR head
-are both `d8016610aa7ebf82263413c48b1164e4a64d13df` (clean tree, pushed by
-non-forced fast-forward). Fresh CI on that exact SHA is green: runs
-`40616497449` (push) and `40616501268` (pull_request), both `success`. Remote
+Repository state last verified 2026-10-28: the delivered code revision is
+`d8016610aa7ebf82263413c48b1164e4a64d13df`, pushed to
+`feat/sentiment-features-and-forecasting` by non-forced fast-forward from a clean
+tree. PR #14 head is the tip of that branch, so GitHub shows the live head SHA
+(including any later documentation-only commit). Fresh CI on `d801661` is green:
+runs `40616497449` (push) and `40616501268` (pull_request), both `success`.
+Remote
 Arena remains `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` and was not changed.
 PR #14 is OPEN and DRAFT, MERGEABLE, base
 `36b7b486bb60b54f3f19201f2e548b11e5f93197`. The earlier assumption that this

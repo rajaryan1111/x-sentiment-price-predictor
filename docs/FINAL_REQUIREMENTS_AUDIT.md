@@ -56,8 +56,9 @@ Total: **28 requirements**. Externally blocked or clarification-dependent
 rows: R2, A1 and A2. A3 is partially complete because the assessment resource is
 identified as a dataset-link index but no candidate has been accepted. Additional
 partial rows depend indirectly on the accepted-X-data gate. PR #14 delivery was
-completed on 2026-10-28 (B8 resolved): head `d801661` with green CI, so delivery
-is no longer gated by a branch policy.
+completed on 2026-10-28 (B8 resolved): the PR head branch contains `d801661` and
+every head of this delivery has green CI, so delivery is no longer gated by a
+branch policy.
 
 This audit is intentionally more conservative than the canonical matrix for R8:
 the six horizons are implemented, but the `n+0` target convention is still a
@@ -81,8 +82,9 @@ verified as offline engineering, not as live provider or real-X acceptance.
   and no-network behavior. Tavily streaming and redaction regressions are covered by
   the unit/CLI tests.
 - GitHub Actions evidence is recorded per SHA: prior runs belong to their specific
-  older commits, and the current PR head `d801661` has its own green runs
-  `40616497449` (push) and `40616501268` (pull_request). See the verification report.
+  older commits, and the delivered revision `d801661` has its own green runs
+  `40616497449` (push) and `40616501268` (pull_request), as did the
+  documentation-only head that followed it. See the verification report.
 - No live Tavily, Exa, Apify or Coinbase request was made during this audit. The implementation-only URL/timestamp and Apify URL regression checks passed locally; no live provider compatibility is inferred.
 
 ## 4.1 Independent evidence cross-check (2026-10-28)

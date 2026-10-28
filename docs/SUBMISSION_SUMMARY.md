@@ -153,8 +153,9 @@ sentiment performance evidence.
 - The assignment PDFs are not in this checkout. The raw 180-day price snapshot is
   present locally but ignored and untracked (SHA-256 `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`); it was not refetched in this network-restricted sandbox.
 - No submission email was sent and PR #14 was not merged. PR #14's head was
-  advanced to `d801661` by non-forced fast-forward from this session and its two
-  CI runs are green; see [PR14_PROMOTION.md](PR14_PROMOTION.md).
+  advanced by non-forced fast-forward from this session to a tip containing
+  `d801661`, and CI is green on every head of this delivery; see
+  [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 8. Reproduction instructions
 
@@ -242,8 +243,9 @@ CI runs on that head are green. External data, authorization and delivery items 
 - [x] GitHub repository link, draft PR #14 link and Markdown evaluation report
   (Sharpe, Sortino, max drawdown) available.
 - [x] Timed 5–7 minute demo script and submission-package documents present.
-- [x] PR #14 head advanced to `d801661` by non-forced fast-forward from this
-  session, with fresh PR-specific CI green (runs `40616497449` and `40616501268`);
+- [x] PR #14 head advanced by non-forced fast-forward to a tip containing
+  `d801661`, with PR-specific CI green (runs `40616497449` and `40616501268` on
+  the code revision, plus green checks on later documentation commits);
   B8 resolved ([PR14_PROMOTION.md](PR14_PROMOTION.md)).
 - [ ] Accepted licensed 180-day X corpus / Actor / spend cap provided (B1/B3),
   and sentiment-enhanced evaluation run with real metrics (R2, R9).

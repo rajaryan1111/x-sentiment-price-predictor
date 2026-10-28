@@ -8,14 +8,15 @@ the exact next safe commands, and the blockers. It is not a completion claim.
 The local tree was reviewed and the already-present changes were preserved. Current
 observations:
 
-- Local branch: `feat/sentiment-features-and-forecasting`; HEAD is
-  `d8016610aa7ebf82263413c48b1164e4a64d13df`, the working tree is clean, and there
-  are no untracked files. The 22-file hardening/evidence change set was committed
-  here on 2026-10-28 and pushed to the remote feature branch by fast-forward.
-- PR #14 is OPEN and DRAFT, mergeable. Head
-  `d8016610aa7ebf82263413c48b1164e4a64d13df`, base
-  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Fresh CI on that exact head is green:
-  run `40616497449` (push) and run `40616501268` (pull_request), both `success`.
+- Local branch: `feat/sentiment-features-and-forecasting`; the working tree is
+  clean with no untracked files. The 22-file hardening/evidence change set was
+  committed as `d8016610aa7ebf82263413c48b1164e4a64d13df` on 2026-10-28 and pushed
+  to the remote feature branch by fast-forward.
+- PR #14 is OPEN and DRAFT, mergeable. Its head is the tip of
+  `feat/sentiment-features-and-forecasting` (GitHub shows the live SHA), base
+  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. CI on `d801661` is green: run
+  `40616497449` (push) and run `40616501268` (pull_request), both `success`, and
+  the documentation-only commit that followed it was verified green as well.
 - Ref ancestry re-verified after the push: base is an ancestor of feature, Arena
   (`c0cd3c1`) is an ancestor of feature, and remote feature...Arena is `1 0` —
   feature is now one commit ahead of Arena, with nothing Arena has that feature
@@ -40,8 +41,8 @@ observations:
 ## Current phase
 
 Local offline engineering checks and the two-run synthetic demo pass on the
-current tree, the change set is committed at `d801661`, and PR #14 head now
-points at that commit with both CI runs green. Remaining work is external:
+current tree, the code change set is committed at `d801661`, and PR #14's head is
+the tip of the feature branch containing it with CI green. Remaining work is external:
 resolve blockers B1-B7 (X source, credential route, spend cap, `n+0`, deadline,
 live-news policy, submission format) in
 [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md). Do not change PR draft status or
@@ -92,8 +93,8 @@ merge PR #14 without explicit authorization.
 
 1. Done: the verified change set was committed as `d801661` and pushed to the
    feature branch; CI on that exact SHA is green (runs `40616497449`, `40616501268`).
-2. Done: PR #14's head now equals `d801661` with fresh PR-specific CI green; it
-   remains draft and unmerged.
+2. Done: PR #14's head is the tip of the feature branch, which contains
+   `d801661`, with PR-specific CI green; it remains draft and unmerged.
 3. Resolve employer-side X/data, credential, clarification and email blockers (see
    [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md)).
 
@@ -109,15 +110,16 @@ live Tavily, Exa, Apify or Coinbase request was made.
 
 ## Latest commit / latest pushed commit
 
-- Current local HEAD and remote feature/PR head are both
-  `d8016610aa7ebf82263413c48b1164e4a64d13df`, so the delivered tree is exactly
-  what PR #14 evaluates. PR base remains
-  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Remote Arena remains
+- Latest pushed revisions: code `d8016610aa7ebf82263413c48b1164e4a64d13df` and
+  the documentation reconciliation that follows it. PR #14 head is the tip of
+  `feat/sentiment-features-and-forecasting`, so GitHub shows the live SHA; the
+  PR base remains `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Remote Arena remains
   `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` and was not changed by this pass.
-- CI on the current PR head is run `40616497449` (push) and run `40616501268`
+- CI on `d801661` is run `40616497449` (push) and run `40616501268`
   (pull_request), both `success`: <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40616497449>
   and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40616501268>.
-  Older runs `40398880548`/`40398888540` (head `5af5bc7`) and `40570468109`
+  Each later documentation-only head was also verified green on the PR. Older
+  runs `40398880548`/`40398888540` (head `5af5bc7`) and `40570468109`
   (Arena `c0cd3c1`) remain historical evidence for those exact commits only.
 
 ## External blockers
@@ -136,9 +138,11 @@ No live provider call is authorized.
 
 ## Exact next commands
 
-The delivery of this revision is done: committed as `d801661`, pushed to the
-feature branch, PR #14 head updated, CI green on that head. Do not re-push or
-re-commit; the working tree is clean.
+The delivery of this revision is done: the code change set is committed as
+`d801661`, pushed to the feature branch, and PR #14's head contains it with CI
+green. Do not re-push or re-commit without new work; the working tree is clean.
+Check the live PR head with `gh pr view 14 --json headRefOid` rather than trusting
+a SHA written in these docs, because documentation commits advance the head.
 
 Remaining actions are external, not Git: resolve blockers B1-B7 in
 [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md), then send the clarification email

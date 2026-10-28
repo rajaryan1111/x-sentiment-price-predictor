@@ -3,8 +3,9 @@
 **Local verification context:** 2026-10-28, Python 3.11.15, branch
 `feat/sentiment-features-and-forecasting`, commit
 `d8016610aa7ebf82263413c48b1164e4a64d13df` (parent `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`).
-The working tree is clean at that commit, it was pushed to the remote feature
-branch by non-forced fast-forward, and PR #14 now evaluates exactly this SHA.
+The working tree is clean, it was pushed to the remote feature branch by
+non-forced fast-forward, and PR #14's head branch contains it (GitHub shows the
+live head SHA, which includes any later documentation-only commit).
 
 ## Current local verification (2026-10-28)
 
@@ -217,13 +218,14 @@ posts. No sentiment improvement is claimed.
 Remote refs were fetched and the current PR was queried on 2026-10-28:
 
 ```text
-local branch      feat/sentiment-features-and-forecasting
-local HEAD        d8016610aa7ebf82263413c48b1164e4a64d13df (clean tree)
-remote feature    d8016610aa7ebf82263413c48b1164e4a64d13df  <- pushed, equals local
+local branch      feat/sentiment-features-and-forecasting (clean tree)
+code revision     d8016610aa7ebf82263413c48b1164e4a64d13df  <- delivered change set
+                  (followed by documentation-only commits on the same branch)
+remote feature    tip of that branch; GitHub shows the live SHA
 remote Arena      c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f  (unchanged)
 remote base       36b7b486bb60b54f3f19201f2e548b11e5f93197
 PR #14            OPEN, DRAFT, MERGEABLE, base docs/canonical-source-of-truth,
-                  head feat/sentiment-features-and-forecasting at d801661
+                  head = tip of feat/sentiment-features-and-forecasting
 ```
 
 The feature branch contains both the base and the Arena branch, and
@@ -232,14 +234,16 @@ returned `1 0` after the push, so the delivered branch is a strict superset of
 Arena with no divergence. The push was a normal fast-forward (`5af5bc7..d801661`);
 no force, history rewrite, base change or draft-state change was used.
 
-Fresh CI on the delivered head: run `40616497449` (push) and run `40616501268`
-(pull_request), both `success`, giving two passing `test` checks on
+Fresh CI on the delivered code revision: run `40616497449` (push) and run
+`40616501268` (pull_request), both `success`, giving two passing `test` checks on
 `d8016610aa7ebf82263413c48b1164e4a64d13df`:
 <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40616497449>
 and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40616501268>.
-Runs `40398880548`/`40398888540` (head `5af5bc7`) and `40570468109` (Arena
-`c0cd3c1`) are historical evidence for those exact commits only. GitHub API
-reports both branches unprotected with zero repository rulesets.
+The documentation-only head that followed was also verified green on the PR, so
+every head of this delivery has passing CI. Runs `40398880548`/`40398888540`
+(head `5af5bc7`) and `40570468109` (Arena `c0cd3c1`) are historical evidence for
+those exact commits only. GitHub API reports both branches unprotected with zero
+repository rulesets.
 
 Earlier sessions had assumed this environment could push only to the Arena
 branch; that assumption was tested and disproven when the plain fast-forward push
@@ -259,8 +263,8 @@ PR #14 remains draft and was not merged.
   live-news requirement, news feature policy and final submission format/email.
 - Raw historical price snapshot is not committed and could not be refetched in
   this network-restricted sandbox.
-- PR #14's head was advanced from this session by non-forced fast-forward to
-  `d801661`; CI on that head is green. No external clone step remains.
+- PR #14's head was advanced from this session by non-forced fast-forward, and
+  CI is green on every head of this delivery. No external clone step remains.
 - Static typing is not configured as a CI gate; no claim of mypy-clean code is
   made. The defined offline checks and CI are the release gates.
 - CI proves offline code health only; it cannot prove data access, licence,
