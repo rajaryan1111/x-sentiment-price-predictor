@@ -133,8 +133,8 @@ that question remains untestable without accepted X data.
 The final local verification is recorded in
 [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md): 187 suite tests and
 64 focused Apify/Tavily/news CLI/pipeline tests passed, along with Ruff, compileall,
-registry/docs validation and diff checks; these edits remain uncommitted with no
-CI run. Two real CLI runs on 210 synthetic bars and 209 synthetic posts produced
+registry/docs validation and diff checks; the change set is committed at
+`d801661` and green CI covers that exact SHA (runs `40616497449`, `40616501268`). Two real CLI runs on 210 synthetic bars and 209 synthetic posts produced
 six artefacts, six walk-forward folds, 2,160 predictions and 18 metric rows, with
 byte-identical outputs across all six files. Security regressions cover
 credential-bearing news URLs, timezone-aware/withheld publication dates,
@@ -152,9 +152,9 @@ sentiment performance evidence.
   deadline, whether live Tavily news is mandatory or the final submission format.
 - The assignment PDFs are not in this checkout. The raw 180-day price snapshot is
   present locally but ignored and untracked (SHA-256 `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`); it was not refetched in this network-restricted sandbox.
-- No submission email was sent and PR #14 was not merged. This Arena session may
-  push only to the working branch, so PR #14's head still needs the authorized
-  fast-forward procedure in [PR14_PROMOTION.md](PR14_PROMOTION.md).
+- No submission email was sent and PR #14 was not merged. PR #14's head was
+  advanced to `d801661` by non-forced fast-forward from this session and its two
+  CI runs are green; see [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 8. Reproduction instructions
 
@@ -209,8 +209,9 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
   final engineering SHA `15478906bbc2cb6c5806f366141b5cd35cac0523`; and run
   `40569320293` passed on the `a19ee2f` documentation checkpoint (with further
   documentation commits reported in the execution response). These are
-  Arena-branch checks; PR #14's head still needs its own fresh CI after the
-  authorized fast-forward. The exact promotion commands are in
+  Arena-branch checks. PR #14's own head then advanced to `d801661`, where runs
+  `40616497449` (push) and `40616501268` (pull_request) both completed `success`.
+  The exact promotion commands are in
   [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 10. Submission documents
@@ -225,8 +226,8 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 
 ## 11. Final submission checklist
 
-Local engineering verification on the current uncommitted worktree passed; no CI
-run covers these changes. External data, authorization and delivery items remain pending.
+Local engineering verification passed on the committed tree `d801661`, and both
+CI runs on that head are green. External data, authorization and delivery items remain pending.
 
 - [x] Reproducible pipeline, gated news CLI, offline demo, database join, chart,
   outlook and evaluation report implemented and tested.
@@ -234,16 +235,16 @@ run covers these changes. External data, authorization and delivery items remain
   commands present; `TEST_PLAN.md` is the authoritative test count.
 - [x] Final offline suite on 2026-10-28 (187 passed, focused set 64 passed), validators, Ruff,
   compileall, diff check and two-run synthetic demo verified on the current local
-  worktree; changes remain uncommitted and fresh CI on them is pending.
+  worktree; committed as `d801661`, pushed, and CI is green on that head.
 - [x] Requirements audit (28 IDs), traceability matrix, external blockers and
   employer clarifications reconciled to 11 complete, 14 partial, 2 externally
   blocked and 1 needing clarification.
 - [x] GitHub repository link, draft PR #14 link and Markdown evaluation report
   (Sharpe, Sortino, max drawdown) available.
 - [x] Timed 5–7 minute demo script and submission-package documents present.
-- [ ] PR #14 head advanced to the final Arena SHA from an authorized normal
-  clone, with fresh PR-specific CI green (B8;
-  [PR14_PROMOTION.md](PR14_PROMOTION.md)).
+- [x] PR #14 head advanced to `d801661` by non-forced fast-forward from this
+  session, with fresh PR-specific CI green (runs `40616497449` and `40616501268`);
+  B8 resolved ([PR14_PROMOTION.md](PR14_PROMOTION.md)).
 - [ ] Accepted licensed 180-day X corpus / Actor / spend cap provided (B1/B3),
   and sentiment-enhanced evaluation run with real metrics (R2, R9).
 - [ ] Provider tokens / Actor IDs delivered through an approved private channel

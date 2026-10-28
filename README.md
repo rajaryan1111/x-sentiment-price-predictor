@@ -44,16 +44,16 @@ submission packet (A7). The database join (R15) is recorded as verified complete
 
 ## Delivery status (2026-10-28)
 
-Repository state last verified 2026-10-28: local HEAD and remote Arena ref are
-`c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`; Arena CI run
-`40570468109` succeeded on that exact SHA. This resumed worktree has uncommitted
-changes not covered by that CI. PR #14 remains OPEN and DRAFT at head
-`5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`, base
-`36b7b486bb60b54f3f19201f2e548b11e5f93197`; its two currently green checks are
-for that older head. The active session can push only to the Arena branch. Once
-these changes are finalized and checked, an authorized normal clone should use the
-fast-forward-only procedure in [docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md)
-to advance PR #14 and obtain fresh PR-specific CI. No merge or draft-state change
+Repository state last verified 2026-10-28: local HEAD and remote feature/PR head
+are both `d8016610aa7ebf82263413c48b1164e4a64d13df` (clean tree, pushed by
+non-forced fast-forward). Fresh CI on that exact SHA is green: runs
+`40616497449` (push) and `40616501268` (pull_request), both `success`. Remote
+Arena remains `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` and was not changed.
+PR #14 is OPEN and DRAFT, MERGEABLE, base
+`36b7b486bb60b54f3f19201f2e548b11e5f93197`. The earlier assumption that this
+session could push only to Arena was disproven when the fast-forward push to the
+feature branch succeeded, so no external promotion step remains — see
+[docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md). No merge or draft-state change
 has been made.
 
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
@@ -244,8 +244,8 @@ From `reports/btc-usd-180d/`, computed by the commands above:
   provenance exactly — and reproduced every metric within 5e-13 (platform float noise
   only). That refetch is not part of the current sandbox verification, whose outbound
   network is restricted. The earlier [TEST_PLAN.md](TEST_PLAN.md) records 167 offline
-  tests at that checkpoint; this resumed local tree (base HEAD `c0cd3c1` plus
-  uncommitted security regressions) passes the full suite; the exact collection
+  tests at that checkpoint; the delivered tree (commit `d801661`) passes the full
+  suite; the exact collection
   count is in [TEST_PLAN.md](TEST_PLAN.md). The first full-suite run found five
   documentation-validation failures, which were repaired before the passing rerun.
   See [FINAL_VERIFICATION_REPORT.md](docs/FINAL_VERIFICATION_REPORT.md) for evidence.

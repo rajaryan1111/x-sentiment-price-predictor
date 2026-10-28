@@ -55,9 +55,9 @@ treated as market evidence.
 Total: **28 requirements**. Externally blocked or clarification-dependent
 rows: R2, A1 and A2. A3 is partially complete because the assessment resource is
 identified as a dataset-link index but no candidate has been accepted. Additional
-partial rows depend indirectly on the accepted-X-data gate. PR #14 delivery is
-separately gated by the session branch policy B8, not by an unimplemented
-requirement.
+partial rows depend indirectly on the accepted-X-data gate. PR #14 delivery was
+completed on 2026-10-28 (B8 resolved): head `d801661` with green CI, so delivery
+is no longer gated by a branch policy.
 
 This audit is intentionally more conservative than the canonical matrix for R8:
 the six horizons are implemented, but the `n+0` target convention is still a
@@ -66,13 +66,13 @@ verified as offline engineering, not as live provider or real-X acceptance.
 
 ## 4. Verification basis
 
-- On 2026-10-28, the final local uncommitted suite passed 187 tests in 4.06s, and
+- On 2026-10-28, the final local suite passed 187 tests in 4.06s, and
   the focused Apify/Tavily/news CLI/pipeline command passed 64 tests in 1.86s. Ruff,
   compileall, registry validation (12 records), docs validation (104 links, 28
   requirement rows) and `git diff --check` passed. The fresh two-run synthetic demo
   matched all six output artifacts byte-for-byte. Exact commands and hashes are in
-  [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). These local changes
-  remain uncommitted and no CI covers them.
+  [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). This change set is
+  committed as `d801661`, and two CI runs on that exact SHA completed `success`.
 - The final local synthetic demo generated six artefacts, six folds, 2,160 predictions
   and 18 metric rows from 210 synthetic bars and 209 synthetic posts. Two independent
   CLI runs matched byte-for-byte on all six artifacts, including manifest. This is
@@ -80,24 +80,24 @@ verified as offline engineering, not as live provider or real-X acceptance.
   covers all six artefacts, horizons, models, finite metrics, lineage, repeatability
   and no-network behavior. Tavily streaming and redaction regressions are covered by
   the unit/CLI tests.
-- Historical GitHub Actions evidence applies only to its specific prior Arena SHAs;
-  this resumed working tree is uncommitted and has no CI evidence. Current PR-head
-  checks are on the older `5af5bc7` commit only; see the verification report.
+- GitHub Actions evidence is recorded per SHA: prior runs belong to their specific
+  older commits, and the current PR head `d801661` has its own green runs
+  `40616497449` (push) and `40616501268` (pull_request). See the verification report.
 - No live Tavily, Exa, Apify or Coinbase request was made during this audit. The implementation-only URL/timestamp and Apify URL regression checks passed locally; no live provider compatibility is inferred.
 
 ## 4.1 Independent evidence cross-check (2026-10-28)
 
 The line-by-line audit below was inherited from the prior checkpoint. This resumed
 pass rechecked implementation paths and added news URL/timestamp plus Apify
-provenance-URL sanitization tests. The exact current tree remains uncommitted on top
-of `c0cd3c1`; no final commit SHA or CI result exists.
+provenance-URL sanitization tests. The verified tree is committed as `d801661`
+and PR #14 evaluates that exact SHA with green CI.
 
 Documentation claims were not counted as implementation evidence. For every
 requirement row, the named source path and automated-test path were checked
 against the actual working tree. The concrete checks were:
 
 - On 2026-10-28, the final `.venv/bin/python -m pytest -q` run passed 187 tests in
-  4.06s on the local uncommitted tree. Exact focused and full-suite results are in
+  4.06s on the tree committed as `d801661`. Exact focused and full-suite results are in
   `FINAL_VERIFICATION_REPORT.md`; earlier documentation-validator failures were
   corrected before this final passing run.
 - `tests/unit/test_coinbase_prices.py`, `test_contracts.py`,
@@ -139,7 +139,7 @@ external data/authorization gates into completion.
 | R11 | T* | Produce a one-page summary of the current sentiment outlook for the asset | PARTIAL | C/T/A: `reporting/outlook.py` and `check_outlook_page`; report tests enforce sections, line ceiling, disclaimer and explicit unavailable states. Caller limitations now appear in the outlook as well as the report. | The page contract is complete; real sentiment and live news content are unavailable by design. |
 | R12 | T* | Produce an evaluation report in PDF or Markdown including Sharpe ratio, Sortino ratio and maximum drawdown | COMPLETE | C/T/A/H: `backtesting/metrics.py`, `strategy.py`, `reporting/report.py`; known-value metric/strategy tests and committed `reports/btc-usd-180d/evaluation-report.md` with Sharpe, Sortino, max drawdown, fees and withheld-metric reasons. | Risk metrics come from a short, single-asset historical sample and a predeclared strategy; no sentiment variant is available. |
 | R13 | T* | Provide a reproducibility package: setup, commands, provider and Actor identifiers, query configuration, snapshots or hashes and secure secrets | PARTIAL | C/T/A: README, `.env.example`, `scripts/make_offline_demo.py`, manifest provenance and `input_lineage`; docs validator, dataset validator and offline demo test. Query modes/hashes are recorded without raw query terms. | Actor identifiers, real query configuration and a secure credential transfer route remain external (R2, A2, B2). |
-| R14 | T* | Provide automated tests for schemas, timestamps, alignment, features, targets, leakage, metrics and reports | PARTIAL | C/T: `tests/unit/` and `tests/integration/` cover schemas, timestamps, alignment, features, targets, leakage, metrics, reports, storage, mocked providers, CLI, streaming response bounds, URL and provider-text sanitization, publication-date handling and offline network isolation. The current local suite and quality gates are verified on 2026-10-28; exact results are in `FINAL_VERIFICATION_REPORT.md`. | The current changes are uncommitted, so no GitHub Actions run covers them; offline tests do not verify live provider behavior or real X acceptance. Obtain CI on the authorized Arena SHA and promoted PR head. |
+| R14 | T* | Provide automated tests for schemas, timestamps, alignment, features, targets, leakage, metrics and reports | PARTIAL | C/T: `tests/unit/` and `tests/integration/` cover schemas, timestamps, alignment, features, targets, leakage, metrics, reports, storage, mocked providers, CLI, streaming response bounds, URL and provider-text sanitization, publication-date handling and offline network isolation. The current local suite and quality gates are verified on 2026-10-28; exact results are in `FINAL_VERIFICATION_REPORT.md`. | The change set is committed as `d801661` and two GitHub Actions runs on that head completed `success`; offline tests still do not verify live provider behavior or real X acceptance, so this row stays partial pending B1-B3. |
 | R15 | T* | Join the X-post and price datasets in a database | COMPLETE | C/T/A: `storage/models.py`, `repositories.py`, `main.py`; `test_storage_join.py` and `test_phase3_ingestion_e2e.py` verify a versioned schema, idempotent upserts, descriptive/cutoff joins and a complete `run --database-url` with `input_source = persisted_storage`. | The offline database path is complete; a database holding licensed real X rows depends on R2. |
 
 ## 6. Non-functional requirements (NFR1–NFR6)
@@ -181,19 +181,18 @@ In summary:
 - **B5** exact calendar deadline — leaves A1 NOT_VERIFIED.
 - **B6** live Tavily requirement and news feature policy — leaves A4 PARTIAL.
 - **B7** submission format/email authorization — leaves A7 PARTIAL.
-- **B8** session branch policy — PR #14's head cannot be advanced from this
-  restricted Arena session; see [PR14_PROMOTION.md](PR14_PROMOTION.md). This is a
-  delivery permission blocker, not an implementation defect.
+- **B8** session branch policy — **resolved**: PR #14's head was advanced by a
+  non-forced fast-forward to `d801661` with green CI on that head; see
+  [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 9. Defensible conclusion
 
 The implementable engineering pipeline is reproducible offline, including the
 gated news CLI, streaming response bound, input-lineage provenance, a full CLI
 end-to-end demonstration and offline network isolation. Local quality gates pass
-on the current working tree; prior CI evidence applies only to its recorded SHA,
-not these uncommitted edits. The assignment is not fully satisfiable in this
+on the delivered commit `d801661`, whose PR CI is green; the assignment is not fully satisfiable in this
 environment because no accepted X corpus, provider credential, paid-call
-authorization, employer clarification, PR-head promotion permission or submission
+authorization, employer clarification or submission
 email exists. Those limitations are
 recorded here rather than hidden. See
 [SUBMISSION_SUMMARY.md](SUBMISSION_SUMMARY.md) for the evaluator-facing summary
