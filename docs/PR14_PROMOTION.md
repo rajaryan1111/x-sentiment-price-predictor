@@ -3,10 +3,11 @@
 **Promotion status: COMPLETED on 2026-10-28.** The verified work was committed
 as `d8016610aa7ebf82263413c48b1164e4a64d13df` and pushed to
 `feat/sentiment-features-and-forecasting` with a normal non-forced fast-forward
-(`5af5bc7..d801661`). PR #14's head branch contains it. CI passed on the latest head observed before
-this final documentation-only synchronization; verify checks on the live head
-before describing this synchronization as CI-verified. No force-push, history
-rewrite, base change, draft-state change or merge occurred.
+(`5af5bc7..d801661`). PR #14's head branch contains it. The final documentation-only reconciliation
+was committed as `2d5e2f70c150a4cd985725d078229338940529e6` and pushed by a normal
+fast-forward. Fresh push and pull-request CI runs `40783061034` and `40783064118`
+both passed on that exact head. No force-push, history rewrite, base change,
+draft-state change or merge occurred.
 The procedure below is retained as the record of how it was done and as the safe
 repeat path if the head ever needs to advance again.
 
@@ -22,27 +23,28 @@ push to the feature branch succeeded from here.
 
 ## Verified state on 2026-10-29 (latest metadata inspection)
 
-- Remote feature / PR #14 head: `5c91603af18d42f03f53412f814a25833f2b3ea1`,
-  containing the code revision `d8016610aa7ebf82263413c48b1164e4a64d13df` and
-  later docs-only commits. GitHub reports the live SHA; check it again before
-  using this procedure.
+- Remote feature / PR #14 head: `2d5e2f70c150a4cd985725d078229338940529e6`,
+  containing code revision `d8016610aa7ebf82263413c48b1164e4a64d13df` and later
+  docs-only commits. GitHub reported this SHA; check it again before using this
+  procedure.
 - PR base `docs/canonical-source-of-truth`:
   `36b7b486bb60b54f3f19201f2e548b11e5f93197`.
 - Remote Arena branch: `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
 - PR #14 metadata: OPEN, DRAFT, MERGEABLE.
-- CI on the latest observed head, both successful: run `40622384336` and run
-  `40622378634` —
-  <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40622384336>
-  and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40622378634>.
-  Earlier code-revision runs `40616497449`/`40616501268` are also successful on
-  `d801661`; older runs `40398880548`/`40398888540` and `40570468109` are
-  historical checks for their respective SHAs.
+- CI on the latest head, both successful: run `40783061034` and run
+  `40783064118` —
+  <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40783061034>
+  and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40783064118>.
+  Earlier runs `40622384336`/`40622378634` belong to head `5c91603`;
+  `40616497449`/`40616501268` belong to `d801661`; older runs
+  `40398880548`/`40398888540` and `40570468109` are historical for their
+  respective SHAs.
 - At last ancestry inspection the base and Arena were ancestors of feature;
-  feature-vs-Arena was `3 0` after documentation-only commits. No force push,
+  feature-vs-Arena was `4 0` after documentation-only commits. No force push,
   history rewrite, base change, PR-ready change or merge occurred.
-- The documentation-only local diff passed the final offline verification gates
-  on 2026-10-29. If committed and pushed, fresh PR CI must run on its resulting
-  commit.
+- The final documentation-only local diff passed the offline verification gates
+  on 2026-10-29, was committed as `2d5e2f7`, and was pushed. Fresh PR CI passed on
+  the resulting commit (runs `40783061034`, `40783064118`).
 
 ## Do not
 

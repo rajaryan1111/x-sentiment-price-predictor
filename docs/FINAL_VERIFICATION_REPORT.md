@@ -1,20 +1,21 @@
 # Final verification report
 
 **Latest local verification context:** 2026-10-29, Python 3.11.15, branch
-`feat/sentiment-features-and-forecasting`, source baseline commit
-`5c91603af18d42f03f53412f814a25833f2b3ea1`. The code under test was introduced at
-`d8016610aa7ebf82263413c48b1164e4a64d13df`; this verification covers the final
-documentation-only reconciliation on top of that source tree. At initial
-inspection the tree was clean and aligned with `origin`; PR #14's current head
-was rechecked separately below.
+`feat/sentiment-features-and-forecasting`, documentation-only commit
+`2d5e2f70c150a4cd985725d078229338940529e6`. The code under test was introduced at
+`d8016610aa7ebf82263413c48b1164e4a64d13df`; this verification covered the final
+documentation reconciliation, whose contents are committed at `2d5e2f7`. At initial
+inspection the tree was clean and aligned with `origin`; current PR metadata and
+CI for the final pushed SHA are recorded below.
 
 ## Latest local re-verification (2026-10-29; documentation-only diff)
 
-The source tree was unchanged from code baseline `5c91603`; the documentation
-synchronization was tested on the working tree. On 2026-10-29, a first full-suite
-attempt found only the documentation count guard failing (186 passed, 1 failed)
-because five test-count statements lacked an explicit date in the same sentence.
-After qualifying those statements, the final gates passed:
+No source code changed from code commit `d801661`; the documentation
+synchronization was validated on the same file contents committed at `2d5e2f7`.
+On 2026-10-29, a first full-suite attempt found only the documentation count guard
+failing (186 passed, 1 failed) because five test-count statements lacked an
+explicit date in the same sentence. After qualifying those statements, the final
+gates passed:
 
 - `.venv/bin/python -m pytest -q` -> **187 passed** (run on 2026-10-29).
 - Focused regressions:
@@ -54,11 +55,11 @@ for APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and EXA_API_KEY; each was absen
 
 The prior complete local code verification was run on 2026-10-28 for the
 22-file change set committed as `d8016610aa7ebf82263413c48b1164e4a64d13df`.
-After that code commit, docs-only commits advanced the PR; at the 2026-10-29
-metadata check the exact head remained `5c91603af18d42f03f53412f814a25833f2b3ea1`
-and both current-head CI runs succeeded (`40622384336`, `40622378634`). The
-historical 2026-10-28 verification results below remain separate from the latest
-local rerun above.
+After that code commit, docs-only commits advanced the PR. The latest pushed
+head is `2d5e2f70c150a4cd985725d078229338940529e6`; fresh CI runs
+`40783061034` and `40783064118` both succeeded on that exact SHA. The historical
+2026-10-28 verification results below remain separate from the latest local
+rerun above.
 
 - Focused regressions on 2026-10-28:
   `.venv/bin/python -m pytest -q tests/unit/test_apify_x.py tests/unit/test_tavily_news.py tests/unit/test_fetch_news_cli.py tests/unit/test_pipeline.py`
@@ -278,21 +279,23 @@ PR #14            OPEN, DRAFT, MERGEABLE, base docs/canonical-source-of-truth,
 The feature branch contains both the base and Arena branches. The initial
 promotion was a normal fast-forward (`5af5bc7..d801661`); subsequent docs-only
 commits increased the feature-vs-Arena count. At the latest ref inspection it was
-`3 0` (feature-only 3, Arena-only 0), with no divergence or Arena-only commits.
+`4 0` (feature-only 4, Arena-only 0), with no divergence or Arena-only commits.
 No force, history rewrite, base change or draft-state change was used.
 
 CI on code revision `d8016610aa7ebf82263413c48b1164e4a64d13df` passed runs
-`40616497449` (push) and `40616501268` (pull_request). At the 2026-10-29 PR check, head
+`40616497449` (push) and `40616501268` (pull_request). Earlier docs-only head
 `5c91603af18d42f03f53412f814a25833f2b3ea1` passed runs `40622384336` and
-`40622378634` (both `test`, success). These are the exact current-head checks
-observed before the documentation-only synchronization; fresh CI must be checked
-on any subsequently pushed head. Older runs
+`40622378634`. The final documentation head
+`2d5e2f70c150a4cd985725d078229338940529e6` passed fresh runs `40783061034`
+and `40783064118` (both `test`, success). These run IDs are tied to their exact
+heads; query GitHub before describing any later commit as CI-verified. Older runs
 `40398880548`/`40398888540` (head `5af5bc7`) and `40570468109` (Arena `c0cd3c1`)
 remain historical for their exact commits only.
 
 PR #14 was advanced by non-forced fast-forward; no merge or draft-state change
 was made. At the latest query it remained OPEN, DRAFT and MERGEABLE, with base
-`36b7b486bb60b54f3f19201f2e548b11e5f93197`.
+`36b7b486bb60b54f3f19201f2e548b11e5f93197` and head
+`2d5e2f70c150a4cd985725d078229338940529e6`.
 
 ## 8. Known limitations and external blockers
 

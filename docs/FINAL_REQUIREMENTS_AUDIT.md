@@ -59,9 +59,10 @@ price snapshot is not present in this checkout; historical public-price metrics
 are retained as report/manifest artifacts only. Additional partial rows depend
 indirectly on the accepted-X-data gate. PR #14 delivery was
 completed on 2026-10-28 (B8 resolved): the code change is in the feature branch.
-At the latest ref check (2026-10-29), PR head was `5c91603af18d42f03f53412f814a25833f2b3ea1`,
-with two successful CI runs (`40622384336`, `40622378634`). This is a
-point-in-time status; query GitHub for the current head before further promotion.
+At the latest ref check (2026-10-29), PR head was
+`2d5e2f70c150a4cd985725d078229338940529e6`, with two successful CI runs
+(`40783061034`, `40783064118`). This is a point-in-time status; query GitHub for
+the current head before any further promotion.
 
 This audit is intentionally more conservative than the canonical matrix for R8:
 the six horizons are implemented, but the `n+0` target convention is still a
@@ -77,8 +78,9 @@ verified as offline engineering, not as live provider or real-X acceptance.
   passed. A fresh two-run synthetic demo matched all six artifacts byte-for-byte. Exact
   commands and hashes are in
   [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). The code change is
-  committed as `d801661`; at the latest metadata check PR head `5c91603` had two
-  successful CI runs on the pre-synchronization head. The documentation synchronization was tested locally; fresh CI is needed on any subsequently pushed head.
+  committed as `d801661`; the documentation reconciliation is committed as
+  `2d5e2f7`. At the latest metadata check, PR head `2d5e2f7` had two successful
+  CI runs. Local documentation and code checks passed on the same content.
 - On 2026-10-29, the docs-synchronized local synthetic demo generated six
   artifacts, six folds, 2,160 predictions and 18 metric rows from 210 synthetic
   bars and 209 synthetic posts. Two independent CLI runs matched byte-for-byte on
@@ -89,8 +91,8 @@ verified as offline engineering, not as live provider or real-X acceptance.
 - GitHub Actions evidence is recorded per SHA: prior runs belong to their specific
   older commits. The code revision `d801661` passed runs `40616497449` (push) and
   `40616501268` (pull_request); later documentation commits advanced the PR head.
-  At the 2026-10-29 metadata check, head `5c91603af18d42f03f53412f814a25833f2b3ea1`
-  passed runs `40622384336` and `40622378634`. See the verification report.
+  At the 2026-10-29 metadata check, head `2d5e2f70c150a4cd985725d078229338940529e6`
+  passed runs `40783061034` and `40783064118`. See the verification report.
 - No live Tavily, Exa, Apify or Coinbase request was made during this audit. The implementation-only URL/timestamp and Apify URL regression checks passed locally; no live provider compatibility is inferred.
 
 ## 4.1 Independent evidence cross-check (2026-10-29)
@@ -99,7 +101,8 @@ The line-by-line audit below was inherited from the prior checkpoint. This resum
 pass rechecked implementation paths and added news URL/timestamp plus Apify
 provenance-URL sanitization tests. The verified code tree is committed as `d801661`;
 subsequent documentation-only commits advanced PR #14. Its last observed head
-`5c91603af18d42f03f53412f814a25833f2b3ea1` had two successful CI runs.
+`2d5e2f70c150a4cd985725d078229338940529e6` had two successful CI runs.
+
 
 Documentation claims were not counted as implementation evidence. For every
 requirement row, the named source path and automated-test path were checked

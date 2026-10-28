@@ -42,19 +42,18 @@ submission packet (A7). The database join (R15) is recorded as verified complete
 
 ## Delivery status (re-inspected 2026-10-29)
 
-The working branch is `feat/sentiment-features-and-forecasting`; at initial
-inspection on 2026-10-29 it was clean and aligned with `origin`. PR #14 is OPEN,
-DRAFT and MERGEABLE against `docs/canonical-source-of-truth` (base SHA
-`36b7b486bb60b54f3f19201f2e548b11e5f93197`). At the 2026-10-29 metadata check,
-PR head SHA `5c91603af18d42f03f53412f814a25833f2b3ea1` had two completed
-successful CI checks (runs `40622384336` and `40622378634`). The delivered code change is
-`d8016610aa7ebf82263413c48b1164e4a64d13df`; subsequent commits are documentation
-synchronization. GitHub's live PR head changes with every commit; check it with
-`gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`
+The working branch is `feat/sentiment-features-and-forecasting`, clean and aligned
+with `origin`. PR #14 is OPEN, DRAFT and MERGEABLE against
+`docs/canonical-source-of-truth` (base SHA
+`36b7b486bb60b54f3f19201f2e548b11e5f93197`). Its verified head is
+`2d5e2f70c150a4cd985725d078229338940529e6`; push and pull-request CI runs
+`40783061034` and `40783064118` both succeeded on that exact SHA. The delivered
+code change is `d8016610aa7ebf82263413c48b1164e4a64d13df`; the later commits are
+documentation-only. GitHub's live PR head can change with each commit; recheck
+with `gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`
 and inspect checks for that exact SHA. The Arena branch remains
-`c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`. PR #14 was updated by a normal
-fast-forward and has not been merged or marked ready for review. See
-[docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md) for the recorded procedure.
+`c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`. PR #14 remains unmerged and draft;
+no ready-for-review change was made. See [docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md).
 
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
 [Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),

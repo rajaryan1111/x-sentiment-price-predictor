@@ -5,25 +5,25 @@ the exact next safe commands, and the blockers. It is not a completion claim.
 
 ## Current verified state — re-inspected 2026-10-29 (UTC)
 
-The local tree was reviewed without discarding existing changes. At initial
-inspection it was clean; this continuation updates documentation only.
+The local tree was reviewed without discarding existing changes. The documentation
+reconciliation was committed and pushed as `2d5e2f70c150a4cd985725d078229338940529e6`.
 
-- Local branch: `feat/sentiment-features-and-forecasting`; initial HEAD
-  `5c91603af18d42f03f53412f814a25833f2b3ea1`, aligned with origin. The code
-  change set `d8016610aa7ebf82263413c48b1164e4a64d13df` is followed by
-  documentation commits `fb1fc3f` and `5c91603`.
-- PR #14 is OPEN, DRAFT and MERGEABLE. At last GitHub check, head was
-  `5c91603af18d42f03f53412f814a25833f2b3ea1`; base is
-  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Runs `40622384336` and
-  `40622378634` both completed successfully on that exact head.
-- Remote feature contains the base and Arena branch. At the latest initial ref
-  check, feature-vs-Arena count was `3 0`; Arena remains
+- Local branch: `feat/sentiment-features-and-forecasting`, HEAD
+  `2d5e2f70c150a4cd985725d078229338940529e6`, aligned with origin; working tree
+  clean. The code change set `d8016610aa7ebf82263413c48b1164e4a64d13df` is
+  followed by documentation commits `fb1fc3f`, `5c91603` and `2d5e2f7`.
+- PR #14 is OPEN, DRAFT and MERGEABLE. GitHub reports head
+  `2d5e2f70c150a4cd985725d078229338940529e6`; base is
+  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Runs `40783061034` and
+  `40783064118` both completed successfully on that exact head.
+- Remote feature contains the base and Arena branch. At the latest ref check,
+  feature-vs-Arena count was `4 0`; Arena remains
   `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
 - Code-suite verification was recorded 2026-10-28 at `d801661`. On 2026-10-29 this
-  continuation reran the full suite after the docs edit (187 passed), the
-  focused set (64 passed in 1.77s), Ruff, compileall, registry validation (12
-  entries), docs validation (101 links, 21 count claims and 28 requirement rows),
-  and `git diff --check`; all passed.
+  continuation reran the full suite (187 passed), the focused set (64 passed in
+  1.77s), Ruff, compileall, registry validation (12 entries), docs validation
+  (101 links, 21 count claims and 28 requirement rows), and `git diff --check`;
+  all passed against the documentation content committed at `2d5e2f7`.
   A fresh two-run synthetic demo at
   `reports/generated/final-submit-verify-2026-10-29/` produced 210 bars, 209 posts,
   six folds, 2,160 predictions and 18 metrics; six artifact hashes matched between
@@ -37,12 +37,12 @@ inspection it was clean; this continuation updates documentation only.
 ## Current phase
 
 Local offline engineering checks and the two-run synthetic demo passed on the
-source tree through code commit `d801661`. At initial PR inspection on 2026-10-29,
-head `5c91603af18d42f03f53412f814a25833f2b3ea1` had green CI. The documentation
-synchronization was then verified locally; any resulting PR branch update must be
-checked against its own live head and fresh CI. Remaining work is external: resolve
-blockers B1-B7 (X source, credential route, spend cap, `n+0`, deadline, live-news
-policy, submission format) in
+source tree through code commit `d801661`. The final documentation reconciliation
+is committed and pushed at `2d5e2f7`; PR #14 remains OPEN/DRAFT/MERGEABLE, with
+head `2d5e2f70c150a4cd985725d078229338940529e6` and successful CI runs
+`40783061034` and `40783064118` on that exact SHA. Remaining work is external:
+resolve blockers B1-B7 (X source, credential route, spend cap, `n+0`, deadline,
+live-news policy, submission format) in
 [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md). Do not change PR draft status or
 merge PR #14 without explicit authorization.
 
@@ -90,11 +90,12 @@ merge PR #14 without explicit authorization.
 ## Pending tasks
 
 1. Done: the verified code change set `d801661` is pushed to the feature branch.
-2. Done: PR #14 was open/draft/mergeable at last check, with green CI at head
-   `5c91603`; do not merge or change draft status without authorization.
+2. Done: PR #14 remains open/draft/mergeable, with green CI at head `2d5e2f7`;
+   do not merge or change draft status without authorization.
 3. Done: local verification gates and the two-run synthetic demo were rerun after
    documentation synchronization and passed on 2026-10-29; the verification report
-   records the results. A new docs commit/push requires fresh CI on that head.
+   records the results. Fresh CI on the resulting pushed head passed (runs
+   `40783061034`, `40783064118`).
 4. Resolve employer-side X/data, credential, clarification and email blockers (see
    [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md)).
 
@@ -109,17 +110,17 @@ predictions and 18 metric rows. Exact commands and artifact hashes are recorded 
 
 ## Latest commit / latest pushed commit
 
-- Latest pushed revisions: code `d8016610aa7ebf82263413c48b1164e4a64d13df` and
-  the documentation reconciliation that follows it. PR #14 head is the tip of
-  `feat/sentiment-features-and-forecasting`, so GitHub shows the live SHA; the
-  PR base remains `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Remote Arena remains
+- Latest pushed revision: documentation-only commit
+  `2d5e2f70c150a4cd985725d078229338940529e6`, following code commit
+  `d8016610aa7ebf82263413c48b1164e4a64d13df`. PR #14 head matches `2d5e2f7`;
+  base remains `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Remote Arena remains
   `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` and was not changed by this pass.
-- CI on code commit `d801661` passed runs `40616497449` (push) and
-  `40616501268` (pull_request). At the last PR check, head
-  `5c91603af18d42f03f53412f814a25833f2b3ea1` passed current runs `40622384336`
-  and `40622378634`. Older runs `40398880548`/`40398888540` (head `5af5bc7`)
-  and `40570468109` (Arena `c0cd3c1`) are historical evidence for those exact
-  commits only.
+- CI on the latest head `2d5e2f70c150a4cd985725d078229338940529e6` passed runs
+  `40783061034` and `40783064118` (push and pull_request). Earlier runs
+  `40622384336`/`40622378634` belong to head `5c91603`; runs
+  `40616497449`/`40616501268` belong to code commit `d801661`. Older runs
+  `40398880548`/`40398888540` (head `5af5bc7`) and `40570468109` (Arena
+  `c0cd3c1`) are historical evidence for those exact commits only.
 
 ## External blockers
 
@@ -130,21 +131,20 @@ predictions and 18 metric rows. Exact commands and artifact hashes are recorded 
   feature policy and submission format/email authorization (see
   [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md)).
 - Original assignment PDFs and raw historical price snapshot.
-- PR #14 head promotion of the code change set: **completed** by non-forced
-  fast-forward. The last recorded pre-synchronization head was `5c91603` with both
-  CI checks successful. Recheck GitHub and the checks attached to the exact live
-  head before treating any later documentation revision as CI-verified.
+- PR #14 head promotion of the code change set and documentation reconciliation:
+  **completed** by non-forced fast-forward. Latest verified head is
+  `2d5e2f70c150a4cd985725d078229338940529e6`; both current CI runs succeeded on
+  that SHA. Recheck GitHub for any subsequent change.
 
 No live provider call is authorized.
 
 ## Exact next commands
 
-At initial inspection, the feature branch tip was `5c91603`; this checkpoint
-records local verification of a documentation-only reconciliation against that
-source baseline. The reconciled files are staged locally; after commit/push, fresh
-CI must be checked on the new PR head.
-Always query the live PR SHA with `gh pr view 14 --json headRefOid` and inspect the
-checks for that exact SHA before describing the PR as green.
+The documentation-only reconciliation is committed and pushed as
+`2d5e2f70c150a4cd985725d078229338940529e6`; its two fresh PR CI runs passed.
+For any future change, query the live PR SHA with
+`gh pr view 14 --json headRefOid` and inspect the checks for that exact SHA before
+describing the PR as green.
 
 Remaining actions are external, not Git: resolve blockers B1-B7 in
 [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md), then send the clarification email
