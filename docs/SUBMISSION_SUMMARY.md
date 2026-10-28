@@ -3,8 +3,8 @@
 **Project:** X Sentiment Price Predictor
 **Repository:** <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 **Assessment PR:** <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
-**Verified working branch:** `arena/cf79e7b7-x-sentiment-price-predictor`
-**Status on 2026-10-28:** READY WITH DOCUMENTED LIMITATIONS for local engineering work; not assignment-complete or delivered. Current verification details are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). No PR was merged.
+**Verified working branch:** `feat/sentiment-features-and-forecasting`
+**Status on 2026-10-29:** READY WITH DOCUMENTED LIMITATIONS for engineering delivery; not assignment-complete or externally submitted. PR #14 is open and draft, not merged. Current verification details are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
 
 ## 1. Assignment objective
 
@@ -128,15 +128,20 @@ cross-checked for internal consistency, not recomputed from raw rows.
 persistence on forecast error. No claim is made that sentiment improves forecasting;
 that question remains untestable without accepted X data.
 
-### Local verification state (2026-10-28)
+### Local verification state (2026-10-29)
 
-The final local verification is recorded in
-[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md): 187 suite tests and
-64 focused Apify/Tavily/news CLI/pipeline tests passed, along with Ruff, compileall,
-registry/docs validation and diff checks; the change set is committed at
-`d801661` and green CI covers that exact SHA (runs `40616497449`, `40616501268`). Two real CLI runs on 210 synthetic bars and 209 synthetic posts produced
-six artefacts, six walk-forward folds, 2,160 predictions and 18 metric rows, with
-byte-identical outputs across all six files. Security regressions cover
+The latest local verification recorded in
+[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) was run on 2026-10-29:
+187 suite tests and 64 focused Apify/Tavily/news CLI/pipeline tests passed, along
+with Ruff, compileall, registry/docs validation and diff checks; the code change
+set is committed at `d801661`. The PR head was rechecked at
+`5c91603af18d42f03f53412f814a25833f2b3ea1`; two current-head CI checks (runs
+`40622384336`, `40622378634`) completed successfully (latest metadata inspection
+2026-10-29). Two real
+CLI runs at `reports/generated/final-submit-verify-2026-10-29/run-a/` and
+`run-b/`, on 210 synthetic bars and 209 synthetic posts, produced six artefacts,
+six walk-forward folds, 2,160 predictions and 18 metric rows, with byte-identical
+outputs across all six files. Security regressions cover
 credential-bearing news URLs, timezone-aware/withheld publication dates,
 caller-supplied news files, Apify provenance URLs, streaming bounds and offline
 no-network execution. Synthetic results are software evidence, not market or
@@ -144,25 +149,31 @@ sentiment performance evidence.
 
 ## 7. Key limitations
 
-- No accepted, licensed 180-day X corpus and no live Apify Actor run. Therefore
-  R2 is externally blocked and the sentiment-versus-price comparison is unmeasured.
-- No APIFY/Tavily/Exa credential, Actor ID, private transfer channel or paid-spend
-  authorization. No live provider call was made.
+- No accepted, licensed 180-day X corpus or live Apify Actor run exists in this
+  checkout. R2 is externally blocked and the sentiment-versus-price comparison is
+  unmeasured.
+- On 2026-10-29, APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and EXA_API_KEY were
+  absent from the process environment and project-local `.env` files.
+  No Actor ID, approved private transfer channel or paid-spend authorization was
+  found; no live provider call was made.
 - The employer has not confirmed the `n+0` target convention, exact calendar
   deadline, whether live Tavily news is mandatory or the final submission format.
-- The assignment PDFs are not in this checkout. The raw 180-day price snapshot is
-  present locally but ignored and untracked (SHA-256 `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`); it was not refetched in this network-restricted sandbox.
-- No submission email was sent and PR #14 was not merged. PR #14's head was
-  advanced by non-forced fast-forward from this session to a tip containing
-  `d801661`, and CI is green on every head of this delivery; see
-  [PR14_PROMOTION.md](PR14_PROMOTION.md).
+- The assignment PDFs and raw 180-day price snapshot are not present in this
+  checkout. The snapshot SHA-256 recorded from the historical 2026-10-26 run is
+  `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`; it was
+  not re-fetched or re-verified in this worktree.
+- No submission email was sent and PR #14 was not merged. The feature branch was
+  updated by non-forced fast-forward; at the latest inspection PR #14 remained
+  OPEN, DRAFT and MERGEABLE with head `5c91603af18d42f03f53412f814a25833f2b3ea1`
+  and base `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Both current-head CI runs
+  succeeded; see [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 8. Reproduction instructions
 
 ```bash
 git clone https://github.com/rajaryan1111/x-sentiment-price-predictor.git
 cd x-sentiment-price-predictor
-git checkout arena/cf79e7b7-x-sentiment-price-predictor
+git checkout feat/sentiment-features-and-forecasting
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev,storage]'
@@ -193,27 +204,20 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 
 - Repository: <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 - Existing draft PR #14: <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
-  (base `docs/canonical-source-of-truth`, head `feat/sentiment-features-and-forecasting`
-  at checkpoint `5af5bc7a50c4b56edc1efe3aae4fce2501bdc656`).
-- Verified working branch: `arena/cf79e7b7-x-sentiment-price-predictor`.
-  This session's environment permits pushing only to that branch, so PR #14's
-  head was deliberately not modified. Verified code checkpoints:
-  `2620dc34d76a38a14b7815e76d207fb32edc1a33` (gated news CLI),
-  `20a0e9641a4ed8705d65bf5c93d3ce50c56cbcaf` (offline demo and lineage),
-  `8bc4f7ffc45ece3402060578fe14aa5c4a89bef7` (submission documentation) and the
-  final engineering checkpoint
-  `15478906bbc2cb6c5806f366141b5cd35cac0523` (streaming news ceiling and final
-  delivery evidence). A later documentation-only checkpoint adds
-  [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md); it changes no code.
-- GitHub Actions runs `40534245216`, `40536670278` and `40540034819` passed all
-  four checks on the earlier commits; run `40566013522` completed `success` on the
-  final engineering SHA `15478906bbc2cb6c5806f366141b5cd35cac0523`; and run
-  `40569320293` passed on the `a19ee2f` documentation checkpoint (with further
-  documentation commits reported in the execution response). These are
-  Arena-branch checks. PR #14's own head then advanced to `d801661`, where runs
-  `40616497449` (push) and `40616501268` (pull_request) both completed `success`.
-  The exact promotion commands are in
-  [PR14_PROMOTION.md](PR14_PROMOTION.md).
+  (base branch `docs/canonical-source-of-truth`; head branch
+  `feat/sentiment-features-and-forecasting`). At last inspection the PR base SHA was
+  `36b7b486bb60b54f3f19201f2e548b11e5f93197`; its live head SHA was
+  `5c91603af18d42f03f53412f814a25833f2b3ea1`.
+- The current checked-out branch is the feature branch. It contains the delivered
+  code revision `d8016610aa7ebf82263413c48b1164e4a64d13df`, followed by
+  documentation-only synchronization commits `fb1fc3f` and `5c91603`.
+- The remote Arena branch remains `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
+  The feature branch is a superset of Arena (three feature-only commits at the
+  latest ref inspection, zero Arena-only commits).
+- PR #14 CI at the latest head: runs `40622384336` and `40622378634`, both
+  completed successfully on `5c91603af18d42f03f53412f814a25833f2b3ea1`.
+  Earlier code commit runs and older Arena/feature checks are historical only.
+  See [PR14_PROMOTION.md](PR14_PROMOTION.md) for current evidence and safe procedure.
 
 ## 10. Submission documents
 
@@ -227,26 +231,29 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 
 ## 11. Final submission checklist
 
-Local engineering verification passed on the committed tree `d801661`, and both
-CI runs on that head are green. External data, authorization and delivery items remain pending.
+The latest local engineering verification passed on the docs-synchronized tree on 2026-10-29; source code remains at commit `d801661`, and PR #14 is at `5c91603` with two successful CI checks (latest check 2026-10-29). External data, authorization and delivery items remain pending.
 
 - [x] Reproducible pipeline, gated news CLI, offline demo, database join, chart,
   outlook and evaluation report implemented and tested.
 - [x] `README.md`, architecture, data policy, tech stack and reproduction
   commands present; `TEST_PLAN.md` is the authoritative test count.
-- [x] Final offline suite on 2026-10-28 (187 passed, focused set 64 passed), validators, Ruff,
-  compileall, diff check and two-run synthetic demo verified on the current local
-  worktree; committed as `d801661`, pushed, and CI is green on that head.
+- [x] Final offline suite on 2026-10-29 (187 passed, focused set 64 passed), validators, Ruff,
+  compileall, diff check and two-run synthetic demo verified on the docs-synchronized
+  working tree at source baseline `5c91603`; the documentation reconciliation is
+  staged locally and was revalidated before commit. PR CI was green on that same
+  pre-synchronization head `5c91603af18d42f03f53412f814a25833f2b3ea1`; after
+  committing/pushing this documentation-only reconciliation, inspect fresh CI on
+  its resulting head.
 - [x] Requirements audit (28 IDs), traceability matrix, external blockers and
   employer clarifications reconciled to 11 complete, 14 partial, 2 externally
   blocked and 1 needing clarification.
 - [x] GitHub repository link, draft PR #14 link and Markdown evaluation report
   (Sharpe, Sortino, max drawdown) available.
 - [x] Timed 5–7 minute demo script and submission-package documents present.
-- [x] PR #14 head advanced by non-forced fast-forward to a tip containing
-  `d801661`, with PR-specific CI green (runs `40616497449` and `40616501268` on
-  the code revision, plus green checks on later documentation commits);
-  B8 resolved ([PR14_PROMOTION.md](PR14_PROMOTION.md)).
+- [x] PR #14 head advanced by non-forced fast-forward to contain `d801661`;
+  latest observed head is `5c91603af18d42f03f53412f814a25833f2b3ea1` with fresh
+  green CI runs `40622384336` and `40622378634` (B8 resolved; see
+  [PR14_PROMOTION.md](PR14_PROMOTION.md)).
 - [ ] Accepted licensed 180-day X corpus / Actor / spend cap provided (B1/B3),
   and sentiment-enhanced evaluation run with real metrics (R2, R9).
 - [ ] Provider tokens / Actor IDs delivered through an approved private channel

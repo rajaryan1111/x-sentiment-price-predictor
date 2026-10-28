@@ -3,48 +3,46 @@
 This file is a recovery aid for interrupted work. It records the verified state,
 the exact next safe commands, and the blockers. It is not a completion claim.
 
-## Current verified state — re-inspected 2026-10-28
+## Current verified state — re-inspected 2026-10-29 (UTC)
 
-The local tree was reviewed and the already-present changes were preserved. Current
-observations:
+The local tree was reviewed without discarding existing changes. At initial
+inspection it was clean; this continuation updates documentation only.
 
-- Local branch: `feat/sentiment-features-and-forecasting`; the working tree is
-  clean with no untracked files. The 22-file hardening/evidence change set was
-  committed as `d8016610aa7ebf82263413c48b1164e4a64d13df` on 2026-10-28 and pushed
-  to the remote feature branch by fast-forward.
-- PR #14 is OPEN and DRAFT, mergeable. Its head is the tip of
-  `feat/sentiment-features-and-forecasting` (GitHub shows the live SHA), base
-  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. CI on `d801661` is green: run
-  `40616497449` (push) and run `40616501268` (pull_request), both `success`, and
-  the documentation-only commit that followed it was verified green as well.
-- Ref ancestry re-verified after the push: base is an ancestor of feature, Arena
-  (`c0cd3c1`) is an ancestor of feature, and remote feature...Arena is `1 0` —
-  feature is now one commit ahead of Arena, with nothing Arena has that feature
-  lacks. The earlier assumption that this session could push only to Arena was
-  incorrect: the plain fast-forward push to the feature branch succeeded, so no
-  external promotion is required. Arena is unchanged.
-- Fresh final local verification on 2026-10-28: `.venv/bin/python -m pytest -q`
-  -> 187 passed in 4.06s, focused Apify/Tavily/news CLI/pipeline tests -> 64 passed
-  in 1.86s; Ruff, compileall, registry validator (12 records), docs validator
-  (104 links, all 28 matrix rows), and `git diff --check` passed. A new two-run
-  synthetic CLI demo produced 210 bars, 209 posts, six folds, 2,160 predictions,
-  18 metric rows and six byte-identical artifacts. Exact hashes and commands are in
-  `FINAL_VERIFICATION_REPORT.md`. These results do not establish real X performance;
-  they are now committed at `d801661` and covered by the two green CI runs above.
-- Provider credentials were checked only for presence; no paid/live provider call
-  was made. No accepted X corpus, original assessment PDFs, employer responses or
+- Local branch: `feat/sentiment-features-and-forecasting`; initial HEAD
+  `5c91603af18d42f03f53412f814a25833f2b3ea1`, aligned with origin. The code
+  change set `d8016610aa7ebf82263413c48b1164e4a64d13df` is followed by
+  documentation commits `fb1fc3f` and `5c91603`.
+- PR #14 is OPEN, DRAFT and MERGEABLE. At last GitHub check, head was
+  `5c91603af18d42f03f53412f814a25833f2b3ea1`; base is
+  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Runs `40622384336` and
+  `40622378634` both completed successfully on that exact head.
+- Remote feature contains the base and Arena branch. At the latest initial ref
+  check, feature-vs-Arena count was `3 0`; Arena remains
+  `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
+- Code-suite verification was recorded 2026-10-28 at `d801661`. On 2026-10-29 this
+  continuation reran the full suite after the docs edit (187 passed), the
+  focused set (64 passed in 1.77s), Ruff, compileall, registry validation (12
+  entries), docs validation (101 links, 21 count claims and 28 requirement rows),
+  and `git diff --check`; all passed.
+  A fresh two-run synthetic demo at
+  `reports/generated/final-submit-verify-2026-10-29/` produced 210 bars, 209 posts,
+  six folds, 2,160 predictions and 18 metrics; six artifact hashes matched between
+  runs. This remains synthetic software evidence only. Exact evidence is in
+  `FINAL_VERIFICATION_REPORT.md`.
+- Provider credentials were checked for presence only and were absent from the
+  process environment and project-local `.env` files. No live provider call was
+  made. No accepted X corpus, original assessment PDFs, employer responses or
   submission confirmation are available in this checkout.
-- CI now exists for the delivered revision itself; earlier runs remain evidence
-  only for their own older commits. See `FINAL_VERIFICATION_REPORT.md` for the
-  full record.
 
 ## Current phase
 
-Local offline engineering checks and the two-run synthetic demo pass on the
-current tree, the code change set is committed at `d801661`, and PR #14's head is
-the tip of the feature branch containing it with CI green. Remaining work is external:
-resolve blockers B1-B7 (X source, credential route, spend cap, `n+0`, deadline,
-live-news policy, submission format) in
+Local offline engineering checks and the two-run synthetic demo passed on the
+source tree through code commit `d801661`. At initial PR inspection on 2026-10-29,
+head `5c91603af18d42f03f53412f814a25833f2b3ea1` had green CI. The documentation
+synchronization was then verified locally; any resulting PR branch update must be
+checked against its own live head and fresh CI. Remaining work is external: resolve
+blockers B1-B7 (X source, credential route, spend cap, `n+0`, deadline, live-news
+policy, submission format) in
 [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md). Do not change PR draft status or
 merge PR #14 without explicit authorization.
 
@@ -91,22 +89,23 @@ merge PR #14 without explicit authorization.
 
 ## Pending tasks
 
-1. Done: the verified change set was committed as `d801661` and pushed to the
-   feature branch; CI on that exact SHA is green (runs `40616497449`, `40616501268`).
-2. Done: PR #14's head is the tip of the feature branch, which contains
-   `d801661`, with PR-specific CI green; it remains draft and unmerged.
-3. Resolve employer-side X/data, credential, clarification and email blockers (see
+1. Done: the verified code change set `d801661` is pushed to the feature branch.
+2. Done: PR #14 was open/draft/mergeable at last check, with green CI at head
+   `5c91603`; do not merge or change draft status without authorization.
+3. Done: local verification gates and the two-run synthetic demo were rerun after
+   documentation synchronization and passed on 2026-10-29; the verification report
+   records the results. A new docs commit/push requires fresh CI on that head.
+4. Resolve employer-side X/data, credential, clarification and email blockers (see
    [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md)).
 
 ## Latest verified test results
 
-On the 2026-10-28 worktree committed as `d801661`, `.venv/bin/python -m pytest -q` passed
-187 tests, and the focused Apify/Tavily/news CLI/pipeline command passed 64
-tests. Ruff, compileall, registry validation (12 records), docs validation (104
-links, 28 requirement rows), and `git diff --check` passed. The two-run synthetic
-demo generated six byte-identical artifacts, six folds, 2,160 predictions and 18
-metric rows. Exact hashes and commands are in `FINAL_VERIFICATION_REPORT.md`. No
-live Tavily, Exa, Apify or Coinbase request was made.
+On 2026-10-29, the docs-synchronized tree passed 187 full tests and 64 focused
+tests; Ruff, compileall, registry validation (12 records), docs validation (101
+links, 21 test-count claims, 28 requirement rows), and `git diff --check` all passed.
+The fresh synthetic demo generated six byte-identical artifacts, six folds, 2,160
+predictions and 18 metric rows. Exact commands and artifact hashes are recorded in
+`FINAL_VERIFICATION_REPORT.md`. No live provider request was made.
 
 ## Latest commit / latest pushed commit
 
@@ -115,12 +114,12 @@ live Tavily, Exa, Apify or Coinbase request was made.
   `feat/sentiment-features-and-forecasting`, so GitHub shows the live SHA; the
   PR base remains `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Remote Arena remains
   `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` and was not changed by this pass.
-- CI on `d801661` is run `40616497449` (push) and run `40616501268`
-  (pull_request), both `success`: <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40616497449>
-  and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40616501268>.
-  Each later documentation-only head was also verified green on the PR. Older
-  runs `40398880548`/`40398888540` (head `5af5bc7`) and `40570468109`
-  (Arena `c0cd3c1`) remain historical evidence for those exact commits only.
+- CI on code commit `d801661` passed runs `40616497449` (push) and
+  `40616501268` (pull_request). At the last PR check, head
+  `5c91603af18d42f03f53412f814a25833f2b3ea1` passed current runs `40622384336`
+  and `40622378634`. Older runs `40398880548`/`40398888540` (head `5af5bc7`)
+  and `40570468109` (Arena `c0cd3c1`) are historical evidence for those exact
+  commits only.
 
 ## External blockers
 
@@ -131,18 +130,21 @@ live Tavily, Exa, Apify or Coinbase request was made.
   feature policy and submission format/email authorization (see
   [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md)).
 - Original assignment PDFs and raw historical price snapshot.
-- PR #14 head promotion: **completed** on 2026-10-28 by a non-forced fast-forward
-  of the feature branch; no external clone was needed after all.
+- PR #14 head promotion of the code change set: **completed** by non-forced
+  fast-forward. The last recorded pre-synchronization head was `5c91603` with both
+  CI checks successful. Recheck GitHub and the checks attached to the exact live
+  head before treating any later documentation revision as CI-verified.
 
 No live provider call is authorized.
 
 ## Exact next commands
 
-The delivery of this revision is done: the code change set is committed as
-`d801661`, pushed to the feature branch, and PR #14's head contains it with CI
-green. Do not re-push or re-commit without new work; the working tree is clean.
-Check the live PR head with `gh pr view 14 --json headRefOid` rather than trusting
-a SHA written in these docs, because documentation commits advance the head.
+At initial inspection, the feature branch tip was `5c91603`; this checkpoint
+records local verification of a documentation-only reconciliation against that
+source baseline. The reconciled files are staged locally; after commit/push, fresh
+CI must be checked on the new PR head.
+Always query the live PR SHA with `gh pr view 14 --json headRefOid` and inspect the
+checks for that exact SHA before describing the PR as green.
 
 Remaining actions are external, not Git: resolve blockers B1-B7 in
 [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md), then send the clarification email

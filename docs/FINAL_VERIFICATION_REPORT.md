@@ -1,25 +1,68 @@
 # Final verification report
 
-**Local verification context:** 2026-10-28, Python 3.11.15, branch
-`feat/sentiment-features-and-forecasting`, commit
-`d8016610aa7ebf82263413c48b1164e4a64d13df` (parent `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`).
-The working tree is clean, it was pushed to the remote feature branch by
-non-forced fast-forward, and PR #14's head branch contains it (GitHub shows the
-live head SHA, which includes any later documentation-only commit).
+**Latest local verification context:** 2026-10-29, Python 3.11.15, branch
+`feat/sentiment-features-and-forecasting`, source baseline commit
+`5c91603af18d42f03f53412f814a25833f2b3ea1`. The code under test was introduced at
+`d8016610aa7ebf82263413c48b1164e4a64d13df`; this verification covers the final
+documentation-only reconciliation on top of that source tree. At initial
+inspection the tree was clean and aligned with `origin`; PR #14's current head
+was rechecked separately below.
 
-## Current local verification (2026-10-28)
+## Latest local re-verification (2026-10-29; documentation-only diff)
 
-This verification applies to the tree committed as
-`d8016610aa7ebf82263413c48b1164e4a64d13df` on branch
-`feat/sentiment-features-and-forecasting`, containing 22 changed tracked files and
-no untracked source files. The commit is pushed, and two GitHub Actions runs
-(`40616497449` push, `40616501268` pull_request) completed `success` on this exact
-SHA. The exact local content is checked below; historical checkpoint results
-remain separate.
+The source tree was unchanged from code baseline `5c91603`; the documentation
+synchronization was tested on the working tree. On 2026-10-29, a first full-suite
+attempt found only the documentation count guard failing (186 passed, 1 failed)
+because five test-count statements lacked an explicit date in the same sentence.
+After qualifying those statements, the final gates passed:
+
+- `.venv/bin/python -m pytest -q` -> **187 passed** (run on 2026-10-29).
+- Focused regressions:
+  `.venv/bin/python -m pytest -q tests/unit/test_apify_x.py tests/unit/test_tavily_news.py tests/unit/test_fetch_news_cli.py tests/unit/test_pipeline.py`
+  -> **64 passed** (run on 2026-10-29).
+- `.venv/bin/ruff check src tests scripts` -> all checks passed.
+- `.venv/bin/python -m compileall -q src tests scripts` -> exit 0.
+- `.venv/bin/python scripts/validate_dataset_registry.py` -> 12 records valid.
+- `.venv/bin/python scripts/validate_docs.py` -> 101 relative Markdown links,
+  21 test-count claims, 28 matrix rows (11 complete, 14 partial, 2 externally
+  blocked, 1 needing clarification); passed.
+- `git diff --check` -> clean.
+
+A fresh two-run CLI demonstration was generated from a previously absent output
+root at `reports/generated/final-submit-verify-2026-10-29/`. It produced 210 synthetic daily bars, 209 synthetic posts,
+6 folds, 2,160 predictions and 18 finite metric rows across horizons `n+0` through
+`n+5` for naive, price-only and sentiment-plus-price models. Each run has six
+non-empty artefacts; all six were byte-identical between runs:
+
+| Artefact | Size | SHA-256 |
+| --- | ---: | --- |
+| `evaluation-report.md` | 7,926 bytes | `e7b9015f07bcbdad1000c51744371979af21a88191017566958f8202e356f8ca` |
+| `outlook.md` | 3,041 bytes | `a4ef193ac43e1f17572550278efe1287eb55587d02e9f9f0afead21d516a5c64` |
+| `sentiment-vs-price.svg` | 17,647 bytes | `852633606e1236fda94fc2b4c6868637af345c201bc6d95800c4e07ab7c285bc` |
+| `manifest.json` | 5,691 bytes | `71a63b8d4f477b4f22e23e0b208300407c18c5004b24a54df9b098387c052aa0` |
+| `metrics.json` | 6,983 bytes | `b7cf3accde0ef8f25749e2f509923502d9ba97a84e38d3b121e955093c79502f` |
+| `predictions.jsonl` | 454,597 bytes | `2885a7399911e29019cdda31bd1b8f9b396798abb280cebf9c35ab7b76f3a5a4` |
+
+Synthetic metrics are only software/reproducibility evidence; they do not establish
+real-world forecast value.
+
+On 2026-10-29, the process environment and project-local `.env` files were checked
+for APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and EXA_API_KEY; each was absent
+(presence only; values were never read or printed). No live provider request was made.
+
+## Previous local verification (2026-10-28; code commit d801661)
+
+The prior complete local code verification was run on 2026-10-28 for the
+22-file change set committed as `d8016610aa7ebf82263413c48b1164e4a64d13df`.
+After that code commit, docs-only commits advanced the PR; at the 2026-10-29
+metadata check the exact head remained `5c91603af18d42f03f53412f814a25833f2b3ea1`
+and both current-head CI runs succeeded (`40622384336`, `40622378634`). The
+historical 2026-10-28 verification results below remain separate from the latest
+local rerun above.
 
 - Focused regressions on 2026-10-28:
   `.venv/bin/python -m pytest -q tests/unit/test_apify_x.py tests/unit/test_tavily_news.py tests/unit/test_fetch_news_cli.py tests/unit/test_pipeline.py`
-  -> **64 passed in 1.86s**.
+  -> **64 passed in 1.86s** on 2026-10-28.
 - Full suite on 2026-10-28: `.venv/bin/python -m pytest -q` -> **187 passed in 4.06s**,
   0 failed, 0 skipped, 0 xfailed. The result matches the authoritative collection
   count in `TEST_PLAN.md`. While correcting this report's wording, several
@@ -33,7 +76,7 @@ remain separate.
   links, 20 test-count claims inspected, 28 requirement rows: 11 complete,
   14 partial, 0 not implemented, 2 externally blocked, 1 needing clarification.
   `git diff --check` -> clean.
-- Two-run synthetic offline CLI demo, output root
+- Previous two-run synthetic offline CLI demo, output root
   `reports/generated/final-verify-2026-10-28-82883/` (ignored by Git): generator
   command `scripts/make_offline_demo.py --generated-at 2026-10-27T00:00:00+00:00`,
   followed by two `python -m xsentiment run` commands with identical inputs and
@@ -50,18 +93,20 @@ remain separate.
   and predictions `2885a7399911e29019cdda31bd1b8f9b396798abb280cebf9c35ab7b76f3a5a4`.
   These synthetic outcomes are software/reproducibility evidence only; no real
   forecasting conclusion follows.
-- `data/` contains the BTC price snapshot and registry, no post-text X corpus.
-  APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and EXA_API_KEY were checked for
-  presence only; all are unset. No live provider call was made.
+- `data/` contains the dataset registry but no raw BTC price snapshot or
+  post-text X corpus; the historical BTC evaluation artifacts are under
+  `reports/btc-usd-180d/`. APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and
+  EXA_API_KEY were checked for presence only; all are unset. No live provider
+  call was made.
 
-## 1. Environment
+## Prior environment details for code commit d801661
 
 - Python: **3.11.15**, existing project `.venv`; confirmed and reused.
 - The shell's bare `python` is unavailable; use `.venv/bin/python`.
 - No packages were installed and no environment was recreated.
 - CI installs `.[dev,storage]` on Python 3.11; the local environment has analysis extras.
 
-## Historical checkpoint records
+## Historical checkpoint records (earlier than d801661)
 
 The historical 167-test run and earlier environment details below describe checkpoint
 `8bc4f7f` only; they are dated evidence, not proof for this local revision.
@@ -138,9 +183,11 @@ No live Tavily, Exa, Apify or Coinbase request was made.
 
 ## 4. Offline end-to-end reproducibility
 
-The documented commands were executed from a clean output directory. This is the
-same run whose SHA-256 hashes are listed under *Current local verification
-(2026-10-28)* above; rerunning it on 2026-10-28 reproduced every hash exactly:
+A prior two-run offline CLI demonstration was recorded on 2026-10-28 at
+`reports/generated/final-verify-2026-10-28-82883/`. The commands below describe
+that historical run; its artifact hashes are listed in the *Previous local
+verification (2026-10-28; code commit d801661)* section above. The fresh 2026-10-29
+demo and hashes are recorded separately at the start of this report:
 
 ```bash
 python scripts/make_offline_demo.py \
@@ -215,7 +262,7 @@ posts. No sentiment improvement is claimed.
 
 ## 7. GitHub delivery and CI
 
-Remote refs were fetched and the current PR was queried on 2026-10-28:
+Remote refs were fetched and PR #14 was queried on 2026-10-29:
 
 ```text
 local branch      feat/sentiment-features-and-forecasting (clean tree)
@@ -228,27 +275,24 @@ PR #14            OPEN, DRAFT, MERGEABLE, base docs/canonical-source-of-truth,
                   head = tip of feat/sentiment-features-and-forecasting
 ```
 
-The feature branch contains both the base and the Arena branch, and
-`git rev-list --left-right --count origin/feat/sentiment-features-and-forecasting...origin/arena/cf79e7b7-x-sentiment-price-predictor`
-returned `1 0` after the push, so the delivered branch is a strict superset of
-Arena with no divergence. The push was a normal fast-forward (`5af5bc7..d801661`);
-no force, history rewrite, base change or draft-state change was used.
+The feature branch contains both the base and Arena branches. The initial
+promotion was a normal fast-forward (`5af5bc7..d801661`); subsequent docs-only
+commits increased the feature-vs-Arena count. At the latest ref inspection it was
+`3 0` (feature-only 3, Arena-only 0), with no divergence or Arena-only commits.
+No force, history rewrite, base change or draft-state change was used.
 
-Fresh CI on the delivered code revision: run `40616497449` (push) and run
-`40616501268` (pull_request), both `success`, giving two passing `test` checks on
-`d8016610aa7ebf82263413c48b1164e4a64d13df`:
-<https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40616497449>
-and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40616501268>.
-The documentation-only head that followed was also verified green on the PR, so
-every head of this delivery has passing CI. Runs `40398880548`/`40398888540`
-(head `5af5bc7`) and `40570468109` (Arena `c0cd3c1`) are historical evidence for
-those exact commits only. GitHub API reports both branches unprotected with zero
-repository rulesets.
+CI on code revision `d8016610aa7ebf82263413c48b1164e4a64d13df` passed runs
+`40616497449` (push) and `40616501268` (pull_request). At the 2026-10-29 PR check, head
+`5c91603af18d42f03f53412f814a25833f2b3ea1` passed runs `40622384336` and
+`40622378634` (both `test`, success). These are the exact current-head checks
+observed before the documentation-only synchronization; fresh CI must be checked
+on any subsequently pushed head. Older runs
+`40398880548`/`40398888540` (head `5af5bc7`) and `40570468109` (Arena `c0cd3c1`)
+remain historical for their exact commits only.
 
-Earlier sessions had assumed this environment could push only to the Arena
-branch; that assumption was tested and disproven when the plain fast-forward push
-to the feature branch succeeded, so no external promotion step remains.
-PR #14 remains draft and was not merged.
+PR #14 was advanced by non-forced fast-forward; no merge or draft-state change
+was made. At the latest query it remained OPEN, DRAFT and MERGEABLE, with base
+`36b7b486bb60b54f3f19201f2e548b11e5f93197`.
 
 ## 8. Known limitations and external blockers
 
@@ -263,14 +307,15 @@ PR #14 remains draft and was not merged.
   live-news requirement, news feature policy and final submission format/email.
 - Raw historical price snapshot is not committed and could not be refetched in
   this network-restricted sandbox.
-- PR #14's head was advanced from this session by non-forced fast-forward, and
-  CI is green on every head of this delivery. No external clone step remains.
+- PR #14 was rechecked on 2026-10-29 at the head and CI stated above. This final
+  docs-only edit is not part of that observed head until committed/pushed and
+  checked.
 - Static typing is not configured as a CI gate; no claim of mypy-clean code is
   made. The defined offline checks and CI are the release gates.
 - CI proves offline code health only; it cannot prove data access, licence,
   model quality, profitability or employer acceptance.
 
-## 9. Submission artifacts
+## 9. Submission artifacts and verified paths
 
 - `README.md`
 - `docs/SUBMISSION_SUMMARY.md`
@@ -284,9 +329,11 @@ PR #14 remains draft and was not merged.
 - `docs/PR14_PROMOTION.md`
 - `docs/REQUIREMENTS_TRACEABILITY.md`
 - `reports/btc-usd-180d/` committed historical real-price artefacts
-- `reports/generated/final-verify-2026-10-28-82883/` — the verified two-run
-  artefact set recorded under *Current local verification (2026-10-28)* and in
-  section 4 (hashes above were re-reproduced).
+- `reports/generated/final-submit-verify-2026-10-29/` — fresh two-run artefact
+  set with sizes and SHA-256 values recorded above; these ignored generated
+  artefacts remain local and are not tracked in Git.
+- `reports/generated/final-verify-2026-10-28-82883/` — prior ignored two-run
+  synthetic demonstration artifacts (historical evidence; unchanged).
 - `reports/generated/final-audit-2026-10-28.D0dgOZ/`,
   `reports/generated/final-resume-2026-10-28/` and
   `reports/generated/resume-audit-2026-10-28/` ignored synthetic demo artefacts

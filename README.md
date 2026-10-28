@@ -4,20 +4,18 @@ Research pipeline that tests whether timestamped X (Twitter) sentiment adds
 out-of-sample predictive value beyond price-only baselines for **BTC-USD** daily
 close forecasts at horizons `n+0` through `n+5`.
 
-> **Status: prices, features, models, evaluation and reporting are implemented and
-> verified on real public Coinbase data. X data access remains an open external
-> gate.** No live X corpus has been accepted, no Apify Actor has been run, and no
-> sentiment result is claimed. The database schema, idempotent repositories,
-> cutoff join and persisted-input CLI path are implemented and verified offline
-> (R15); a database holding accepted real X rows is not available. `fetch-news`
-> is an opt-in, mocked-verified Tavily
-> CLI step; no live Tavily or Exa request has been made, so live provider behaviour
-> is unverified. The two assessment PDFs were read in full on
-> 2026-10-26 but are not committed to this checkout; the linked Google Doc is a
-> 12-entry dataset-link compilation, not a tweet corpus. The pipeline runs end to
-> end today with zero posts and reports
-> sentiment as unavailable rather than inventing it. CI passing is not evidence of
-> data access, model quality or profitability.
+> **Status: the pipeline, models, evaluation and reports are implemented.** A
+> historical Coinbase run and report are documented, but the raw price snapshot
+> is neither tracked nor present in this checkout, and no fresh provider response
+> was verified here. X data access remains blocked: no approved live corpus or
+> Actor has been used, and no sentiment benefit is claimed. The database schema, idempotent
+> repositories, cutoff join and persisted-input CLI path are implemented and
+> verified offline (R15). `fetch-news` is an opt-in, mocked-verified Tavily CLI
+> step; no live Tavily or Exa request has been made. The assessment PDFs were read
+> on 2026-10-26 but are not in this checkout; the linked Google Doc is a 12-entry
+> dataset-link compilation, not a tweet corpus. The pipeline reports sentiment as
+> unavailable when run without posts. CI does not prove provider access, data
+> licensing, model quality or profitability.
 
 ## Canonical engineering documents
 
@@ -42,22 +40,21 @@ gap and external blocker, checked by `python scripts/validate_docs.py`). The mat
 records the verified assignment PDFs (page counts and SHA-256), the 12 dataset candidates, and the requirements that remain partial, including provider access (R2) and the email
 submission packet (A7). The database join (R15) is recorded as verified complete offline.
 
-## Delivery status (2026-10-28)
+## Delivery status (re-inspected 2026-10-29)
 
-Repository state last verified 2026-10-28: the delivered code revision is
-`d8016610aa7ebf82263413c48b1164e4a64d13df`, pushed to
-`feat/sentiment-features-and-forecasting` by non-forced fast-forward from a clean
-tree. PR #14 head is the tip of that branch, so GitHub shows the live head SHA
-(including any later documentation-only commit). Fresh CI on `d801661` is green:
-runs `40616497449` (push) and `40616501268` (pull_request), both `success`.
-Remote
-Arena remains `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` and was not changed.
-PR #14 is OPEN and DRAFT, MERGEABLE, base
-`36b7b486bb60b54f3f19201f2e548b11e5f93197`. The earlier assumption that this
-session could push only to Arena was disproven when the fast-forward push to the
-feature branch succeeded, so no external promotion step remains — see
-[docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md). No merge or draft-state change
-has been made.
+The working branch is `feat/sentiment-features-and-forecasting`; at initial
+inspection on 2026-10-29 it was clean and aligned with `origin`. PR #14 is OPEN,
+DRAFT and MERGEABLE against `docs/canonical-source-of-truth` (base SHA
+`36b7b486bb60b54f3f19201f2e548b11e5f93197`). At the 2026-10-29 metadata check,
+PR head SHA `5c91603af18d42f03f53412f814a25833f2b3ea1` had two completed
+successful CI checks (runs `40622384336` and `40622378634`). The delivered code change is
+`d8016610aa7ebf82263413c48b1164e4a64d13df`; subsequent commits are documentation
+synchronization. GitHub's live PR head changes with every commit; check it with
+`gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`
+and inspect checks for that exact SHA. The Arena branch remains
+`c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`. PR #14 was updated by a normal
+fast-forward and has not been merged or marked ready for review. See
+[docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md) for the recorded procedure.
 
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
 [Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),

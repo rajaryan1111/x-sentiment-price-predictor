@@ -13,7 +13,7 @@ verification state before presenting.
 ```bash
 git clone https://github.com/rajaryan1111/x-sentiment-price-predictor.git
 cd x-sentiment-price-predictor
-git checkout arena/cf79e7b7-x-sentiment-price-predictor
+git checkout feat/sentiment-features-and-forecasting
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev,storage]'

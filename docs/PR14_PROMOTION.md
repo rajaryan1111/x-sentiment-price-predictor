@@ -3,10 +3,10 @@
 **Promotion status: COMPLETED on 2026-10-28.** The verified work was committed
 as `d8016610aa7ebf82263413c48b1164e4a64d13df` and pushed to
 `feat/sentiment-features-and-forecasting` with a normal non-forced fast-forward
-(`5af5bc7..d801661`). PR #14's head branch now contains it, and CI is green on
-every head this delivery has had (including the documentation-only follow-up
-commit). No force-push, history rewrite, base change, draft-state change or merge
-occurred.
+(`5af5bc7..d801661`). PR #14's head branch contains it. CI passed on the latest head observed before
+this final documentation-only synchronization; verify checks on the live head
+before describing this synchronization as CI-verified. No force-push, history
+rewrite, base change, draft-state change or merge occurred.
 The procedure below is retained as the record of how it was done and as the safe
 repeat path if the head ever needs to advance again.
 
@@ -20,27 +20,29 @@ push to the feature branch succeeded from here.
 **Base:** `docs/canonical-source-of-truth`
 **PR head branch:** `feat/sentiment-features-and-forecasting`
 
-## Verified state on 2026-10-28 (after promotion)
+## Verified state on 2026-10-29 (latest metadata inspection)
 
-- Remote feature / PR #14 head: the tip of
-  `feat/sentiment-features-and-forecasting`, which contains the delivered code
-  revision `d8016610aa7ebf82263413c48b1164e4a64d13df`. GitHub shows the live head
-  SHA; the working tree is clean.
+- Remote feature / PR #14 head: `5c91603af18d42f03f53412f814a25833f2b3ea1`,
+  containing the code revision `d8016610aa7ebf82263413c48b1164e4a64d13df` and
+  later docs-only commits. GitHub reports the live SHA; check it again before
+  using this procedure.
 - PR base `docs/canonical-source-of-truth`:
   `36b7b486bb60b54f3f19201f2e548b11e5f93197`.
-- Remote Arena branch: `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` (unchanged by
-  this promotion; Arena CI run `40570468109` remains valid for that SHA).
+- Remote Arena branch: `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
 - PR #14 metadata: OPEN, DRAFT, MERGEABLE.
-- Fresh CI on the delivered head, both `success`:
-  run `40616497449` (push) and run `40616501268` (pull_request) —
-  <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40616497449>
-  and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40616501268>.
-  Older runs `40398880548`/`40398888540` (head `5af5bc7`) are historical only.
-- Ancestry rechecked after the push: base is an ancestor of feature, Arena is an
-  ancestor of feature, and `git rev-list --left-right --count feature...arena`
-  returns `1 0` (feature strictly ahead, no divergence).
-- GitHub branch API reported `protected=false` for the feature branch and zero
-  repository rulesets, which is why the plain fast-forward push was accepted.
+- CI on the latest observed head, both successful: run `40622384336` and run
+  `40622378634` —
+  <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40622384336>
+  and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40622378634>.
+  Earlier code-revision runs `40616497449`/`40616501268` are also successful on
+  `d801661`; older runs `40398880548`/`40398888540` and `40570468109` are
+  historical checks for their respective SHAs.
+- At last ancestry inspection the base and Arena were ancestors of feature;
+  feature-vs-Arena was `3 0` after documentation-only commits. No force push,
+  history rewrite, base change, PR-ready change or merge occurred.
+- The documentation-only local diff passed the final offline verification gates
+  on 2026-10-29. If committed and pushed, fresh PR CI must run on its resulting
+  commit.
 
 ## Do not
 
@@ -57,7 +59,6 @@ Run from a clean, authorized clone with a normal `origin` refspec:
 
 ```bash
 git fetch origin \
-  '+refs/heads/main:refs/remotes/origin/main' \
   '+refs/heads/arena/cf79e7b7-x-sentiment-price-predictor:refs/remotes/origin/arena/cf79e7b7-x-sentiment-price-predictor' \
   '+refs/heads/feat/sentiment-features-and-forecasting:refs/remotes/origin/feat/sentiment-features-and-forecasting' \
   '+refs/heads/docs/canonical-source-of-truth:refs/remotes/origin/docs/canonical-source-of-truth'
@@ -68,11 +69,18 @@ BASE=origin/docs/canonical-source-of-truth
 
 git rev-parse "$FEAT" "$ARENA" "$BASE"
 git merge-base --is-ancestor "$BASE" "$FEAT"
-git merge-base --is-ancestor "$FEAT" "$ARENA"
 ```
 
-The last two commands must exit zero. If either fails, stop: the graph has
-diverged and a fast-forward is not safe.
+The base-ancestry check must exit zero. Next inspect whether Arena is already
+contained in the feature branch:
+
+```bash
+git merge-base --is-ancestor "$ARENA" "$FEAT" && echo 'Arena is contained in feature'
+git rev-list --left-right --count "$FEAT...$ARENA"
+```
+
+If Arena is not an ancestor of feature, do not assume a fast-forward direction;
+inspect the graph and diffs before deciding anything. Never push the base branch.
 
 ## Step 2 — confirm the feature branch has not unexpectedly advanced
 
@@ -93,13 +101,11 @@ COUNTS=$(git rev-list --left-right --count "$FEAT...$ARENA")
 LEFT=${COUNTS%%$'\t'*}
 RIGHT=${COUNTS##*$'\t'}
 echo "feat-only=$LEFT arena-only=$RIGHT"
-# Promotion already happened, so the current state is feat-only=1 arena-only=0:
-# feature contains Arena. The arena -> feature fast-forward run on 2026-10-28 was
-# valid only while feat-only was 0 and arena-only was >= 1. If either guard does
-# not hold now, push nothing; re-derive the direction from the two live SHAs.
-test "$LEFT" -eq 1 && test "$RIGHT" -eq 0 || {
-  echo "STOP: refs no longer match the recorded post-promotion state" >&2
-  echo "Inspect $FEAT and $ARENA before deciding anything." >&2
+# After promotion, Arena should be an ancestor of feature and arena-only must be 0.
+# The feature-only count can grow as PR documentation or code advances.
+git merge-base --is-ancestor "$ARENA" "$FEAT" && test "$RIGHT" -eq 0 || {
+  echo "STOP: feature no longer contains the recorded Arena base" >&2
+  echo "Inspect both refs and the complete diff before deciding anything." >&2
   exit 1
 }
 
@@ -108,12 +114,11 @@ git diff --check "$ARENA..$FEAT"
 git diff --stat "$ARENA..$FEAT"
 ```
 
-The feature-only commits should be the verified delivery commit `d801661` listed
-above, possibly followed by its documentation-only reconciliation commits.
-`git diff --check` must be clean, and the diff should contain only
-the verified implementation, tests, CI configuration and documentation changes
-described in the submission package. Pre-promotion, the equivalent check was
-`feat-only=0` with `arena-only >= 1`, and `git diff --check "$FEAT..$ARENA"`.
+The feature-only commits include the verified code delivery `d801661` plus
+subsequent documentation commits; the exact count is not a fixed guard. Review
+`git log --oneline "$ARENA..$FEAT"`, `git diff --check "$ARENA..$FEAT"`, and
+`git diff --stat "$ARENA..$FEAT"`. Do not advance anything unless the reviewed
+diff is intended and all local gates pass.
 
 ## Step 3 — verify branch rules and local cleanliness
 
@@ -130,25 +135,27 @@ The working tree must be clean. On 2026-10-28 the branch endpoint reported
 change. If a new rule blocks direct pushes, ask a maintainer with bypass rights to
 run the fast-forward or approve the push through GitHub's normal UI.
 
-## Step 4 — fast-forward and push normally
+## Step 4 — advance the PR branch only when there is a reviewed descendant
+
+Promotion of the previously audited Arena change set is complete; do not repeat
+it. For a future, separately reviewed candidate commit, first verify it descends
+from the live feature tip and contains the intended base, then fast-forward only:
 
 ```bash
-if git show-ref --verify --quiet refs/heads/feat/sentiment-features-and-forecasting; then
-  git switch feat/sentiment-features-and-forecasting
-  git merge --ff-only "$FEAT"
-else
-  git switch --create feat/sentiment-features-and-forecasting --track "$FEAT"
-fi
-
-git merge --ff-only "$ARENA"
-git status --short --branch
+FEATURE=origin/feat/sentiment-features-and-forecasting
+CANDIDATE=<reviewed-local-commit>
+git merge-base --is-ancestor "$FEATURE" "$CANDIDATE"
+git merge-base --is-ancestor "$BASE" "$CANDIDATE"
+git diff --check "$FEATURE..$CANDIDATE"
+git diff --stat "$FEATURE..$CANDIDATE"
+# Review the complete diff, run local gates, then:
+git switch feat/sentiment-features-and-forecasting
+git merge --ff-only "$CANDIDATE"
 git push origin feat/sentiment-features-and-forecasting
 ```
 
-`git merge --ff-only` cannot create a merge commit; it only moves the branch
-pointer to a descendant. A normal `git push` will be rejected if someone advanced
-the remote branch in the meantime. If that happens, re-fetch and restart at Step
-1 instead of forcing.
+Never blindly merge Arena into feature. If someone advanced the remote branch,
+normal push rejects; fetch and re-inspect, without forcing.
 
 ## Step 5 — verify the PR head and fresh CI
 
@@ -164,8 +171,9 @@ gh run watch "$RUN" --exit-status
 gh pr checks 14
 ```
 
-PR #14 should now report the same head SHA as the remote feature branch — for the
-2026-10-28 promotion it reported `d8016610aa7ebf82263413c48b1164e4a64d13df`.
+PR #14 should report the same head SHA as the remote feature branch. Record the
+live SHA returned by GitHub at the time of the check; documentation commits also
+advance the branch tip.
 Both the push event and the pull-request event trigger the CI workflow because
 `.github/workflows/ci.yml` contains `feat/**` in its push and pull-request branch
 filters; both runs were observed green. Wait for the checks attached to the new

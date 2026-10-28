@@ -66,10 +66,12 @@ none has an employer answer on record.
 
 ## 3. Provider / credential authorization checklist
 
-Availability of a credential never implies authorization to spend. As of
-2026-10-28 no provider credential is present in this environment (only empty
-`.env.example` placeholders), no private transfer route is defined, and no paid
-call is authorized. This is the exact checklist to satisfy before any live call.
+Availability of a credential never implies authorization to spend. At the latest
+inspection on 2026-10-29, APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and
+EXA_API_KEY were absent from the process environment and project-local `.env`
+files (only empty `.env.example` placeholders exist). No private transfer route
+is defined, and no paid call is authorized. This is the exact checklist to satisfy
+before any live call.
 
 | Provider | Purpose | Expected operation | May incur cost? | Required cap | Required approval |
 | --- | --- | --- | --- | --- | --- |
@@ -81,8 +83,8 @@ call is authorized. This is the exact checklist to satisfy before any live call.
 
 Engineering rule: no live Tavily/Exa/Apify/Coinbase request is made until the
 matching row is fully approved, the cap is recorded, and the user explicitly
-authorizes the call. Up to and including 2026-10-28, **no live provider call has
-been made**; all provider coverage is mocked.
+authorizes the call. As of 2026-10-29, **no live provider call has been made**;
+all provider coverage is mocked.
 
 ## 4. Ready-to-send email draft (NOT SENT)
 
@@ -95,7 +97,7 @@ been made**; all provider coverage is mocked.
 >
 > **Repository:** <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 > **Assessment PR:** <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
-> **Verified working branch:** `arena/cf79e7b7-x-sentiment-price-predictor`
+> **Verified working branch:** `feat/sentiment-features-and-forecasting` (PR #14 head; check GitHub for the live SHA)
 > **Documentation:** the submission summary, requirements audit, verification
 > report, demo walkthrough and evaluation report (PDF or Markdown) are in the
 > repository's `docs/` folder and `reports/btc-usd-180d/`.
@@ -161,6 +163,7 @@ application, never from mockups:
   [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md)); label them as synthetic.
 - **Video (5–7 min):** record the timed script in
   [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md), which uses verified commands only.
-- **GitHub links:** repository URL and PR #14 URL above; note the final verified
-  code is on the Arena branch until the PR head is promoted per
-  [PR14_PROMOTION.md](PR14_PROMOTION.md).
+- **GitHub links:** repository URL and PR #14 URL above; the verified code was
+  promoted to the existing PR #14 feature branch by non-forced fast-forward.
+  At the last recorded inspection the PR was still OPEN and DRAFT, and was not
+  merged. Check GitHub for the live head and CI before sending.
