@@ -59,9 +59,10 @@ price snapshot is not present in this checkout; historical public-price metrics
 are retained as report/manifest artifacts only. Additional partial rows depend
 indirectly on the accepted-X-data gate. PR #14 delivery was
 completed on 2026-10-28 (B8 resolved): the code change is in the feature branch.
-At the latest ref check (2026-10-29), PR head was
-`2d5e2f70c150a4cd985725d078229338940529e6`, with two successful CI runs
-(`40783061034`, `40783064118`). This is a point-in-time status; query GitHub for
+At the PR metadata inspection before this documentation-only update
+(2026-10-29), PR head was
+`6a41980943b000326e3b3cabe331a392e63410a3`, with two successful CI runs
+(`40784385769`, `40784392125`). This is a point-in-time status; query GitHub for
 the current head before any further promotion.
 
 This audit is intentionally more conservative than the canonical matrix for R8:
@@ -74,13 +75,16 @@ verified as offline engineering, not as live provider or real-X acceptance.
 - The docs-synchronized local suite passed 187 tests (run on 2026-10-29);
   the focused Apify/Tavily/news CLI/pipeline command passed 64 tests (run on
   2026-10-29). Ruff, compileall, registry validation (12 records), docs validation
-  (101 links, 21 test-count claims, 28 requirement rows) and `git diff --check`
-  passed. A fresh two-run synthetic demo matched all six artifacts byte-for-byte. Exact
-  commands and hashes are in
+  (102 links, 21 test-count claims, 28 requirement rows) and `git diff --check`
+  passed on this documentation-only update. The prior two-run synthetic demo
+  matched all six artifacts byte-for-byte. Exact commands and hashes are in
   [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). The code change is
-  committed as `d801661`; the documentation reconciliation is committed as
-  `2d5e2f7`. At the latest metadata check, PR head `2d5e2f7` had two successful
-  CI runs. Local documentation and code checks passed on the same content.
+  committed as `d801661`; documentation-only synchronization followed. At the
+  metadata check preceding this documentation-only correction, PR head `6a41980`
+  had two successful CI runs. The full code suite and related gates apply to the
+  inspected source tree; this documentation-only update separately passed the
+  docs validator, focused docs tests and `git diff --check`. Inspect PR checks on
+  the resulting pushed head.
 - On 2026-10-29, the docs-synchronized local synthetic demo generated six
   artifacts, six folds, 2,160 predictions and 18 metric rows from 210 synthetic
   bars and 209 synthetic posts. Two independent CLI runs matched byte-for-byte on
@@ -91,8 +95,9 @@ verified as offline engineering, not as live provider or real-X acceptance.
 - GitHub Actions evidence is recorded per SHA: prior runs belong to their specific
   older commits. The code revision `d801661` passed runs `40616497449` (push) and
   `40616501268` (pull_request); later documentation commits advanced the PR head.
-  At the 2026-10-29 metadata check, head `2d5e2f70c150a4cd985725d078229338940529e6`
-  passed runs `40783061034` and `40783064118`. See the verification report.
+  At the 2026-10-29 metadata check before this documentation-only update,
+  head `6a41980943b000326e3b3cabe331a392e63410a3` passed runs `40784385769` and
+  `40784392125`. See the verification report.
 - No live Tavily, Exa, Apify or Coinbase request was made during this audit. The implementation-only URL/timestamp and Apify URL regression checks passed locally; no live provider compatibility is inferred.
 
 ## 4.1 Independent evidence cross-check (2026-10-29)
@@ -100,8 +105,9 @@ verified as offline engineering, not as live provider or real-X acceptance.
 The line-by-line audit below was inherited from the prior checkpoint. This resumed
 pass rechecked implementation paths and added news URL/timestamp plus Apify
 provenance-URL sanitization tests. The verified code tree is committed as `d801661`;
-subsequent documentation-only commits advanced PR #14. Its last observed head
-`2d5e2f70c150a4cd985725d078229338940529e6` had two successful CI runs.
+subsequent documentation-only commits advanced PR #14. Its head at the last
+inspection before this local correction was `6a41980943b000326e3b3cabe331a392e63410a3`,
+with two successful CI runs.
 
 
 Documentation claims were not counted as implementation evidence. For every
@@ -194,7 +200,7 @@ In summary:
 - **B6** live Tavily requirement and news feature policy — leaves A4 PARTIAL.
 - **B7** submission format/email authorization — leaves A7 PARTIAL.
 - **B8** session branch policy — **resolved**: PR #14's head was advanced by a
-  non-forced fast-forward to `d801661` with green CI on that head; see
+  non-forced fast-forward to `d801661` with green CI on that code revision; see
   [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 9. Defensible conclusion
@@ -202,10 +208,10 @@ In summary:
 The implementable engineering pipeline is reproducible offline, including the
 gated news CLI, streaming response bound, input-lineage provenance, a full CLI
 end-to-end demonstration and offline network isolation. Local quality gates pass
-on code commit `d801661`, and subsequent documentation-only commits have green CI at the last observed PR head; the assignment is not fully satisfiable in this
+on code commit `d801661`; the last inspected PR head `6a41980` had green CI before
+this documentation-only update. The assignment is not fully satisfiable in this
 environment because no accepted X corpus, provider credential, paid-call
-authorization, employer clarification or submission
-email exists. Those limitations are
-recorded here rather than hidden. See
+authorization, employer clarification or submission email exists. Those
+limitations are recorded here rather than hidden. See
 [SUBMISSION_SUMMARY.md](SUBMISSION_SUMMARY.md) for the evaluator-facing summary
 and [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md) for the timed demonstration.

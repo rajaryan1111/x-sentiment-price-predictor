@@ -1,21 +1,22 @@
 # Final verification report
 
-**Latest local verification context:** 2026-10-29, Python 3.11.15, branch
-`feat/sentiment-features-and-forecasting`, documentation-only commit
-`2d5e2f70c150a4cd985725d078229338940529e6`. The code under test was introduced at
-`d8016610aa7ebf82263413c48b1164e4a64d13df`; this verification covered the final
-documentation reconciliation, whose contents are committed at `2d5e2f7`. At initial
-inspection the tree was clean and aligned with `origin`; current PR metadata and
-CI for the final pushed SHA are recorded below.
+**Verification context:** 2026-10-29, Python 3.11.15, branch
+`feat/sentiment-features-and-forecasting`. Source code is at
+`d8016610aa7ebf82263413c48b1164e4a64d13df`; PR #14's pushed head at the inspection
+preceding this status-only documentation reconciliation was
+`6a41980943b000326e3b3cabe331a392e63410a3`. This report distinguishes the source
+verification from the reconciliation's separately listed local checks.
 
-## Latest local re-verification (2026-10-29; documentation-only diff)
+## Code verification and current documentation checks (2026-10-29)
 
-No source code changed from code commit `d801661`; the documentation
-synchronization was validated on the same file contents committed at `2d5e2f7`.
-On 2026-10-29, a first full-suite attempt found only the documentation count guard
-failing (186 passed, 1 failed) because five test-count statements lacked an
-explicit date in the same sentence. After qualifying those statements, the final
-gates passed:
+The full code suite, focused regressions, and source-oriented quality gates below
+were rerun on 2026-10-29 with source code unchanged at `d801661`. A later
+status-only documentation correction was separately checked with the docs
+validator, its focused tests, and `git diff --check`; those results are listed
+explicitly below. The first full-suite attempt after earlier wording changes found
+only the documentation count guard failing (186 passed, 1 failed) because five
+test-count statements lacked an explicit date in the same sentence. After those
+statements were corrected, the full suite passed:
 
 - `.venv/bin/python -m pytest -q` -> **187 passed** (run on 2026-10-29).
 - Focused regressions:
@@ -24,10 +25,12 @@ gates passed:
 - `.venv/bin/ruff check src tests scripts` -> all checks passed.
 - `.venv/bin/python -m compileall -q src tests scripts` -> exit 0.
 - `.venv/bin/python scripts/validate_dataset_registry.py` -> 12 records valid.
-- `.venv/bin/python scripts/validate_docs.py` -> 101 relative Markdown links,
+- `.venv/bin/python scripts/validate_docs.py` -> 102 relative Markdown links,
   21 test-count claims, 28 matrix rows (11 complete, 14 partial, 2 externally
-  blocked, 1 needing clarification); passed.
-- `git diff --check` -> clean.
+  blocked, 1 needing clarification); passed on the current local documentation.
+- `.venv/bin/python -m pytest -q tests/unit/test_docs_validation.py` -> **9 passed**
+  on the current local documentation correction.
+- `git diff --check` -> clean on the current local documentation correction.
 
 A fresh two-run CLI demonstration was generated from a previously absent output
 root at `reports/generated/final-submit-verify-2026-10-29/`. It produced 210 synthetic daily bars, 209 synthetic posts,
@@ -55,9 +58,10 @@ for APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and EXA_API_KEY; each was absen
 
 The prior complete local code verification was run on 2026-10-28 for the
 22-file change set committed as `d8016610aa7ebf82263413c48b1164e4a64d13df`.
-After that code commit, docs-only commits advanced the PR. The latest pushed
-head is `2d5e2f70c150a4cd985725d078229338940529e6`; fresh CI runs
-`40783061034` and `40783064118` both succeeded on that exact SHA. The historical
+After that code commit, docs-only commits advanced the PR. The head inspected
+before these local documentation corrections was
+`6a41980943b000326e3b3cabe331a392e63410a3`; fresh CI runs `40784385769` and
+`40784392125` both succeeded on that exact SHA. The historical
 2026-10-28 verification results below remain separate from the latest local
 rerun above.
 
@@ -278,24 +282,26 @@ PR #14            OPEN, DRAFT, MERGEABLE, base docs/canonical-source-of-truth,
 
 The feature branch contains both the base and Arena branches. The initial
 promotion was a normal fast-forward (`5af5bc7..d801661`); subsequent docs-only
-commits increased the feature-vs-Arena count. At the latest ref inspection it was
-`4 0` (feature-only 4, Arena-only 0), with no divergence or Arena-only commits.
+commits increased the feature-vs-Arena count. At the ref inspection before this
+local correction it was `5 0` (feature-only 5, Arena-only 0), with no divergence
+or Arena-only commits.
 No force, history rewrite, base change or draft-state change was used.
 
 CI on code revision `d8016610aa7ebf82263413c48b1164e4a64d13df` passed runs
 `40616497449` (push) and `40616501268` (pull_request). Earlier docs-only head
 `5c91603af18d42f03f53412f814a25833f2b3ea1` passed runs `40622384336` and
-`40622378634`. The final documentation head
-`2d5e2f70c150a4cd985725d078229338940529e6` passed fresh runs `40783061034`
-and `40783064118` (both `test`, success). These run IDs are tied to their exact
+`40622378634`. The documentation head inspected before this status-only update,
+`6a41980943b000326e3b3cabe331a392e63410a3`, passed fresh runs `40784385769`
+and `40784392125` (both `test`, success). These run IDs are tied to their exact
 heads; query GitHub before describing any later commit as CI-verified. Older runs
 `40398880548`/`40398888540` (head `5af5bc7`) and `40570468109` (Arena `c0cd3c1`)
 remain historical for their exact commits only.
 
 PR #14 was advanced by non-forced fast-forward; no merge or draft-state change
-was made. At the latest query it remained OPEN, DRAFT and MERGEABLE, with base
+was made. At the query before the current local correction it remained OPEN, DRAFT
+and MERGEABLE, with base
 `36b7b486bb60b54f3f19201f2e548b11e5f93197` and head
-`2d5e2f70c150a4cd985725d078229338940529e6`.
+`6a41980943b000326e3b3cabe331a392e63410a3`.
 
 ## 8. Known limitations and external blockers
 
@@ -310,9 +316,10 @@ was made. At the latest query it remained OPEN, DRAFT and MERGEABLE, with base
   live-news requirement, news feature policy and final submission format/email.
 - Raw historical price snapshot is not committed and could not be refetched in
   this network-restricted sandbox.
-- PR #14 was rechecked on 2026-10-29 at the head and CI stated above. This final
-  docs-only edit is not part of that observed head until committed/pushed and
-  checked.
+- The last PR inspection before the local documentation corrections found PR #14
+  OPEN/DRAFT/MERGEABLE at head `6a41980943b000326e3b3cabe331a392e63410a3`; runs
+  `40784385769` and `40784392125` passed on that exact head. Any pushed changes
+  after that SHA require their own fresh CI before being described as green.
 - Static typing is not configured as a CI gate; no claim of mypy-clean code is
   made. The defined offline checks and CI are the release gates.
 - CI proves offline code health only; it cannot prove data access, licence,

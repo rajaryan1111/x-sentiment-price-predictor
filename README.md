@@ -40,14 +40,15 @@ gap and external blocker, checked by `python scripts/validate_docs.py`). The mat
 records the verified assignment PDFs (page counts and SHA-256), the 12 dataset candidates, and the requirements that remain partial, including provider access (R2) and the email
 submission packet (A7). The database join (R15) is recorded as verified complete offline.
 
-## Delivery status (re-inspected 2026-10-29)
+## Delivery status (GitHub inspection on 2026-10-29)
 
-The working branch is `feat/sentiment-features-and-forecasting`, clean and aligned
-with `origin`. PR #14 is OPEN, DRAFT and MERGEABLE against
+At the recorded metadata check, branch `feat/sentiment-features-and-forecasting`
+was clean and aligned with `origin`.
+PR #14 was OPEN, DRAFT and MERGEABLE against
 `docs/canonical-source-of-truth` (base SHA
-`36b7b486bb60b54f3f19201f2e548b11e5f93197`). Its verified head is
-`2d5e2f70c150a4cd985725d078229338940529e6`; push and pull-request CI runs
-`40783061034` and `40783064118` both succeeded on that exact SHA. The delivered
+`36b7b486bb60b54f3f19201f2e548b11e5f93197`). At that check, its head was
+`6a41980943b000326e3b3cabe331a392e63410a3`; push and pull-request CI runs
+`40784385769` and `40784392125` both succeeded on that exact SHA. The delivered
 code change is `d8016610aa7ebf82263413c48b1164e4a64d13df`; the later commits are
 documentation-only. GitHub's live PR head can change with each commit; recheck
 with `gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`

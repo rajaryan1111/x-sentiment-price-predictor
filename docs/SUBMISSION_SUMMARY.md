@@ -130,16 +130,13 @@ that question remains untestable without accepted X data.
 
 ### Local verification state (2026-10-29)
 
-The latest local verification recorded in
+The prior code verification recorded in
 [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) was run on 2026-10-29:
 187 suite tests and 64 focused Apify/Tavily/news CLI/pipeline tests passed, along
-with Ruff, compileall, registry/docs validation and diff checks; the code change
-set is committed at `d801661`, and the documentation reconciliation at
-`2d5e2f7`. The PR head was rechecked at
-`2d5e2f70c150a4cd985725d078229338940529e6`; two current-head CI checks (runs
-`40783061034`, `40783064118`) completed successfully (latest metadata inspection
-2026-10-29). Two real
-CLI runs at `reports/generated/final-submit-verify-2026-10-29/run-a/` and
+with Ruff, compileall, registry/docs validation and diff checks. The code change
+set is committed at `d801661`, followed by documentation-only commits. PR head
+`6a41980943b000326e3b3cabe331a392e63410a3` passed CI runs `40784385769` and
+`40784392125` at the recorded 2026-10-29 metadata inspection. Two CLI runs at `reports/generated/final-submit-verify-2026-10-29/run-a/` and
 `run-b/`, on 210 synthetic bars and 209 synthetic posts, produced six artefacts,
 six walk-forward folds, 2,160 predictions and 18 metric rows, with byte-identical
 outputs across all six files. Security regressions cover
@@ -164,10 +161,10 @@ sentiment performance evidence.
   `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`; it was
   not re-fetched or re-verified in this worktree.
 - No submission email was sent and PR #14 was not merged. The feature branch was
-  updated by non-forced fast-forward; at the latest inspection PR #14 remained
-  OPEN, DRAFT and MERGEABLE with head `2d5e2f70c150a4cd985725d078229338940529e6`
-  and base `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Both current-head CI runs
-  succeeded; see [PR14_PROMOTION.md](PR14_PROMOTION.md).
+  updated by non-forced fast-forward; at the pre-correction inspection PR #14 remained
+  OPEN, DRAFT and MERGEABLE with head `6a41980943b000326e3b3cabe331a392e63410a3`
+  and base `36b7b486bb60b54f3f19201f2e548b11e5f93197`. The two CI runs on that
+  head succeeded; see [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 8. Reproduction instructions
 
@@ -206,17 +203,17 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 - Repository: <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 - Existing draft PR #14: <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
   (base branch `docs/canonical-source-of-truth`; head branch
-  `feat/sentiment-features-and-forecasting`). At last inspection the PR base SHA was
-  `36b7b486bb60b54f3f19201f2e548b11e5f93197`; its latest verified head SHA was
-  `2d5e2f70c150a4cd985725d078229338940529e6`.
+  `feat/sentiment-features-and-forecasting`). At the recorded inspection the PR base SHA was
+  `36b7b486bb60b54f3f19201f2e548b11e5f93197`; the head SHA was
+  `6a41980943b000326e3b3cabe331a392e63410a3`.
 - The current checked-out branch is the feature branch. It contains the delivered
   code revision `d8016610aa7ebf82263413c48b1164e4a64d13df`, followed by
-  documentation-only synchronization commits `fb1fc3f`, `5c91603` and `2d5e2f7`.
+  documentation-only synchronization commits `fb1fc3f`, `5c91603`, `2d5e2f7` and `6a41980`.
 - The remote Arena branch remains `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
-  The feature branch is a superset of Arena (four feature-only commits at the
-  latest ref inspection, zero Arena-only commits).
-- PR #14 CI at the latest verified head: runs `40783061034` and `40783064118`,
-  both completed successfully on `2d5e2f70c150a4cd985725d078229338940529e6`.
+  At the recorded ref inspection, the feature branch was a superset of Arena
+  (five feature-only commits, zero Arena-only commits).
+- PR #14 CI at the recorded inspected head: runs `40784385769` and `40784392125`,
+  both completed successfully on `6a41980943b000326e3b3cabe331a392e63410a3`.
   Earlier code commit runs and older Arena/feature checks are historical only.
   See [PR14_PROMOTION.md](PR14_PROMOTION.md) for current evidence and safe procedure.
 
@@ -232,16 +229,23 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 
 ## 11. Final submission checklist
 
-The latest local engineering verification passed against the documentation content committed at `2d5e2f7` on 2026-10-29; source code remains at `d801661`. PR #14 is at `2d5e2f70c150a4cd985725d078229338940529e6` with two successful CI checks (latest check 2026-10-29). External data, authorization and delivery items remain pending.
+The source/code verification recorded in
+[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) passed on 2026-10-29;
+source code remains at `d801661`. At the recorded PR inspection, head was
+`6a41980943b000326e3b3cabe331a392e63410a3`; both CI checks passed on that SHA.
+These are point-in-time results;
+external data, authorization and delivery items remain pending.
 
 - [x] Reproducible pipeline, gated news CLI, offline demo, database join, chart,
   outlook and evaluation report implemented and tested.
 - [x] `README.md`, architecture, data policy, tech stack and reproduction
   commands present; `TEST_PLAN.md` is the authoritative test count.
-- [x] Final offline suite on 2026-10-29 (187 passed, focused set 64 passed), validators, Ruff,
-  compileall, diff check and two-run synthetic demo verified against the content
-  committed at `2d5e2f7`. Fresh PR CI passed on that exact pushed head (runs
-  `40783061034` and `40783064118`).
+- [x] The full offline suite (187 passed on 2026-10-29), focused source
+  regressions (64 passed on 2026-10-29), source gates and two-run synthetic
+  demo were verified with code unchanged at `d801661`; docs-only commits followed.
+  This current status-only correction passed docs validation, its focused tests
+  (9 passed on 2026-10-29) and `git diff --check`. CI on the previously pushed
+  head is not evidence for this local correction; inspect the updated PR head.
 - [x] Requirements audit (28 IDs), traceability matrix, external blockers and
   employer clarifications reconciled to 11 complete, 14 partial, 2 externally
   blocked and 1 needing clarification.
@@ -249,9 +253,8 @@ The latest local engineering verification passed against the documentation conte
   (Sharpe, Sortino, max drawdown) available.
 - [x] Timed 5–7 minute demo script and submission-package documents present.
 - [x] PR #14 head advanced by non-forced fast-forward to contain `d801661` and
-  final documentation commit `2d5e2f7`; latest verified head is
-  `2d5e2f70c150a4cd985725d078229338940529e6` with green CI runs `40783061034`
-  and `40783064118` (B8 resolved; see [PR14_PROMOTION.md](PR14_PROMOTION.md)).
+  documentation synchronization through `6a41980`; the two CI checks observed on
+  that prior head passed (B8 resolved; see [PR14_PROMOTION.md](PR14_PROMOTION.md)).
 - [ ] Accepted licensed 180-day X corpus / Actor / spend cap provided (B1/B3),
   and sentiment-enhanced evaluation run with real metrics (R2, R9).
 - [ ] Provider tokens / Actor IDs delivered through an approved private channel
