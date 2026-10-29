@@ -64,9 +64,10 @@ def test_rolling_source_without_coverage_end_requires_a_limitation(tmp_path: Pat
 def test_registry_records_independent_verification_state() -> None:
     document = json.loads(DEFAULT_REGISTRY.read_text(encoding="utf-8"))
     verification = document["independent_verification"]
-    assert verification["status"] == "not-reverified"
-    assert verification["checked_date"] == "2026-10-26"
-    assert "provider" in verification["scope"]
+    assert verification["status"] == "partially-reverified"
+    assert verification["checked_date"] == "2026-10-29"
+    assert "Hugging Face" in verification["scope"]
+    assert "row-level coverage" in verification["scope"]
 
 
 def test_validator_rejects_unknown_verification_and_recommended_id_only_source(

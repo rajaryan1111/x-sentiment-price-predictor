@@ -88,7 +88,7 @@ and `ruff`; charts are dependency-free SVG. See
 | Coinbase Exchange public BTC-USD daily candles | Historical real-data run recorded on 2026-10-26; 180/180 bars, SHA-256 `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`. The raw snapshot is not committed and was not refetched here. | Price features, targets, historical evaluation |
 | X/Twitter 180-day corpus | **Not accepted.** No approved Actor, licence, credential, spend cap or post-level text dataset exists. | Required for a genuine sentiment result; currently unavailable |
 | Tavily/Exa live news | **Not called.** Adapter and CLI are mocked-verified only. | Optional outlook context |
-| Assessment dataset-link Google Doc | Retrieved previously; 12-entry link compilation, not a tweet corpus. Registry is structurally validated, not independently re-verified. | Candidate inventory only |
+| Assessment dataset-link Google Doc | Full text re-fetched 2026-10-29; 12-entry link compilation, not a tweet corpus. Three candidate listings/cards were partially checked; no dataset rows or rights were verified. | Candidate inventory only |
 | Synthetic offline demo | Deterministic generator; labelled `synthetic` in files, records, manifest, report and outlook. | Software demonstration only; never reported as market evidence |
 
 ## 5. Model methodology
@@ -130,13 +130,15 @@ that question remains untestable without accepted X data.
 
 ### Local verification state (2026-10-29)
 
-The prior code verification recorded in
-[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) was run on 2026-10-29:
+The source-code verification recorded in
+[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) ran on 2026-10-29:
 187 suite tests and 64 focused Apify/Tavily/news CLI/pipeline tests passed, along
 with Ruff, compileall, registry/docs validation and diff checks. The code change
-set is committed at `d801661`, followed by documentation-only commits. PR head
-`6a41980943b000326e3b3cabe331a392e63410a3` passed CI runs `40784385769` and
-`40784392125` at the recorded 2026-10-29 metadata inspection. Two CLI runs at `reports/generated/final-submit-verify-2026-10-29/run-a/` and
+set is committed at `d801661`, followed by documentation-only commits. The latest
+live PR head queried on 2026-10-29 was `fa69d53f70535dec03dd7f48c1c0d212b565e336`;
+CI runs `40787633232` and `40787639350` both passed on that exact SHA. The local
+worktree subsequently acquired uncommitted documentation/registry/test edits not
+included in that PR head. Two CLI runs at `reports/generated/final-submit-verify-2026-10-29/run-a/` and
 `run-b/`, on 210 synthetic bars and 209 synthetic posts, produced six artefacts,
 six walk-forward folds, 2,160 predictions and 18 metric rows, with byte-identical
 outputs across all six files. Security regressions cover
@@ -149,22 +151,24 @@ sentiment performance evidence.
 
 - No accepted, licensed 180-day X corpus or live Apify Actor run exists in this
   checkout. R2 is externally blocked and the sentiment-versus-price comparison is
-  unmeasured.
-- On 2026-10-29, APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and EXA_API_KEY were
-  absent from the process environment and project-local `.env` files.
-  No Actor ID, approved private transfer channel or paid-spend authorization was
-  found; no live provider call was made.
+  unmeasured. Three public candidate listing/card metadata were checked but no rows
+  or rights were verified.
+- A prior 2026-10-29 inspection recorded APIFY_TOKEN, APIFY_API_TOKEN,
+  TAVILY_API_KEY and EXA_API_KEY absent from the process environment and project-local
+  `.env` files. No Actor ID, approved private transfer channel or paid-spend authorization
+  was found; no live provider call was made.
 - The employer has not confirmed the `n+0` target convention, exact calendar
   deadline, whether live Tavily news is mandatory or the final submission format.
 - The assignment PDFs and raw 180-day price snapshot are not present in this
   checkout. The snapshot SHA-256 recorded from the historical 2026-10-26 run is
   `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`; it was
   not re-fetched or re-verified in this worktree.
-- No submission email was sent and PR #14 was not merged. The feature branch was
-  updated by non-forced fast-forward; at the pre-correction inspection PR #14 remained
-  OPEN, DRAFT and MERGEABLE with head `6a41980943b000326e3b3cabe331a392e63410a3`
-  and base `36b7b486bb60b54f3f19201f2e548b11e5f93197`. The two CI runs on that
-  head succeeded; see [PR14_PROMOTION.md](PR14_PROMOTION.md).
+- No submission email was sent and PR #14 was not merged. At the current 2026-10-29
+  live query, PR #14 was OPEN, DRAFT and MERGEABLE with head
+  `fa69d53f70535dec03dd7f48c1c0d212b565e336` and base
+  `36b7b486bb60b54f3f19201f2e548b11e5f93197`; CI runs `40787633232` and
+  `40787639350` passed on that head. These checks do not include the current local
+  uncommitted documentation/registry/test changes.
 
 ## 8. Reproduction instructions
 
@@ -203,19 +207,20 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 - Repository: <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 - Existing draft PR #14: <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
   (base branch `docs/canonical-source-of-truth`; head branch
-  `feat/sentiment-features-and-forecasting`). At the recorded inspection the PR base SHA was
-  `36b7b486bb60b54f3f19201f2e548b11e5f93197`; the head SHA was
-  `6a41980943b000326e3b3cabe331a392e63410a3`.
+  `feat/sentiment-features-and-forecasting`). At the latest live query on
+  2026-10-29, base SHA was `36b7b486bb60b54f3f19201f2e548b11e5f93197`; head
+  SHA was `fa69d53f70535dec03dd7f48c1c0d212b565e336`.
 - The current checked-out branch is the feature branch. It contains the delivered
   code revision `d8016610aa7ebf82263413c48b1164e4a64d13df`, followed by
   documentation-only synchronization commits `fb1fc3f`, `5c91603`, `2d5e2f7` and `6a41980`.
 - The remote Arena branch remains `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
   At the recorded ref inspection, the feature branch was a superset of Arena
   (five feature-only commits, zero Arena-only commits).
-- PR #14 CI at the recorded inspected head: runs `40784385769` and `40784392125`,
-  both completed successfully on `6a41980943b000326e3b3cabe331a392e63410a3`.
-  Earlier code commit runs and older Arena/feature checks are historical only.
-  See [PR14_PROMOTION.md](PR14_PROMOTION.md) for current evidence and safe procedure.
+- PR #14 CI at the latest live inspected head: runs `40787633232` and
+  `40787639350`, both completed successfully on
+  `fa69d53f70535dec03dd7f48c1c0d212b565e336`. These checks predate current
+  uncommitted changes. Earlier code/Arena checks are historical only. See
+  [PR14_PROMOTION.md](PR14_PROMOTION.md) for the promotion history.
 
 ## 10. Submission documents
 
@@ -229,12 +234,12 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 
 ## 11. Final submission checklist
 
-The source/code verification recorded in
-[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) passed on 2026-10-29;
-source code remains at `d801661`. At the recorded PR inspection, head was
-`6a41980943b000326e3b3cabe331a392e63410a3`; both CI checks passed on that SHA.
-These are point-in-time results;
-external data, authorization and delivery items remain pending.
+The source-code verification recorded in
+[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) passed on 2026-10-29
+at code commit `d801661`. At the latest live PR inspection, head was
+`fa69d53f70535dec03dd7f48c1c0d212b565e336`; both CI checks passed on that SHA.
+Those checks predate current local uncommitted changes. External data,
+authorization and delivery items remain pending.
 
 - [x] Reproducible pipeline, gated news CLI, offline demo, database join, chart,
   outlook and evaluation report implemented and tested.
@@ -252,9 +257,10 @@ external data, authorization and delivery items remain pending.
 - [x] GitHub repository link, draft PR #14 link and Markdown evaluation report
   (Sharpe, Sortino, max drawdown) available.
 - [x] Timed 5–7 minute demo script and submission-package documents present.
-- [x] PR #14 head advanced by non-forced fast-forward to contain `d801661` and
-  documentation synchronization through `6a41980`; the two CI checks observed on
-  that prior head passed (B8 resolved; see [PR14_PROMOTION.md](PR14_PROMOTION.md)).
+- [x] PR #14 head was advanced by non-forced fast-forward to contain `d801661`;
+  later PR head `fa69d53` had two successful CI checks before the current local
+  edits. The current uncommitted changes are not included in PR #14 (B8 resolved;
+  see [PR14_PROMOTION.md](PR14_PROMOTION.md)).
 - [ ] Accepted licensed 180-day X corpus / Actor / spend cap provided (B1/B3),
   and sentiment-enhanced evaluation run with real metrics (R2, R9).
 - [ ] Provider tokens / Actor IDs delivered through an approved private channel

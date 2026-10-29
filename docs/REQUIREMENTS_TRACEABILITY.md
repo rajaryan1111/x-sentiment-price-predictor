@@ -6,29 +6,35 @@ evidence pointer, an evidence-based status and its external blocker.
 
 ## Authority and source verification
 
-**Current audit checkout (2026-10-28):** source inspection confirms the workspace `data/` directory contains only the BTC-USD price snapshot, registry and `.gitkeep`; there is no accepted X post-text corpus. The price file is the real 180-candle snapshot, not a post dataset. Do not rely on older uploaded-file inventory claims for this checkout.
+**Current audit checkout (2026-10-29):** the root and `docs/` copies of both supplied assessment PDFs are absent. `data/` contains the historical dataset registry but no raw BTC price snapshot or accepted X post-text corpus; the BTC run survives as committed report/manifest/metrics artifacts. Do not rely on prior uploaded-file inventory notes as files available in this checkout.
 
 The authority is the supplied assessment PDF (`CWT X sentiment Agent - intern task.pdf`)
-and its companion dataset-reference PDF. Both files were supplied and read in full on
-2026-10-26:
+and its companion dataset-reference PDF. The prior inspection record says both files
+were supplied and read in full on 2026-10-26; neither is present for re-reading in this
+checkout:
 
 | Source file | Pages | SHA-256 | Inspection result |
 | --- | --- | --- | --- |
-| `CWT X sentiment Agent - intern task.pdf` | 2 | `dc8211d11c5baf542b39b6e496e2a9b90e008b8a7b7108ba2b86b12b6ecbb19c` | Read in full; requirements transcribed in PHASE_1_REQUIREMENTS §2 and reconciled below. |
-| `Historical Twitter_X Datasets_ Verified Download Links.pdf` | 2 | `511e71cba26df7dcbc089b89639ba4ea28a0f2697c5fd92ffdbf598ac82e75e7` | Read in full; 12 dataset candidates; registry reconciled. |
-| Assessment-linked Google Doc | n/a | Export `7dba6d0431a3fff70736bc02fd74b855f213e9b148ec5decbcab60a5280043ea` | Retrieved 2026-10-26; exported text matches the dataset PDF. It is a dataset-link compilation, not a tweet corpus. |
+| `CWT X sentiment Agent - intern task.pdf` | 2 | `dc8211d11c5baf542b39b6e496e2a9b90e008b8a7b7108ba2b86b12b6ecbb19c` | Historically recorded as read in full; requirements transcribed in PHASE_1_REQUIREMENTS §2 and reconciled below. Current primary-source re-read unavailable. |
+| `Historical Twitter_X Datasets_ Verified Download Links.pdf` | 2 | `511e71cba26df7dcbc089b89639ba4ea28a0f2697c5fd92ffdbf598ac82e75e7` | Historically recorded as read in full; 12 dataset candidates; registry reconciled. Current primary-source re-read unavailable. |
+| Assessment-linked Google Doc | n/a | Prior export hash `7dba6d0431a3fff70736bc02fd74b855f213e9b148ec5decbcab60a5280043ea` (not recomputed 2026-10-29) | Full text re-fetched 2026-10-29; 12-entry dataset-link compilation, not a tweet corpus. |
 
-The PDFs are not committed to this repository. The hashes identify the inspected copies;
-the files themselves remain outside Git. Uploaded local files were also inspected:
-`90-day-samples.zip` contains numeric tweet IDs only; `Twitter-historical-...-sample.txt`,
-`date-tweet-id.tsv` and the `statistics-full_dataset*.tsv` files contain IDs or date/count
-summaries; `archive.zip` is an air-quality CSV; the available `archive (1).zip` is MQTT
-sensor JSON; `Manuscript.pdf` is a StockTwits research paper; the `archive (2).zip` named
-in an earlier handoff is not present. No uploaded file contains post-level X text.
+The PDFs are not committed to this repository. Their hashes identify the copies
+recorded as inspected on 2026-10-26; they are not available for re-reading in this
+checkout. Uploaded-file inventory from prior sessions is historical context, not
+current local evidence. The assessment-linked Google Doc was re-fetched as a full
+text export on 2026-10-29; it remains a 12-entry dataset-link list, not a tweet
+corpus. Current dataset-provider checks are summarized in
+[docs/data-sources.md](data-sources.md) and
+[docs/EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md); no candidate file
+was downloaded, licensed or approved.
 
-The assignment's exact wording is summarized in PHASE_1_REQUIREMENTS §2. Where the PDF is
-silent or ambiguous (the `n+0` convention, the news role, ML versus RL, the exact calendar
-deadline), the row records the provisional interpretation rather than employer intent.
+The assignment's wording is summarized in PHASE_1_REQUIREMENTS §2 from its
+recorded prior transcription. As the original PDFs are absent, these summaries are
+not reverified against the primary source in the 2026-10-29 audit pass. Where the
+brief is silent or ambiguous (the `n+0` convention, the news role, ML versus RL,
+the exact calendar deadline), the row records the provisional interpretation
+rather than employer intent.
 
 ## Requirement ID conventions
 
@@ -71,10 +77,10 @@ Allowed status vocabulary, used verbatim in the table:
 | NFR6 | Honest reporting: fixtures and in-sample values never presented as real out-of-sample results | Assessment brief, Project Overview; PHASE_1 §4 non-goals | Must | Artefacts label unavailable items and synthetic fixtures; no unverified claim is made | RULES.md §Data/model integrity, MODEL_PLAN.md | `src/xsentiment/reporting/report.py`, `outlook.py` | `tests/unit/test_reporting.py`; this matrix is checked by `scripts/validate_docs.py` | Verified complete | Enforcement is partly convention plus tests rather than a hard gate on every sentence | Extend the docs validator as new claims appear | None |
 | A1 | Submit within the stated timeline (the brief says both one week and 5–7 days) | Assessment brief, page 1 and Timeline; PHASE_1 §7 O11 | Must | Actual receipt date and due date confirmed from employer communication and recorded | DECISIONS D-014 | Not applicable | No employer communication or calendar date exists in the repository | Needs clarification | The PDF gives two durations and no calendar date; no date may be inferred from repository timestamps | Ask the employer for the exact due date and record it here | Employer reply (O11) |
 | A2 | Provide the APIFY/Tavily/Exa tokens and Actor IDs used for scraping | Assessment brief, Submission item 2; PHASE_1 §5 Credentials | Must | Non-secret Actor identifiers and query configuration are documented; tokens are delivered only through an employer-approved private channel and only for providers actually used | RULES.md §Security, docs/APIFY_X_SETUP.md | `.env.example` placeholders only | No identifier or token is required in Git; no secret is committed | Blocked by external dependency | No Actor ID exists; no token exists; the credential transfer route is undefined; Exa use is optional | Select the Actor, then agree a private transfer channel with the employer | R2, O10, O13 |
-| A3 | Use the historical tweets resource linked by the assessment | Assessment brief, Technical Requirements; PHASE_1 §5; DATA_POLICY.md | Should | Resource retrieved, terms reviewed, schema and text availability inspected and 180-day coverage profiled before use | DATA_POLICY.md §Historical datasets, DECISIONS D-008 | `src/xsentiment/ingestion/local_dataset_profile.py`, `scripts/profile_local_x_dataset.py`, `data/registry/historical_twitter_x_datasets.json` | The linked Google Doc was retrieved 2026-10-26; it is a 12-entry dataset-link compilation matching the companion PDF, not a tweet corpus; current project `data/` contains the 180-candle BTC-USD price snapshot and the registry, but no X post text | Partially complete | The resource link itself provides no posts; no candidate dataset has been downloaded, licensed, schema-checked or profiled for 180-day text coverage | Select a candidate, verify terms and schema, then profile a permitted snapshot locally | Dataset access and licensing; O6 |
+| A3 | Use the historical tweets resource linked by the assessment | Assessment brief, Technical Requirements; PHASE_1 §5; DATA_POLICY.md | Should | Resource retrieved, terms reviewed, schema and text availability inspected and 180-day coverage profiled before use | DATA_POLICY.md §Historical datasets, DECISIONS D-008 | `src/xsentiment/ingestion/local_dataset_profile.py`, `scripts/profile_local_x_dataset.py`, `data/registry/historical_twitter_x_datasets.json` | The linked Google Doc was re-fetched as full text on 2026-10-29 and confirms a 12-entry dataset-link compilation, not a tweet corpus; three candidate public listings were partially checked. This checkout has the registry but no raw BTC snapshot or X post text | Partially complete | No candidate dataset has been downloaded, rights-cleared, row-profiled or accepted for 180-day text coverage | Obtain employer approval for a candidate and permitted bounded inspection; profile actual rows before use | Dataset access and licensing; O6 |
 | A4 | Ingest the most recent and relevant news with Tavily to complement X sentiment; Exa appears in the submission line | Assessment brief, Project Scope §1 and Submission; PHASE_1 §7 O7 and O12 | Should | News is ingested as context with source, time and provenance and never becomes a model feature unless a documented clarification changes the feature policy; Exa is optional unless actually used | DECISIONS D-005, D-013, D-027 and D-030, DATA_POLICY.md §News | `src/xsentiment/main.py` (`fetch-news` and `run --news-file`), `src/xsentiment/ingestion/tavily_news.py` (bounded streaming POST, credential-safe URL normalization, timezone-aware publication timestamps, no automatic retry), `src/xsentiment/pipeline/forecast_run.py` (`load_news_context` and manifest provenance) | `tests/unit/test_tavily_news.py` verifies URL component and query-secret sanitization, unsafe-URL exclusion, UTC conversion, naive/malformed timestamp withholding, streaming bounds and bounded provider errors. `tests/unit/test_fetch_news_cli.py` verifies sanitization in serialized news and generated artifacts, the explicit live-call gate, environment-only credentials, no retry and unchanged predictions/metrics with/without context. `tests/integration/test_offline_demo.py` proves the offline run makes no network connection. All provider responses are mocked; no live call is claimed. | Partially complete | Adapter and gated JSONL hand-off are mocked-verified; live provider behaviour and a real snapshot await a key and employer authorization. | If live news is confirmed required: run one bounded search with the approved key and keep news context-only unless feature policy is formally changed. | API key and employer clarification; O12 |
 | A5 | The brief offers a machine learning / reinforcement learning pipeline | Assessment brief, Project Overview; PHASE_1 §5 | Could | The slash wording permits either ML or RL; the implemented supervised ML path satisfies the ML option; any RL work would first define action space, reward, execution model and evaluation protocol | DECISIONS D-006, MODEL_PLAN.md | `src/xsentiment/models/baseline.py`, `models/forecasting.py` | Supervised multi-horizon forecasting with baselines exists and is unit-tested; no RL environment exists | Verified complete | RL is not implemented; the PDF does not define an RL environment or explicitly require it, so supervised ML is the documented interpretation | Reopen only if the employer explicitly requires RL and specifies the design | Employer clarification, O8 |
-| A6 | Reference inventory of historical Twitter/X datasets with verified download links | Supplied dataset-reference PDF and linked Google Doc | Should | Inventory recorded machine-readably with platform identity, text availability, date format, platform-specific limitations and an explicit registry-wide independent-verification state; validated offline | docs/data-sources.md | `data/registry/historical_twitter_x_datasets.json`, `scripts/validate_dataset_registry.py` | Validator reports 12 records; 11 X/Twitter and 1 StockTwits; 3 are ID-only with hydration caveats; two rolling sources have null coverage end and carry cutoff/coverage limitations; `independent_verification.status` is `not-reverified` | Partially complete | Registry facts are transcribed from the supplied PDF and Google Doc; provider pages, current availability and license terms were not independently re-verified | Re-verify the selected candidate page at submission time; do not treat registry entries as legal approval | Live provider pages, O6 |
+| A6 | Reference inventory of historical Twitter/X datasets with verified download links | Supplied dataset-reference PDF and linked Google Doc | Should | Inventory recorded machine-readably with platform identity, text availability, date format, platform-specific limitations and an explicit registry-wide independent-verification state; validated offline | docs/data-sources.md | `data/registry/historical_twitter_x_datasets.json`, `scripts/validate_dataset_registry.py` | Validator reports 12 records; 11 X/Twitter and 1 StockTwits; 3 are ID-only with hydration caveats; two rolling sources have null coverage end and carry coverage limitations; `independent_verification.status` is `partially-reverified` as three public listing/card metadata were checked on 2026-10-29 | Partially complete | The remaining registry entries, source rights, actual rows, current availability and licenses have not been verified; no dataset is approved | With employer approval, inspect a permitted bounded sample and record actual schema, coverage, rights and provenance; do not treat registry entries as legal approval | Candidate-row verification and O6 |
 | A7 | Submit the repository link, provider tokens and Actor IDs, and the evaluation report by email to gilad@crowdwisdomtrading.com | Assessment brief, Submission | Must | Submission packet contains the repository URL, a PDF or Markdown evaluation report and non-secret provider/Actor identifiers; secrets go only through an approved private channel; delivery date recorded | README.md, RULES.md §Security, docs/APIFY_X_SETUP.md | Repository, `reports/btc-usd-180d/evaluation-report.md`, `docs/SUBMISSION_SUMMARY.md`, `docs/FINAL_VERIFICATION_REPORT.md`, `docs/DEMO_WALKTHROUGH.md` and `docs/FINAL_REQUIREMENTS_AUDIT.md` | No email has been sent; no tokens or Actor IDs exist; no final sentiment result exists | Partially complete | Repository and report exist, but the email submission, tokens/Actor IDs and a sentiment-backed evaluation are missing | After R2 and A2, assemble the packet and send it; record the date and any employer response | R2, A2, A1, employer channel |
 
 ## Status summary
@@ -94,7 +100,9 @@ cannot drift from the rows above.
 
 Provisional interpretations and their status are maintained in
 [PHASE_1_REQUIREMENTS.md](PHASE_1_REQUIREMENTS.md) §7 and recorded as decisions in
-[DECISIONS.md](../DECISIONS.md). The assignment source is now verified; D-023 is closed.
+[DECISIONS.md](../DECISIONS.md). D-023 records a prior source review, but the
+assessment PDFs are absent and that review could not be independently repeated in
+this checkout.
 Remaining external items: **O6** (dataset selection and terms), **O10** (credential
 channel), **O11** (exact calendar deadline), **O13** (Apify Actor, pricing and spend cap),
 **A2/R2** (provider access and credentials), **A4** (Tavily key for live news context) and
@@ -110,8 +118,8 @@ Phase 1 is complete when: the matrix above has no empty acceptance-criterion,
 evidence or status cell; every status is drawn from the allowed vocabulary; the docs
 validator passes; the canonical documents agree on asset, interval, cutoff, targets and
 negative scope; and the blocker column names an owner for every blocked row. The source
-PDFs have now been read and reconciled. The remaining external items are the employer
-deadline (A1), provider/credential access (A2, R2), dataset/Actor selection (O6, O13), the
+PDFs were previously recorded as read and reconciled; this checkout cannot reopen
+them. The remaining external items are the employer deadline (A1), provider/credential access (A2, R2), dataset/Actor selection (O6, O13), the
 private credential channel (O10), a Tavily key for live news context (A4) and employer
 confirmation of the n+0 target convention (O3/O4). R15 now has a tested schema, joins
 and a persisted-input CLI path, verified offline; the other partial implementation
@@ -132,6 +140,6 @@ A7 tracks the delivery. The repository and Markdown report already exist; the to
 identifiers and a sentiment-backed evaluation do not. A consolidated, unsent question set
 and email draft addressed to this recorded recipient, plus the provider/credential
 authorization checklist, are in [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md).
-The brief's request to email raw tokens conflicts with the never-commit/never-email-secrets
+The brief's recorded request to email raw tokens conflicts with the never-commit/never-email-secrets
 policy (D-012, D-029), so the draft asks the employer to name a private credential channel
-instead; no email has been sent.
+instead; the primary PDF wording was not reverified on this pass and no email has been sent.

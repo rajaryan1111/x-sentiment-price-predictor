@@ -1,14 +1,16 @@
 # Final requirements audit
 
-**Status:** evidence-based audit independently re-verified on 2026-10-29. This document does
+**Status:** evidence-based audit updated on 2026-10-29. This document does
 not replace the canonical [requirements traceability matrix](REQUIREMENTS_TRACEABILITY.md);
 it independently classifies every requirement against code, tests, committed
-artefacts and the verified offline run.
+artefacts and the verified offline run, and includes current provider/dataset
+source checks. The original assessment PDFs remain absent from this checkout.
 
 ## 1. Source-of-truth limitation
 
-The original assignment PDFs are **not present in this checkout**. The repository
-records that they were read in full on 2026-10-26:
+The original assignment PDFs are **not present in this checkout**; root and
+`docs/` paths were checked on 2026-10-29. The repository records that they were
+read in full on 2026-10-26:
 
 | Source | Pages | Recorded SHA-256 |
 | --- | ---: | --- |
@@ -17,10 +19,13 @@ records that they were read in full on 2026-10-26:
 
 Therefore **every row below is marked `T*`**: its exact definition is transcribed
 from [PRD.md](../PRD.md), [PHASE_1_REQUIREMENTS.md](PHASE_1_REQUIREMENTS.md) and the
-canonical matrix, and the primary-source wording is **NOT_VERIFIED against the
-original PDF in this checkout**. No new requirement interpretation was invented.
-The `Audit status` column describes implementation/evidence against that
-transcription, not re-verification of the PDF itself.
+canonical matrix, and the primary-source wording remains **NOT_REVERIFIED from
+the original PDFs during this pass**. Their prior inspection is historical
+repository evidence only. The linked Google Doc was independently re-fetched as
+a full text export on 2026-10-29 and the dataset candidate pages/cards were
+checked; those facts are not treated as assessment-PDF access or legal approval.
+The `Audit status` column describes implementation/evidence against the recorded
+transcription, not re-verification of the absent assessment PDFs.
 
 ## 2. Classification rules and evidence key
 
@@ -59,11 +64,10 @@ price snapshot is not present in this checkout; historical public-price metrics
 are retained as report/manifest artifacts only. Additional partial rows depend
 indirectly on the accepted-X-data gate. PR #14 delivery was
 completed on 2026-10-28 (B8 resolved): the code change is in the feature branch.
-At the PR metadata inspection before this documentation-only update
-(2026-10-29), PR head was
-`6a41980943b000326e3b3cabe331a392e63410a3`, with two successful CI runs
-(`40784385769`, `40784392125`). This is a point-in-time status; query GitHub for
-the current head before any further promotion.
+At the live PR metadata inspection on 2026-10-29, PR head was
+`fa69d53f70535dec03dd7f48c1c0d212b565e336`, with two successful CI runs
+(`40787633232`, `40787639350`) on that exact pushed SHA. Current local
+uncommitted documentation/registry edits are not included in that result.
 
 This audit is intentionally more conservative than the canonical matrix for R8:
 the six horizons are implemented, but the `n+0` target convention is still a
@@ -72,19 +76,15 @@ verified as offline engineering, not as live provider or real-X acceptance.
 
 ## 4. Verification basis
 
-- The docs-synchronized local suite passed 187 tests (run on 2026-10-29);
-  the focused Apify/Tavily/news CLI/pipeline command passed 64 tests (run on
-  2026-10-29). Ruff, compileall, registry validation (12 records), docs validation
-  (102 links, 21 test-count claims, 28 requirement rows) and `git diff --check`
-  passed on this documentation-only update. The prior two-run synthetic demo
-  matched all six artifacts byte-for-byte. Exact commands and hashes are in
-  [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). The code change is
-  committed as `d801661`; documentation-only synchronization followed. At the
-  metadata check preceding this documentation-only correction, PR head `6a41980`
-  had two successful CI runs. The full code suite and related gates apply to the
-  inspected source tree; this documentation-only update separately passed the
-  docs validator, focused docs tests and `git diff --check`. Inspect PR checks on
-  the resulting pushed head.
+- The full code suite (187 tests), focused Apify/Tavily/news CLI/pipeline command
+  (64 tests), Ruff, compileall and synthetic CLI demo are recorded against code
+  commit `d801661` and its verification context. In this continuation, the registry
+  and documentation validators passed; the focused registry/docs tests passed
+  (20 tests on 2026-10-29), and `git diff --check` passed. These local checks do not imply real
+  provider behavior or model quality. The current PR head is `fa69d53` with two
+  successful CI runs (`40787633232`, `40787639350`); current local edits remain
+  uncommitted and are not covered by CI. Exact commands and hashes are in
+  [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
 - On 2026-10-29, the docs-synchronized local synthetic demo generated six
   artifacts, six folds, 2,160 predictions and 18 metric rows from 210 synthetic
   bars and 209 synthetic posts. Two independent CLI runs matched byte-for-byte on
@@ -92,22 +92,22 @@ verified as offline engineering, not as live provider or real-X acceptance.
   evidence. The integration test covers all artifacts, horizons, models, finite metrics,
   lineage, repeatability and no-network behavior. Tavily streaming and redaction
   regressions are covered by the unit/CLI tests.
-- GitHub Actions evidence is recorded per SHA: prior runs belong to their specific
-  older commits. The code revision `d801661` passed runs `40616497449` (push) and
-  `40616501268` (pull_request); later documentation commits advanced the PR head.
-  At the 2026-10-29 metadata check before this documentation-only update,
-  head `6a41980943b000326e3b3cabe331a392e63410a3` passed runs `40784385769` and
-  `40784392125`. See the verification report.
-- No live Tavily, Exa, Apify or Coinbase request was made during this audit. The implementation-only URL/timestamp and Apify URL regression checks passed locally; no live provider compatibility is inferred.
+- GitHub Actions evidence is tied to exact SHAs. The code revision `d801661`
+  passed runs `40616497449` (push) and `40616501268` (pull_request). At the live
+  2026-10-29 query, PR head `fa69d53f70535dec03dd7f48c1c0d212b565e336` passed
+  runs `40787633232` and `40787639350`; these do not include the current local
+  uncommitted edits. See the verification report.
+- No live Tavily, Exa, Apify or Coinbase request was made during this audit. Apify and Tavily have adapter code and mocked tests; Exa has only a SecretStr setting/configuration-presence check and no client, adapter, provider test or usage documentation. The Google Doc full-text export was fetched; accessible Kaggle metadata and Hugging Face card/schema/API were reviewed for three candidates. No bulk file was downloaded, no dataset was licensed/approved, and no row-level coverage or data-quality profile was performed. Candidate uploader license declarations are not legal clearance. No live provider compatibility is inferred.
 
 ## 4.1 Independent evidence cross-check (2026-10-29)
 
-The line-by-line audit below was inherited from the prior checkpoint. This resumed
-pass rechecked implementation paths and added news URL/timestamp plus Apify
-provenance-URL sanitization tests. The verified code tree is committed as `d801661`;
-subsequent documentation-only commits advanced PR #14. Its head at the last
-inspection before this local correction was `6a41980943b000326e3b3cabe331a392e63410a3`,
-with two successful CI runs.
+The line-by-line audit below was inherited from the prior checkpoint. The security
+regression work rechecked news URL/timestamp plus Apify provenance-URL sanitization.
+This addendum checked provider integration roles and current public dataset metadata;
+it did not download candidate corpora or perform legal review. The verified code tree
+is committed as `d801661`; subsequent documentation-only commits advanced PR #14.
+GitHub was queried on 2026-10-29 and the live PR head/checks are stated in the final
+verification evidence rather than inferred from older head references.
 
 
 Documentation claims were not counted as implementation evidence. For every
@@ -134,8 +134,10 @@ against the actual working tree. The concrete checks were:
   verify external URLs, licences or real provider behaviour.
 - Committed `reports/btc-usd-180d/` artifacts were cross-checked for internal
   metric/manifest/report consistency. The original PDFs and raw price snapshot
-  are not present in this checkout, so primary-source wording and live re-fetch
-  were not re-verified here.
+  are not present in this checkout, so primary-source wording and live price
+  re-fetch were not re-verified here. The assessment-linked Google Doc text export
+  and three candidate dataset provider pages/cards were reviewed on 2026-10-29;
+  no candidate was downloaded or approved.
 
 This cross-check supports the implementation statuses below; it does not convert
 external data/authorization gates into completion.
@@ -177,10 +179,10 @@ external data/authorization gates into completion.
 | --- | --- | --- | --- | --- | --- |
 | A1 | T* | Submit within the stated timeline (the brief says both one week and 5–7 days) | NOT_VERIFIED | X: no employer message or calendar due date exists in the repository. The brief is recorded as saying both one week and 5–7 days. | Exact calendar deadline and timezone require employer clarification. Primary-source wording is also not re-verifiable from this checkout. |
 | A2 | T* | Provide the APIFY/Tavily/Exa tokens and Actor IDs used for scraping | BLOCKED_EXTERNAL | C/A: `.env.example` has placeholders only; no Actor ID or token exists and no private credential channel is defined. | Requires approved Actor/provider selection and a private credential channel; secrets must never be committed or shared in chat. |
-| A3 | T* | Use the historical tweets resource linked by the assessment | PARTIAL | C/T/A: `local_dataset_profile.py`, `profile_local_x_dataset.py`, dataset registry and validator; the assessment-linked Google Doc is a 12-entry link compilation, not a post corpus. Current project `data/` contains the registry but no raw BTC price snapshot or X post-text corpus; historical price evidence is in `reports/btc-usd-180d/`. | Requires employer-approved candidate selection, licence/terms review, permitted download, schema/text check and 180-day coverage profile. |
+| A3 | T* | Use the historical tweets resource linked by the assessment | PARTIAL | C/T/A: `local_dataset_profile.py`, `profile_local_x_dataset.py`, dataset registry and validator; the Google Doc full text was re-fetched 2026-10-29 and is a 12-entry link compilation, not a post corpus. Three public candidate listing/card metadata were partially checked; this checkout has no raw price snapshot or X post-text corpus. | Requires employer-approved candidate selection, rights/terms review, permitted bounded inspection, row schema/text check and measured 180-day coverage profile. |
 | A4 | T* | Ingest the most recent and relevant news with Tavily to complement X sentiment; Exa appears in the submission line | PARTIAL | C/T/M: `main.py` `fetch-news` and `run --news-file`, `tavily_news.py`, `pipeline/forecast_run.py`; mocked tests cover URL component sanitization before JSONL persistence, UTC-offset parsing, naive/malformed timestamp withholding, context-only behaviour, streaming bounds, no retry, offline network isolation and unchanged predictions/metrics. | Live Tavily behaviour and a real news snapshot require an approved key, authorization and confirmation that live news is mandatory (B6). |
 | A5 | T* | The brief offers a machine learning / reinforcement learning pipeline | COMPLETE | C/T: `models/baseline.py` and `forecasting.py` implement supervised multi-horizon ML with naive and price-only baselines; no RL environment is defined or claimed. | RL is not implemented; the brief does not define an RL environment. Reopen only on explicit employer instruction. |
-| A6 | T* | Reference inventory of historical Twitter/X datasets with verified download links | PARTIAL | C/T/A: `data/registry/historical_twitter_x_datasets.json` and `scripts/validate_dataset_registry.py`; structural validator checks platform identity, ID-only caveats, coverage limitations and the explicit `not-reverified` state. | Registry entries are transcribed; live provider pages, current availability and licence terms were not independently re-verified. |
+| A6 | T* | Reference inventory of historical Twitter/X datasets with verified download links | PARTIAL | C/T/A: `data/registry/historical_twitter_x_datasets.json` and `scripts/validate_dataset_registry.py`; structural validator checks platform identity, ID-only caveats, coverage limitations and the explicit `partially-reverified` state. Three candidate public listing/card metadata were checked on 2026-10-29. | Remaining registry entries, actual rows, current rights, availability and licenses remain unverified; no candidate is approved or coverage-profiled. |
 | A7 | T* | Submit the repository link, provider tokens and Actor IDs, and the evaluation report by email to gilad@crowdwisdomtrading.com | PARTIAL | A: repository URL, Markdown evaluation report and the full submission-document set (including a consolidated employer-clarifications document and an unsent ready-to-send email draft) exist. No email was sent and no provider identifiers/tokens were delivered. | Email delivery, provider identifiers/tokens and a sentiment-backed evaluation require user authorization and R2/A2. |
 
 ## 8. External blockers and their requirement impact
@@ -201,17 +203,20 @@ In summary:
 - **B7** submission format/email authorization — leaves A7 PARTIAL.
 - **B8** session branch policy — **resolved**: PR #14's head was advanced by a
   non-forced fast-forward to `d801661` with green CI on that code revision; see
-  [PR14_PROMOTION.md](PR14_PROMOTION.md).
+  [PR14_PROMOTION.md](PR14_PROMOTION.md). The current PR head is queried in the
+  final verification report; never reuse an older CI claim for a later SHA.
 
 ## 9. Defensible conclusion
 
 The implementable engineering pipeline is reproducible offline, including the
 gated news CLI, streaming response bound, input-lineage provenance, a full CLI
-end-to-end demonstration and offline network isolation. Local quality gates pass
-on code commit `d801661`; the last inspected PR head `6a41980` had green CI before
-this documentation-only update. The assignment is not fully satisfiable in this
+end-to-end demonstration and offline network isolation. Local source quality gates
+were rerun on 2026-10-29 at code commit `d801661`; later local documentation
+updates were separately checked. The assignment is not fully satisfiable in this
 environment because no accepted X corpus, provider credential, paid-call
-authorization, employer clarification or submission email exists. Those
-limitations are recorded here rather than hidden. See
+authorization, employer clarification or submission email exists. The current PR
+head and CI were live-queried on 2026-10-29 and are documented in
+[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md); those results do not
+constitute real-data acceptance. See
 [SUBMISSION_SUMMARY.md](SUBMISSION_SUMMARY.md) for the evaluator-facing summary
 and [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md) for the timed demonstration.

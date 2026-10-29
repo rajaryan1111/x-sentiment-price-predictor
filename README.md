@@ -11,8 +11,8 @@ close forecasts at horizons `n+0` through `n+5`.
 > Actor has been used, and no sentiment benefit is claimed. The database schema, idempotent
 > repositories, cutoff join and persisted-input CLI path are implemented and
 > verified offline (R15). `fetch-news` is an opt-in, mocked-verified Tavily CLI
-> step; no live Tavily or Exa request has been made. The assessment PDFs were read
-> on 2026-10-26 but are not in this checkout; the linked Google Doc is a 12-entry
+> step; no live Tavily or Exa request has been made. The assessment PDFs were recorded as read
+> on 2026-10-26 but are absent from this checkout and were not reopened during this audit; the linked Google Doc is a 12-entry
 > dataset-link compilation, not a tweet corpus. The pipeline reports sentiment as
 > unavailable when run without posts. CI does not prove provider access, data
 > licensing, model quality or profitability.
@@ -36,22 +36,25 @@ contracts and status, and they list what is verified versus still open.
 
 Phase 1 deliverable: the authoritative [requirements traceability matrix](docs/REQUIREMENTS_TRACEABILITY.md)
 (every requirement with its acceptance criterion, verification method, evidence, status,
-gap and external blocker, checked by `python scripts/validate_docs.py`). The matrix also
-records the verified assignment PDFs (page counts and SHA-256), the 12 dataset candidates, and the requirements that remain partial, including provider access (R2) and the email
-submission packet (A7). The database join (R15) is recorded as verified complete offline.
+gap and external blocker, checked by `python scripts/validate_docs.py`). It preserves
+page counts and hashes from the assessment PDFs recorded as reviewed on 2026-10-26;
+the originals are absent from this checkout and were not re-opened in the current audit.
+The matrix covers the 12 dataset candidates and outstanding requirements, including
+provider access (R2) and the email submission packet (A7). The database join (R15) is
+recorded as verified complete offline.
 
-## Delivery status (GitHub inspection on 2026-10-29)
+## Delivery status (live GitHub inspection on 2026-10-29)
 
-At the recorded metadata check, branch `feat/sentiment-features-and-forecasting`
-was clean and aligned with `origin`.
-PR #14 was OPEN, DRAFT and MERGEABLE against
-`docs/canonical-source-of-truth` (base SHA
-`36b7b486bb60b54f3f19201f2e548b11e5f93197`). At that check, its head was
-`6a41980943b000326e3b3cabe331a392e63410a3`; push and pull-request CI runs
-`40784385769` and `40784392125` both succeeded on that exact SHA. The delivered
-code change is `d8016610aa7ebf82263413c48b1164e4a64d13df`; the later commits are
-documentation-only. GitHub's live PR head can change with each commit; recheck
-with `gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`
+The local feature branch is based on pushed HEAD
+`fa69d53f70535dec03dd7f48c1c0d212b565e336`; the current documentation and registry
+edits in this checkout are uncommitted and are not on GitHub. PR #14 was OPEN, DRAFT
+and MERGEABLE against `docs/canonical-source-of-truth` (base SHA
+`36b7b486bb60b54f3f19201f2e548b11e5f93197`). GitHub reported that pushed head and
+successful push/pull-request CI runs `40787633232` and `40787639350` on that exact
+SHA. Those checks do not cover the current local edits. The delivered code change is
+`d8016610aa7ebf82263413c48b1164e4a64d13df`; later pushed commits were documentation-only.
+GitHub's live PR head can change with each commit; recheck with
+`gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`
 and inspect checks for that exact SHA. The Arena branch remains
 `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`. PR #14 remains unmerged and draft;
 no ready-for-review change was made. See [docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md).
@@ -264,11 +267,12 @@ beat the naive persistence baseline on forecast error, so no claim is made that 
 model adds predictive value. The strategy numbers are short-sample research
 statistics on a single asset and period, not evidence of tradability.
 
-**Source audit (2026-10-26):** both assessment PDFs were read in full. The linked
-Google Doc is a dataset-link compilation matching the companion PDF, not a tweet
-corpus. Uploaded local files contain tweet IDs, date/count summaries, unrelated
-air-quality/MQTT data or a StockTwits paper; none contains X post text. No candidate
-dataset has been accepted, licensed or profiled for 180-day text coverage.
+**Source audit:** both assessment PDFs were recorded as read in full on 2026-10-26,
+but are absent from this checkout and were not re-opened in the current audit. The
+linked Google Doc was re-fetched on 2026-10-29 as a dataset-link compilation, not a
+tweet corpus. Prior notes inventory uploaded local files, but those raw files are not
+present in this checkout. No candidate dataset has been accepted, licensed or profiled
+for 180-day text coverage.
 
 ## Module map
 

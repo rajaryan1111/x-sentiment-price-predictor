@@ -2,7 +2,7 @@
 
 > Naming note: this file belongs to the repository's historical "Phase 2 data quality/alignment" workstream, which maps to canonical Phase 3 in [PHASES.md](../PHASES.md). It is not canonical documentation Phase 2.
 
-**Status: partially implemented; external data-access gates remain open.** This document distinguishes code and test evidence from provider/account verification. Live X ingestion and a verified 180-day X dataset are not yet complete, so the sentiment-versus-price comparison remains blocked. Price-only models, walk-forward evaluation and reporting are implemented on `feat/sentiment-features-and-forecasting`. The local offline suite passed on code commit `d801661` (2026-10-28). After documentation-only commits, PR #14 head `6a41980943b000326e3b3cabe331a392e63410a3` had two successful CI runs at that recorded inspection (`40784385769`, `40784392125`); see [TEST_PLAN.md](../TEST_PLAN.md) for the authoritative test count and [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) for exact results and scope.
+**Status: partially implemented; external data-access gates remain open.** This document distinguishes code and test evidence from provider/account verification. Live X ingestion and a verified 180-day X dataset are not yet complete, so the sentiment-versus-price comparison remains blocked. Price-only models, walk-forward evaluation and reporting are implemented on `feat/sentiment-features-and-forecasting`. The local offline suite passed on code commit `d801661` (2026-10-28). At the live GitHub query on 2026-10-29, PR #14 head `fa69d53f70535dec03dd7f48c1c0d212b565e336` had two successful CI runs (`40787633232`, `40787639350`) on that exact pushed SHA; the current uncommitted local documentation/registry changes are not included. See [TEST_PLAN.md](../TEST_PLAN.md) for the authoritative test count and [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) for scope.
 
 ## Implemented and locally verified
 
@@ -48,7 +48,7 @@ The profiler now reports deterministic reference windows (`--as-of`), daily expe
 
 ### Dataset registry
 
-`validate_registry` now enforces the documented platform and text-availability vocabulary, ISO verification dates, date ordering, positive record counts, ID-only hydration caveats, and a recommendation only for X/Twitter sources with post text. The registry carries an explicit `independent_verification` object with status `not-reverified`; structural validity is not evidence of current provider access or legal approval.
+`validate_registry` now enforces the documented platform and text-availability vocabulary, ISO verification dates, date ordering, positive record counts, ID-only hydration caveats, and a recommendation only for X/Twitter sources with post text. The registry carries an explicit `independent_verification` object with status `partially-reverified`: three candidate listing/card metadata were checked on 2026-10-29, but structural validity is not evidence of row-level coverage, current provider access or legal approval.
 
 ### Persistent storage and join (R15 complete offline)
 

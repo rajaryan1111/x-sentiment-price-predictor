@@ -29,9 +29,10 @@ Status: complete as a documented baseline, with external data/provider and deadl
 - Give every requirement an acceptance criterion, a verification method, an evidence pointer, a status, a gap and a blocker.
 Evidence: docs/PHASE_1_REQUIREMENTS.md, PRD.md and the authoritative matrix in
 docs/REQUIREMENTS_TRACEABILITY.md, checked by `scripts/validate_docs.py`. Both assessment
-PDFs were read in full on 2026-10-26 and the requirement set was reconciled against them;
-D-023 is closed. The linked Google Doc was retrieved and is a dataset-link compilation,
-not a tweet corpus.
+PDFs are recorded as read in full on 2026-10-26 and reconciled against the requirements;
+they are absent from this checkout, so that primary-source review could not be repeated
+in the current pass. The linked Google Doc was re-fetched as full text on 2026-10-29 and
+is a dataset-link compilation, not a tweet corpus.
 **Open items that engineering cannot close:** the employer's calendar deadline is unknown
 (A1, D-014); provider access, credentials and the private transfer channel remain external
 (R2, A2, O10); dataset/Actor selection remains open (O6, O13); a Tavily key is needed for
@@ -41,9 +42,10 @@ R15 (database join) now has a tested storage layer plus a persisted-input CLI pa
 does not mean X data has been collected or any sentiment result measured.
 
 ## Phase 2 — Canonical documentation
-Status: complete for the current verified baseline. The canonical documents were reconciled
-with the verified assignment source on 2026-10-26 and again with the Phase 3 storage,
-contract and profiler changes on the same date.
+Status: complete for the recorded working baseline. The canonical documents were reconciled
+with the assignment transcription on 2026-10-26 and with later implementation changes;
+the original PDF is absent from this checkout, so its wording could not be independently
+reverified during the current pass.
 - Maintain all nine root-level files: PRD, ARCHITECTURE, DESIGN, DATA_POLICY,
   MODEL_PLAN, TEST_PLAN, RULES, PHASES, DECISIONS.
 - Keep docs/REQUIREMENTS_TRACEABILITY.md and docs/PHASE_1_REQUIREMENTS.md aligned.
@@ -57,18 +59,21 @@ Status: in progress; X data externally blocked. Price ingestion is complete and 
   2026-10-25 UTC, refetched 2026-10-26 with no missing or duplicate timestamps and the
   unfinished current day excluded. Reproduced with `python -m xsentiment fetch-prices`.
 - X: no accepted dataset and no live Actor run. Local CSV/JSONL profiling exists and
-  refuses to call an old download point-in-time ready. The uploaded ZIPs were inspected on
-  2026-10-26: `90-day-samples.zip` contains numeric tweet IDs only; the available archives
-  are an air-quality CSV and MQTT sensor JSON, unrelated to X; `archive (2).zip` is absent.
-  No uploaded file contains X post text.
+  refuses to call an old download point-in-time ready. Earlier repository notes record
+  inspection of uploaded files on 2026-10-26 (tweet IDs/date-count summaries, unrelated
+  air-quality/MQTT archives and a StockTwits paper); those raw files are absent from this
+  checkout, so that inventory is historical context only. No current local X post-text
+  corpus is available.
 - Data contract: the normalized record preserves the raw provider timestamp, supplied UTC
   offset, payload hash, author reference, query mode/query and warnings; the JSONL loader
   round-trips these fields. The profiler detects retrieval-time columns, reports daily
   coverage gaps and invalid engagement counts, and accepts `--as-of` for reproducible
   windows. The Apify adapter unwraps the documented `data` envelope, pages dataset items
   with `offset`/`limit`, and records query provenance; it remains mocked-only.
-- Registry: 12 source records validate structurally, with an explicit
-  `independent_verification.status = not-reverified` and no implied legal approval.
+- Registry: 12 source records validate structurally, with
+  `independent_verification.status = partially-reverified`: three candidate
+  listing/card metadata were checked on 2026-10-29, but no dataset rows, rights,
+  license or 180-day coverage were verified. No legal approval is implied.
 - Database join (R15): complete for the offline path. Versioned `price_bars`/`x_posts`
   tables, idempotent repositories and tested descriptive/cutoff joins exist in
   `src/xsentiment/storage/`, and the pipeline now consumes persisted inputs:

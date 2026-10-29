@@ -1,36 +1,37 @@
 # Final verification report
 
-**Verification context:** 2026-10-29, Python 3.11.15, branch
-`feat/sentiment-features-and-forecasting`. Source code is at
-`d8016610aa7ebf82263413c48b1164e4a64d13df`; PR #14's pushed head at the inspection
-preceding this status-only documentation reconciliation was
-`6a41980943b000326e3b3cabe331a392e63410a3`. This report distinguishes the source
-verification from the reconciliation's separately listed local checks.
+**Verification context:** full local checks rerun on 2026-10-29, branch
+`feat/sentiment-features-and-forecasting`, starting HEAD
+`fa69d53f70535dec03dd7f48c1c0d212b565e336` plus the uncommitted documentation,
+registry and registry-test changes described below. The code remains at
+`d8016610aa7ebf82263413c48b1164e4a64d13df`; current PR #14 head and CI were live
+queried at `fa69d53f70535dec03dd7f48c1c0d212b565e336`. Historical source review
+is distinguished from current local documentation and registry checks.
 
 ## Code verification and current documentation checks (2026-10-29)
 
-The full code suite, focused regressions, and source-oriented quality gates below
-were rerun on 2026-10-29 with source code unchanged at `d801661`. A later
-status-only documentation correction was separately checked with the docs
-validator, its focused tests, and `git diff --check`; those results are listed
-explicitly below. The first full-suite attempt after earlier wording changes found
-only the documentation count guard failing (186 passed, 1 failed) because five
-test-count statements lacked an explicit date in the same sentence. After those
-statements were corrected, the full suite passed:
+The full suite and source-oriented quality gates were run on 2026-10-29 against
+the local checkout at HEAD `fa69d53` plus the uncommitted documentation, registry
+and registry-test changes listed in `git status`. Application code remains the
+same as code commit `d801661`; the full suite includes the changed registry test
+and documentation-count validation. Earlier wording revisions briefly tripped
+the count guard; those claims were corrected before the final run. The final
+results for this exact local state are listed below.
 
-- `.venv/bin/python -m pytest -q` -> **187 passed** (run on 2026-10-29).
-- Focused regressions:
-  `.venv/bin/python -m pytest -q tests/unit/test_apify_x.py tests/unit/test_tavily_news.py tests/unit/test_fetch_news_cli.py tests/unit/test_pipeline.py`
-  -> **64 passed** (run on 2026-10-29).
+- `.venv/bin/python -m pytest -q` -> **187 passed in 3.77s** (run on 2026-10-29
+  against the current local documentation/registry changes).
+- The focused Apify/Tavily/news CLI/pipeline regressions previously passed **64
+  tests** (run on 2026-10-29 against application source commit `d801661`).
 - `.venv/bin/ruff check src tests scripts` -> all checks passed.
 - `.venv/bin/python -m compileall -q src tests scripts` -> exit 0.
-- `.venv/bin/python scripts/validate_dataset_registry.py` -> 12 records valid.
-- `.venv/bin/python scripts/validate_docs.py` -> 102 relative Markdown links,
-  21 test-count claims, 28 matrix rows (11 complete, 14 partial, 2 externally
-  blocked, 1 needing clarification); passed on the current local documentation.
-- `.venv/bin/python -m pytest -q tests/unit/test_docs_validation.py` -> **9 passed**
-  on the current local documentation correction.
-- `git diff --check` -> clean on the current local documentation correction.
+- `.venv/bin/python scripts/validate_dataset_registry.py` -> 12 records
+  structurally valid; no URL, license, download or data-quality claim is implied.
+- `.venv/bin/python scripts/validate_docs.py` -> passed: 102 relative Markdown
+  links, 20 test-count claims, and 28 requirement rows (11 complete, 14 partial,
+  2 externally blocked, 1 needing clarification).
+- `.venv/bin/python -m pytest tests/unit/test_dataset_registry.py tests/unit/test_docs_validation.py -q`
+  -> focused registry/docs tests passed on the final local state (2026-10-29).
+- `git diff --check` -> clean on the final local changes.
 
 A fresh two-run CLI demonstration was generated from a previously absent output
 root at `reports/generated/final-submit-verify-2026-10-29/`. It produced 210 synthetic daily bars, 209 synthetic posts,
@@ -50,20 +51,20 @@ non-empty artefacts; all six were byte-identical between runs:
 Synthetic metrics are only software/reproducibility evidence; they do not establish
 real-world forecast value.
 
-On 2026-10-29, the process environment and project-local `.env` files were checked
-for APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and EXA_API_KEY; each was absent
-(presence only; values were never read or printed). No live provider request was made.
+The prior 2026-10-29 inspection recorded APIFY_TOKEN, APIFY_API_TOKEN,
+TAVILY_API_KEY and EXA_API_KEY absent from the process environment and project-local
+`.env` files (presence only; values were never read or printed). No live provider
+request was made. This current pass inspected `.env.example` placeholders and
+implementation/configuration but did not re-read credential values.
 
 ## Previous local verification (2026-10-28; code commit d801661)
 
 The prior complete local code verification was run on 2026-10-28 for the
 22-file change set committed as `d8016610aa7ebf82263413c48b1164e4a64d13df`.
-After that code commit, docs-only commits advanced the PR. The head inspected
-before these local documentation corrections was
-`6a41980943b000326e3b3cabe331a392e63410a3`; fresh CI runs `40784385769` and
-`40784392125` both succeeded on that exact SHA. The historical
-2026-10-28 verification results below remain separate from the latest local
-rerun above.
+The live PR query on 2026-10-29 found pushed head
+`fa69d53f70535dec03dd7f48c1c0d212b565e336`; CI runs `40787633232` and
+`40787639350` succeeded on that exact SHA before the current local edits. The
+historical 2026-10-28 code results below remain separate from current local checks.
 
 - Focused regressions on 2026-10-28:
   `.venv/bin/python -m pytest -q tests/unit/test_apify_x.py tests/unit/test_tavily_news.py tests/unit/test_fetch_news_cli.py tests/unit/test_pipeline.py`
@@ -267,10 +268,12 @@ posts. No sentiment improvement is claimed.
 
 ## 7. GitHub delivery and CI
 
-Remote refs were fetched and PR #14 was queried on 2026-10-29:
+Remote refs and PR #14 were queried live on 2026-10-29:
 
 ```text
-local branch      feat/sentiment-features-and-forecasting (clean tree)
+local branch      feat/sentiment-features-and-forecasting
+local HEAD        fa69d53f70535dec03dd7f48c1c0d212b565e336 (same as remote feature)
+working tree      14 modified tracked files; no untracked files
 code revision     d8016610aa7ebf82263413c48b1164e4a64d13df  <- delivered change set
                   (followed by documentation-only commits on the same branch)
 remote feature    tip of that branch; GitHub shows the live SHA
@@ -282,26 +285,26 @@ PR #14            OPEN, DRAFT, MERGEABLE, base docs/canonical-source-of-truth,
 
 The feature branch contains both the base and Arena branches. The initial
 promotion was a normal fast-forward (`5af5bc7..d801661`); subsequent docs-only
-commits increased the feature-vs-Arena count. At the ref inspection before this
-local correction it was `5 0` (feature-only 5, Arena-only 0), with no divergence
-or Arena-only commits.
+commits increased the feature-vs-Arena count. The current local edits are
+uncommitted and therefore are not on either remote ref. At the latest recorded
+ancestry inspection, feature-vs-Arena was `5 0` (feature-only 5, Arena-only 0).
 No force, history rewrite, base change or draft-state change was used.
 
 CI on code revision `d8016610aa7ebf82263413c48b1164e4a64d13df` passed runs
 `40616497449` (push) and `40616501268` (pull_request). Earlier docs-only head
 `5c91603af18d42f03f53412f814a25833f2b3ea1` passed runs `40622384336` and
-`40622378634`. The documentation head inspected before this status-only update,
-`6a41980943b000326e3b3cabe331a392e63410a3`, passed fresh runs `40784385769`
-and `40784392125` (both `test`, success). These run IDs are tied to their exact
-heads; query GitHub before describing any later commit as CI-verified. Older runs
-`40398880548`/`40398888540` (head `5af5bc7`) and `40570468109` (Arena `c0cd3c1`)
-remain historical for their exact commits only.
+`40622378634`. The pushed head immediately before the current uncommitted edits,
+`fa69d53f70535dec03dd7f48c1c0d212b565e336`, passed runs `40787633232` and
+`40787639350` (both `test`, success). These results are tied to that SHA and do
+not verify the current changes. Older runs `40398880548`/`40398888540` (head
+`5af5bc7`) and `40570468109` (Arena `c0cd3c1`) remain historical for their exact
+commits only.
 
 PR #14 was advanced by non-forced fast-forward; no merge or draft-state change
-was made. At the query before the current local correction it remained OPEN, DRAFT
-and MERGEABLE, with base
-`36b7b486bb60b54f3f19201f2e548b11e5f93197` and head
-`6a41980943b000326e3b3cabe331a392e63410a3`.
+was made. The current live query reports it OPEN, DRAFT and MERGEABLE, with base
+`36b7b486bb60b54f3f19201f2e548b11e5f93197` and pushed head
+`fa69d53f70535dec03dd7f48c1c0d212b565e336`. The present local documentation and
+registry changes are uncommitted and are not included in that head.
 
 ## 8. Known limitations and external blockers
 
@@ -316,10 +319,11 @@ and MERGEABLE, with base
   live-news requirement, news feature policy and final submission format/email.
 - Raw historical price snapshot is not committed and could not be refetched in
   this network-restricted sandbox.
-- The last PR inspection before the local documentation corrections found PR #14
-  OPEN/DRAFT/MERGEABLE at head `6a41980943b000326e3b3cabe331a392e63410a3`; runs
-  `40784385769` and `40784392125` passed on that exact head. Any pushed changes
-  after that SHA require their own fresh CI before being described as green.
+- The current live PR inspection found PR #14 OPEN/DRAFT/MERGEABLE at head
+  `fa69d53f70535dec03dd7f48c1c0d212b565e336`; runs `40787633232` and
+  `40787639350` passed on that exact head. The present local edits are not in that
+  commit. Any later pushed change requires its own fresh CI before being described
+  as green.
 - Static typing is not configured as a CI gate; no claim of mypy-clean code is
   made. The defined offline checks and CI are the release gates.
 - CI proves offline code health only; it cannot prove data access, licence,

@@ -5,49 +5,40 @@ the exact next safe commands, and the blockers. It is not a completion claim.
 
 ## Current verified state — inspected 2026-10-29 (UTC)
 
-The local tree was reviewed without discarding existing changes. This checkpoint
-records the full repository/PR inspection immediately before the current
-status-only documentation correction.
+The actual repository and PR state were rechecked without discarding work.
 
-- Immediately before this local correction, branch `feat/sentiment-features-and-forecasting`
-  was clean and aligned with origin at `6a41980943b000326e3b3cabe331a392e63410a3`.
-  Code commit `d8016610aa7ebf82263413c48b1164e4a64d13df` is followed
-  by documentation commits `fb1fc3f`, `5c91603`, `2d5e2f7` and `6a41980`.
-- PR #14 was OPEN, DRAFT and MERGEABLE. GitHub reported head
-  `6a41980943b000326e3b3cabe331a392e63410a3`; base is
-  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Runs `40784385769` and
-  `40784392125` both completed successfully on that exact head.
-- At that ref check, remote feature contained the base and Arena branch;
-  feature-vs-Arena count was `5 0`; Arena remains
+- Local branch `feat/sentiment-features-and-forecasting` is at
+  `fa69d53f70535dec03dd7f48c1c0d212b565e336`, aligned with its remote tracking
+  branch, with 14 modified tracked files and no untracked files. Those local
+  documentation/registry edits are not committed or present on the remote.
+- PR #14 is OPEN, DRAFT and MERGEABLE. GitHub reports head
+  `fa69d53f70535dec03dd7f48c1c0d212b565e336`; base is
+  `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Runs `40787633232` and
+  `40787639350` completed successfully on that pushed SHA; they do not cover the
+  current local changes. Remote Arena remains
   `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
-- Code-suite verification was recorded 2026-10-28 at `d801661`. On 2026-10-29 this
-  continuation reran the full suite (187 passed), the focused set (64 passed in
-  1.77s), Ruff, compileall, registry validation (12 entries), docs validation
-  (102 links, 21 count claims and 28 requirement rows), and `git diff --check`;
-  all passed for the current local documentation correction. The earlier full
-  suite and demo remain tied to the unchanged source at `d801661`.
-  A fresh two-run synthetic demo at
-  `reports/generated/final-submit-verify-2026-10-29/` produced 210 bars, 209 posts,
-  six folds, 2,160 predictions and 18 metrics; six artifact hashes matched between
-  runs. This remains synthetic software evidence only. Exact evidence is in
-  `FINAL_VERIFICATION_REPORT.md`.
-- Provider credentials were checked for presence only and were absent from the
-  process environment and project-local `.env` files. No live provider call was
-  made. No accepted X corpus, original assessment PDFs, employer responses or
-  submission confirmation are available in this checkout.
+- Code-suite and security verification are recorded against code commit
+  `d8016610aa7ebf82263413c48b1164e4a64d13df`; they are not a fresh full-suite run
+  on the current documentation edits. In this continuation, the docs and registry
+  validators and focused registry/docs tests passed on 2026-10-29.
+  `git diff --check` passed. The synthetic demo at
+  `reports/generated/final-submit-verify-2026-10-29/` is labelled synthetic and
+  is software evidence only; it is not a real sentiment evaluation. Exact scope
+  and commands are in `FINAL_VERIFICATION_REPORT.md`.
+- Original assessment PDFs and raw BTC/X files are absent. No accepted X corpus,
+  employer response, live provider call or delivery confirmation is available.
 
 ## Current phase
 
-Local offline engineering checks and the two-run synthetic demo passed on the
-source tree through code commit `d801661`. The last live PR inspection found PR #14
-OPEN/DRAFT/MERGEABLE at head `6a41980943b000326e3b3cabe331a392e63410a3`; CI runs
-`40784385769` and `40784392125` passed on that SHA. These run IDs apply only to
-that inspected head; check GitHub for the current head and checks. Remaining work
-is external:
-resolve blockers B1-B7 (X source, credential route, spend cap, `n+0`, deadline,
-live-news policy, submission format) in
-[EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md). Do not change PR draft status or
-merge PR #14 without explicit authorization.
+The last live PR inspection found PR #14 OPEN/DRAFT/MERGEABLE at pushed head
+`fa69d53f70535dec03dd7f48c1c0d212b565e336`; CI runs `40787633232` and
+`40787639350` passed on that exact SHA. The local docs/registry edits are
+uncommitted and have no CI result attached. On the final local state for this
+continuation, docs validation, registry validation, and focused registry/docs
+tests passed on 2026-10-29, as did `git diff --check`. Remaining blockers are primarily external:
+resolve B1-B7 (X source, credential route, spend cap, `n+0`, deadline, live-news
+policy, submission format) in [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md). Do not
+change PR draft status or merge PR #14 without explicit authorization.
 
 ## Recovery history (2026-10-28)
 
@@ -107,22 +98,23 @@ merge PR #14 without explicit authorization.
 
 On 2026-10-29, the code tree at `d801661` passed 187 full tests and 64 focused
 tests; Ruff, compileall, registry validation (12 records), and the two-run
-synthetic demo also passed. The current local docs-only correction passed
-`.venv/bin/python scripts/validate_docs.py` (102 links, 21 test-count claims,
-28 requirement rows), `tests/unit/test_docs_validation.py` (9 passed), and
-`git diff --check`. Exact source-tree commands and artifact hashes are in
+synthetic demo also passed. In the current continuation, docs validation (102
+links, 20 test-count claims, 28 requirement rows), registry validation (12
+records), and the focused docs/registry tests succeeded on 2026-10-29, as did
+`git diff --check`. These local results do not cover live providers or real X
+sentiment. Exact source-tree commands and artifact hashes are in
 `FINAL_VERIFICATION_REPORT.md`. No live provider request was made.
 
 ## Pushed commit at recorded PR inspection
 
-- Pushed revision at the recorded PR inspection was documentation-only commit
-  `6a41980943b000326e3b3cabe331a392e63410a3`, following code commit
-  `d8016610aa7ebf82263413c48b1164e4a64d13df`. PR #14 head matched `6a41980`;
+- Pushed revision at the latest recorded PR inspection was
+  `fa69d53f70535dec03dd7f48c1c0d212b565e336`, following code commit
+  `d8016610aa7ebf82263413c48b1164e4a64d13df`. PR #14 head matched `fa69d53`;
   base remains `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Remote Arena remains
   `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f` and was not changed.
-- CI on the inspected head `6a41980943b000326e3b3cabe331a392e63410a3` passed runs
-  `40784385769` and `40784392125` (push and pull_request). Earlier runs
-  `40622384336`/`40622378634` belong to head `5c91603`; runs
+- CI on that inspected head passed runs `40787633232` and `40787639350` (push and
+  pull_request). These results apply only to that SHA; current local changes are
+  uncommitted. Earlier runs `40622384336`/`40622378634` belong to `5c91603`; runs
   `40616497449`/`40616501268` belong to code commit `d801661`. Older runs
   `40398880548`/`40398888540` (head `5af5bc7`) and `40570468109` (Arena
   `c0cd3c1`) are historical evidence for those exact commits only.
@@ -137,19 +129,19 @@ synthetic demo also passed. The current local docs-only correction passed
   [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md)).
 - Original assignment PDFs and raw historical price snapshot.
 - PR #14 head promotion of the code change set and prior documentation
-  reconciliation was completed by non-forced fast-forward. The head at the
-  recorded metadata check was `6a41980943b000326e3b3cabe331a392e63410a3`; both
-  CI runs succeeded on that SHA. Recheck GitHub for current state.
+  reconciliation was completed by non-forced fast-forward. At the live metadata
+  check on 2026-10-29, head was `fa69d53f70535dec03dd7f48c1c0d212b565e336` and
+  both CI runs succeeded on that SHA. The uncommitted local docs/registry changes
+  are not covered; recheck GitHub after any push.
 
 No live provider call is authorized.
 
 ## Exact next commands
 
-At the recorded PR inspection, the documentation-only status sync at
-`6a41980943b000326e3b3cabe331a392e63410a3` had two fresh CI runs passing.
-For any future change, query the live PR SHA with
-`gh pr view 14 --json headRefOid` and inspect the checks for that exact SHA before
-describing the PR as green.
+At the recorded PR inspection, pushed head `fa69d53f70535dec03dd7f48c1c0d212b565e336`
+had two successful CI runs. The current local changes are not pushed or covered.
+For any future change, query the live PR SHA with `gh pr view 14 --json headRefOid`
+and inspect the checks for that exact SHA before describing the PR as green.
 
 Remaining actions are external, not Git: resolve blockers B1-B7 in
 [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md), then send the clarification email

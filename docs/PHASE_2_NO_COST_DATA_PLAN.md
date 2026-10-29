@@ -12,13 +12,13 @@ Keep the data workstream moving without requiring the project owner to purchase 
 - **Provider-neutral contracts, profiler and point-in-time alignment:** implemented and covered by unit tests. The profiler supports deterministic `--as-of` windows, daily coverage gaps, retrieval-column coverage, schema drift and invalid engagement counts.
 - **Apify adapter:** implemented and mocked in tests, including the documented `data` envelope and dataset offset/limit paging; no Actor is selected or run. Do not assume its free allowance will cover an Actor or 180-day search.
 - **Storage:** a versioned price/post schema, idempotent repositories, descriptive and leakage-safe cutoff joins, and `xsentiment persist` plus `run --database-url` are implemented and fixture-verified end-to-end. This verifies the offline persisted-input path for R15; no accepted real X rows are available to populate it.
-- **Historical X collection:** not complete. The assessment-linked Google Doc was retrieved on 2026-10-26 and is a 12-entry dataset-link compilation, not a tweet corpus. No candidate dataset has been downloaded, profiled, or accepted for use. Uploaded local files contain IDs, date/count summaries, unrelated air-quality/MQTT data or a StockTwits paper; none contains X post text.
+- **Historical X collection:** not complete. The assessment-linked Google Doc was retrieved on 2026-10-29 and is a 12-entry dataset-link compilation, not a tweet corpus. Three public candidate listing/card metadata were checked, but no candidate dataset has been downloaded, row-profiled, or accepted for use. No raw candidate corpus is present in this checkout.
 
 ## Zero-budget options to investigate
 
 ### Option A — Assessment-linked historical dataset
 
-The assessment-linked Google Doc was retrieved on 2026-10-26. It is a 12-entry dataset-link compilation matching the companion dataset PDF, **not** a tweet corpus. Select one candidate from it and review access, schema, timestamp coverage, license/terms, whether full text is present, and whether the rows are actual X posts. Do not assume a dataset is usable simply because its link appeared in the assessment. If it is accessible and permitted, record the exact snapshot/version and file hash, then profile it locally without committing the data.
+The assessment-linked Google Doc full text was re-fetched on 2026-10-29. It is a 12-entry dataset-link compilation matching the previously recorded companion PDF, **not** a tweet corpus. Three candidate listings/cards were partially inspected and documented in `docs/data-sources.md`; this does not establish row contents, current 180-day coverage, complete schema, rights or license. Ask the employer to approve a candidate and permitted bounded inspection before downloading. If approved, record the exact snapshot/version and file hash, then profile it locally without committing the data.
 
 ### Option B — Existing public research corpus
 
@@ -44,4 +44,4 @@ Before calling X ingestion complete, produce a sanitized profile containing:
 - counts of available engagement fields and their missingness;
 - explicit statement whether the source covers the entire required 180-day period and whether retrieval-time/point-in-time availability is known.
 
-Keep raw post text, cookies, API tokens and downloaded datasets out of Git. Do not claim a sentiment forecast, Sharpe ratio, Sortino ratio or drawdown until the corresponding model/backtest has actually run on valid out-of-sample data. The registry's `independent_verification.status` is `not-reverified`: selecting a link from the PDF or Google Doc is not independent confirmation of current access, schema, coverage or license.
+Keep raw post text, cookies, API tokens and downloaded datasets out of Git. Do not claim a sentiment forecast, Sharpe ratio, Sortino ratio or drawdown until the corresponding model/backtest has actually run on valid out-of-sample data. The registry's `independent_verification.status` is `partially-reverified`: three candidate listing/card metadata were checked, but this is not independent confirmation of current access, row schema, 180-day coverage or license.

@@ -3,13 +3,12 @@
 **Code promotion status: COMPLETED on 2026-10-28.** The verified work was committed
 as `d8016610aa7ebf82263413c48b1164e4a64d13df` and pushed to
 `feat/sentiment-features-and-forecasting` with a normal non-forced fast-forward
-(`5af5bc7..d801661`). PR #14's head branch contains it. Documentation-only
-reconciliation commits were subsequently pushed by normal fast-forward. At the
-full PR inspection before this documentation-only update, head
-`6a41980943b000326e3b3cabe331a392e63410a3` had fresh push and pull-request CI
-runs `40784385769` and `40784392125`, both passed. No force-push, history rewrite,
-base change, draft-state change or merge occurred. The procedure below is retained as the record of how it was done and as the safe
-repeat path if the head ever needs to advance again.
+(`5af5bc7..d801661`). PR #14's head branch contains it. At the live PR inspection
+on 2026-10-29, pushed head `fa69d53f70535dec03dd7f48c1c0d212b565e336` had
+successful push and pull-request CI runs `40787633232` and `40787639350`. These
+checks do not include current local uncommitted documentation changes. No
+force-push, history rewrite, base change, draft-state change or merge occurred.
+The procedure below is retained as the record and safe repeat path.
 
 **Purpose:** move verified Arena-branch work into the existing PR #14 head
 branch with a normal, non-forced fast-forward. The earlier assumption that this
@@ -21,33 +20,29 @@ push to the feature branch succeeded from here.
 **Base:** `docs/canonical-source-of-truth`
 **PR head branch:** `feat/sentiment-features-and-forecasting`
 
-## Verified state on 2026-10-29 (recorded metadata inspection)
+## Verified state on 2026-10-29 (live metadata inspection)
 
-- Remote feature / PR #14 head at the recorded metadata inspection:
-  `6a41980943b000326e3b3cabe331a392e63410a3`, containing code revision
-  `d8016610aa7ebf82263413c48b1164e4a64d13df` and later docs-only commits. Check
-  GitHub again before using this procedure.
-- PR base `docs/canonical-source-of-truth`:
+- PR #14 is OPEN, DRAFT, MERGEABLE. Its pushed head is
+  `fa69d53f70535dec03dd7f48c1c0d212b565e336`; base is
+  `docs/canonical-source-of-truth` at
   `36b7b486bb60b54f3f19201f2e548b11e5f93197`.
-- Remote Arena branch: `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
-- PR #14 metadata: OPEN, DRAFT, MERGEABLE.
-- CI on that inspected head, both successful: run `40784385769` and run
-  `40784392125` —
-  <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40784385769>
-  and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40784392125>.
+- The PR head is also the remote feature branch. The local checkout has
+  uncommitted documentation/registry edits beyond that head; they have not been
+  pushed or checked by GitHub CI.
+- Remote Arena is `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
+- CI on the inspected pushed head passed runs `40787633232` and `40787639350` —
+  <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40787633232>
+  and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40787639350>.
   Earlier runs `40783061034`/`40783064118` belong to head `2d5e2f7`;
   `40622384336`/`40622378634` belong to `5c91603`; and
   `40616497449`/`40616501268` belong to `d801661`. Older runs
   `40398880548`/`40398888540` and `40570468109` are historical for their
   respective SHAs.
-- At the recorded ancestry inspection, the base and Arena
-  were ancestors of feature; feature-vs-Arena was `5 0` after documentation-only
-  commits. No force push,
-  history rewrite, base change, PR-ready change or merge occurred.
-- Documentation updates through inspected head `6a41980` passed the offline
-  verification gates on 2026-10-29; fresh CI passed on that head (runs
-  `40784385769`, `40784392125`). These results are tied to that SHA; inspect the
-  live PR head and attached checks before making a new CI claim.
+- At the recorded ancestry inspection, the base and Arena were ancestors of
+  feature; feature-vs-Arena was `5 0`. No force push, history rewrite, base
+  change, PR-ready change or merge occurred.
+- Do not describe the present local changes as CI-verified. Query the current PR
+  head and wait for its attached checks after any authorized push.
 
 ## Do not
 
