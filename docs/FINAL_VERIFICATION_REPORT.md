@@ -28,9 +28,10 @@ for this exact state are listed below.
 - `.venv/bin/python -m compileall -q src tests scripts` -> exit 0.
 - `.venv/bin/python scripts/validate_dataset_registry.py` -> 12 records
   structurally valid; no URL, license, download or data-quality claim is implied.
-- `.venv/bin/python scripts/validate_docs.py` -> passed: 103 relative Markdown
-  links, 22 test-count claims, and 28 requirement rows (11 complete, 14 partial,
-  2 externally blocked, 1 needing clarification).
+- `.venv/bin/python scripts/validate_docs.py` -> passed: relative Markdown links,
+  test-count claims and 28 requirement rows (11 complete, 14 partial, 2 externally
+  blocked, 1 needing clarification) all valid. The link count is not restated here
+  because it moves with every documentation edit; the validator prints it.
 - `.venv/bin/python -m pytest tests/unit/test_dataset_registry.py tests/unit/test_docs_validation.py -q`
   -> focused registry/docs tests passed on the final local state (2026-10-29).
 - `git diff --check` -> clean on the final local changes.

@@ -104,8 +104,8 @@ change PR draft status or merge PR #14 without explicit authorization.
 
 On 2026-10-29, the code tree at `d801661` passed 187 full tests and 64 focused
 tests; Ruff, compileall, registry validation (12 records), and the two-run
-synthetic demo also passed. In the current continuation, docs validation (102
-links, 21 test-count claims, 28 requirement rows), registry validation (12
+synthetic demo also passed. In the current continuation, docs validation (all
+links and test-count claims valid, 28 requirement rows), registry validation (12
 records), and the focused docs/registry tests succeeded on 2026-10-29, as did
 `git diff --check`. The released commit `9b0698f` then reproduced the suite and
 the validators from a clean worktree. These results do not cover live providers
