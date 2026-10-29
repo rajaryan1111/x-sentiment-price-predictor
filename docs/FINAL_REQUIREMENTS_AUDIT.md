@@ -65,9 +65,9 @@ are retained as report/manifest artifacts only. Additional partial rows depend
 indirectly on the accepted-X-data gate. PR #14 delivery was
 completed on 2026-10-28 (B8 resolved): the code change is in the feature branch.
 At the live PR metadata inspection on 2026-10-29, PR head was
-`fa69d53f70535dec03dd7f48c1c0d212b565e336`, with two successful CI runs
-(`40787633232`, `40787639350`) on that exact pushed SHA. Current local
-uncommitted documentation/registry edits are not included in that result.
+`9b0698f86267973a220c914ac0802a5bba171374`, with two successful CI runs
+(`40795420005`, `40795425900`) on that exact pushed SHA. Nothing is left
+uncommitted in the working tree.
 
 This audit is intentionally more conservative than the canonical matrix for R8:
 the six horizons are implemented, but the `n+0` target convention is still a
@@ -78,13 +78,12 @@ verified as offline engineering, not as live provider or real-X acceptance.
 
 - The full code suite (187 tests), focused Apify/Tavily/news CLI/pipeline command
   (64 tests), Ruff, compileall and synthetic CLI demo are recorded against code
-  commit `d801661` and its verification context. In this continuation, the registry
-  and documentation validators passed; the focused registry/docs tests passed
-  (20 tests on 2026-10-29), and `git diff --check` passed. These local checks do not imply real
-  provider behavior or model quality. The current PR head is `fa69d53` with two
-  successful CI runs (`40787633232`, `40787639350`); current local edits remain
-  uncommitted and are not covered by CI. Exact commands and hashes are in
-  [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
+  commit `d801661` and its verification context. The final documentation/registry
+  reconciliation passed the same full suite, both validators, the focused
+  registry/docs tests and `git diff --check`, was committed as `9b0698f`, and then
+  reproduced from a detached clean worktree at that commit with Python 3.11.15.
+  These checks do not imply real provider behavior or model quality. Exact commands
+  and hashes are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
 - On 2026-10-29, the docs-synchronized local synthetic demo generated six
   artifacts, six folds, 2,160 predictions and 18 metric rows from 210 synthetic
   bars and 209 synthetic posts. Two independent CLI runs matched byte-for-byte on
@@ -94,9 +93,8 @@ verified as offline engineering, not as live provider or real-X acceptance.
   regressions are covered by the unit/CLI tests.
 - GitHub Actions evidence is tied to exact SHAs. The code revision `d801661`
   passed runs `40616497449` (push) and `40616501268` (pull_request). At the live
-  2026-10-29 query, PR head `fa69d53f70535dec03dd7f48c1c0d212b565e336` passed
-  runs `40787633232` and `40787639350`; these do not include the current local
-  uncommitted edits. See the verification report.
+  2026-10-29 query, PR head `9b0698f86267973a220c914ac0802a5bba171374` passed
+  runs `40795420005` and `40795425900`. See the verification report.
 - No live Tavily, Exa, Apify or Coinbase request was made during this audit. Apify and Tavily have adapter code and mocked tests; Exa has only a SecretStr setting/configuration-presence check and no client, adapter, provider test or usage documentation. The Google Doc full-text export was fetched; accessible Kaggle metadata and Hugging Face card/schema/API were reviewed for three candidates. No bulk file was downloaded, no dataset was licensed/approved, and no row-level coverage or data-quality profile was performed. Candidate uploader license declarations are not legal clearance. No live provider compatibility is inferred.
 
 ## 4.1 Independent evidence cross-check (2026-10-29)

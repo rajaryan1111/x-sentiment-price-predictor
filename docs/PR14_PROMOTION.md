@@ -3,12 +3,13 @@
 **Code promotion status: COMPLETED on 2026-10-28.** The verified work was committed
 as `d8016610aa7ebf82263413c48b1164e4a64d13df` and pushed to
 `feat/sentiment-features-and-forecasting` with a normal non-forced fast-forward
-(`5af5bc7..d801661`). PR #14's head branch contains it. At the live PR inspection
-on 2026-10-29, pushed head `fa69d53f70535dec03dd7f48c1c0d212b565e336` had
-successful push and pull-request CI runs `40787633232` and `40787639350`. These
-checks do not include current local uncommitted documentation changes. No
-force-push, history rewrite, base change, draft-state change or merge occurred.
-The procedure below is retained as the record and safe repeat path.
+(`5af5bc7..d801661`). PR #14's head branch contains it. The final documentation
+and registry reconciliation was then committed as
+`9b0698f86267973a220c914ac0802a5bba171374` and pushed by ordinary fast-forward
+(`fa69d53..9b0698f`); its push and pull-request CI runs `40795420005` and
+`40795425900` both succeeded. No force-push, history rewrite, base change,
+draft-state change or merge occurred. The procedure below is retained as the
+record and safe repeat path.
 
 **Purpose:** move verified Arena-branch work into the existing PR #14 head
 branch with a normal, non-forced fast-forward. The earlier assumption that this
@@ -22,27 +23,28 @@ push to the feature branch succeeded from here.
 
 ## Verified state on 2026-10-29 (live metadata inspection)
 
-- PR #14 is OPEN, DRAFT, MERGEABLE. Its pushed head is
-  `fa69d53f70535dec03dd7f48c1c0d212b565e336`; base is
+- PR #14 is OPEN, DRAFT, MERGEABLE. At the last live inspection its pushed head
+  was `9b0698f86267973a220c914ac0802a5bba171374`; base is
   `docs/canonical-source-of-truth` at
   `36b7b486bb60b54f3f19201f2e548b11e5f93197`.
-- The PR head is also the remote feature branch. The local checkout has
-  uncommitted documentation/registry edits beyond that head; they have not been
-  pushed or checked by GitHub CI.
+- That head is also the remote feature branch. The status wording in this file was
+  committed after the inspection, so the live head can be one documentation commit
+  later; re-query it rather than quoting a remembered SHA.
 - Remote Arena is `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
-- CI on the inspected pushed head passed runs `40787633232` and `40787639350` —
-  <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40787633232>
-  and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40787639350>.
-  Earlier runs `40783061034`/`40783064118` belong to head `2d5e2f7`;
+- CI on that pushed head passed runs `40795420005` and `40795425900` —
+  <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40795420005>
+  and <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40795425900>.
+  Earlier runs `40787633232`/`40787639350` belong to `fa69d53`;
+  `40783061034`/`40783064118` belong to `2d5e2f7`;
   `40622384336`/`40622378634` belong to `5c91603`; and
   `40616497449`/`40616501268` belong to `d801661`. Older runs
   `40398880548`/`40398888540` and `40570468109` are historical for their
   respective SHAs.
-- At the recorded ancestry inspection, the base and Arena were ancestors of
-  feature; feature-vs-Arena was `5 0`. No force push, history rewrite, base
+- At the post-push ancestry inspection, the base and Arena were both ancestors of
+  feature; feature-vs-Arena was `7 0`. No force push, history rewrite, base
   change, PR-ready change or merge occurred.
-- Do not describe the present local changes as CI-verified. Query the current PR
-  head and wait for its attached checks after any authorized push.
+- Query the live PR head and its attached checks before repeating any CI claim;
+  a later commit invalidates this evidence for the new SHA.
 
 ## Do not
 

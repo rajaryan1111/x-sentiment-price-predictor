@@ -45,14 +45,19 @@ recorded as verified complete offline.
 
 ## Delivery status (live GitHub inspection on 2026-10-29)
 
-The local feature branch is based on pushed HEAD
-`fa69d53f70535dec03dd7f48c1c0d212b565e336`; the current documentation and registry
-edits in this checkout are uncommitted and are not on GitHub. PR #14 was OPEN, DRAFT
-and MERGEABLE against `docs/canonical-source-of-truth` (base SHA
-`36b7b486bb60b54f3f19201f2e548b11e5f93197`). GitHub reported that pushed head and
-successful push/pull-request CI runs `40787633232` and `40787639350` on that exact
-SHA. Those checks do not cover the current local edits. The delivered code change is
-`d8016610aa7ebf82263413c48b1164e4a64d13df`; later pushed commits were documentation-only.
+PR #14 remains OPEN, DRAFT and MERGEABLE against `docs/canonical-source-of-truth`
+(base SHA `36b7b486bb60b54f3f19201f2e548b11e5f93197`). The final documentation and
+registry reconciliation was committed and pushed as
+`9b0698f86267973a220c914ac0802a5bba171374`; at that inspection GitHub reported it
+as the PR head with both push and pull-request CI runs (`40795420005`,
+`40795425900`) succeeding. This status text was committed after that inspection, so
+the live head may be one documentation commit later: query
+`gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`
+and inspect the checks for that exact SHA before quoting a head or a CI result. The
+code change remains `d8016610aa7ebf82263413c48b1164e4a64d13df`; later commits are
+documentation/registry updates. The Arena branch remains
+`c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`. PR #14 remains unmerged and draft;
+no ready-for-review change was made. See [docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md).
 GitHub's live PR head can change with each commit; recheck with
 `gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`
 and inspect checks for that exact SHA. The Arena branch remains

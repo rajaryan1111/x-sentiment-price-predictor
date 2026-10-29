@@ -1,22 +1,24 @@
 # Final verification report
 
-**Verification context:** full local checks rerun on 2026-10-29, branch
-`feat/sentiment-features-and-forecasting`, starting HEAD
-`fa69d53f70535dec03dd7f48c1c0d212b565e336` plus the uncommitted documentation,
-registry and registry-test changes described below. The code remains at
-`d8016610aa7ebf82263413c48b1164e4a64d13df`; current PR #14 head and CI were live
-queried at `fa69d53f70535dec03dd7f48c1c0d212b565e336`. Historical source review
-is distinguished from current local documentation and registry checks.
+**Verification context:** checks were run on 2026-10-29 on branch
+`feat/sentiment-features-and-forecasting`, first on the working tree based on
+`fa69d53f70535dec03dd7f48c1c0d212b565e336` plus the documentation/registry
+changes, then again from a detached clean worktree at the released commit
+`9b0698f86267973a220c914ac0802a5bba171374`. Application code remains
+`d8016610aa7ebf82263413c48b1164e4a64d13df`; the release commit adds documentation,
+registry evidence and its registry test only. PR #14 and CI were live queried at
+that released head. Historical source review is distinguished from the current
+documentation and registry checks.
 
 ## Code verification and current documentation checks (2026-10-29)
 
 The full suite and source-oriented quality gates were run on 2026-10-29 against
-the local checkout at HEAD `fa69d53` plus the uncommitted documentation, registry
-and registry-test changes listed in `git status`. Application code remains the
-same as code commit `d801661`; the full suite includes the changed registry test
-and documentation-count validation. Earlier wording revisions briefly tripped
-the count guard; those claims were corrected before the final run. The final
-results for this exact local state are listed below.
+the working tree at HEAD `fa69d53` plus the documentation, registry and
+registry-test changes that became commit `9b0698f`. Application code remains
+code commit `d801661`; the change set includes the updated registry test and
+documentation-count validation. Earlier wording revisions briefly tripped the
+count guard; those claims were corrected before the final run. The final results
+for this exact state are listed below.
 
 - `.venv/bin/python -m pytest -q` -> **187 passed in 3.77s** (run on 2026-10-29
   against the current local documentation/registry changes).
@@ -26,8 +28,8 @@ results for this exact local state are listed below.
 - `.venv/bin/python -m compileall -q src tests scripts` -> exit 0.
 - `.venv/bin/python scripts/validate_dataset_registry.py` -> 12 records
   structurally valid; no URL, license, download or data-quality claim is implied.
-- `.venv/bin/python scripts/validate_docs.py` -> passed: 102 relative Markdown
-  links, 20 test-count claims, and 28 requirement rows (11 complete, 14 partial,
+- `.venv/bin/python scripts/validate_docs.py` -> passed: 103 relative Markdown
+  links, 22 test-count claims, and 28 requirement rows (11 complete, 14 partial,
   2 externally blocked, 1 needing clarification).
 - `.venv/bin/python -m pytest tests/unit/test_dataset_registry.py tests/unit/test_docs_validation.py -q`
   -> focused registry/docs tests passed on the final local state (2026-10-29).
@@ -56,6 +58,33 @@ TAVILY_API_KEY and EXA_API_KEY absent from the process environment and project-l
 `.env` files (presence only; values were never read or printed). No live provider
 request was made. This current pass inspected `.env.example` placeholders and
 implementation/configuration but did not re-read credential values.
+
+## Clean-checkout reproduction of the released commit (2026-10-29)
+
+The released commit `9b0698f86267973a220c914ac0802a5bba171374` was checked out
+detached into a separate temporary worktree with no copied `.env`, no ignored
+inputs and a fresh virtual environment built with Python 3.11.15. The host's
+default `python3` is 3.9, below the project's `requires-python`, so it was not
+used; the first setup attempt with it failed for that reason and is not counted
+as a project failure. In the clean tree the documented commands then produced:
+
+- `python3.11 -m venv .venv && .venv/bin/python -m pip install -e '.[dev,storage]'`
+  -> succeeded.
+- `.venv/bin/python -m pytest -q` -> **187 passed** on 2026-10-29 at commit
+  `9b0698f`.
+- `.venv/bin/ruff check src tests scripts` -> all checks passed.
+- `.venv/bin/python scripts/validate_dataset_registry.py` -> 12 records valid.
+- `.venv/bin/python scripts/validate_docs.py` -> passed: 102 relative Markdown
+  links, 19 test-count claims outside `TEST_PLAN.md`, 28 matrix rows.
+- `scripts/make_offline_demo.py` followed by `python -m xsentiment run` -> 210
+  synthetic bars, 209 synthetic posts, six artefacts and finite metrics for
+  `n+0`..`n+5`; all labelled synthetic.
+- `git status --short --branch` -> clean before those ignored outputs were written.
+
+The temporary worktree and its generated outputs were removed after the run, so
+this is a recorded reproduction rather than a committed artefact. It shows the
+delivered tree needs no undocumented local file; it adds no real X data,
+provider evidence or real-market result.
 
 ## Previous local verification (2026-10-28; code commit d801661)
 
@@ -272,11 +301,12 @@ Remote refs and PR #14 were queried live on 2026-10-29:
 
 ```text
 local branch      feat/sentiment-features-and-forecasting
-local HEAD        fa69d53f70535dec03dd7f48c1c0d212b565e336 (same as remote feature)
-working tree      14 modified tracked files; no untracked files
+local HEAD        9b0698f86267973a220c914ac0802a5bba171374 (= remote feature)
+working tree      clean; the 19 documentation/registry files were committed and
+                  pushed as 9b0698f, then verified in a detached clean worktree
 code revision     d8016610aa7ebf82263413c48b1164e4a64d13df  <- delivered change set
                   (followed by documentation-only commits on the same branch)
-remote feature    tip of that branch; GitHub shows the live SHA
+remote feature    9b0698f86267973a220c914ac0802a5bba171374
 remote Arena      c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f  (unchanged)
 remote base       36b7b486bb60b54f3f19201f2e548b11e5f93197
 PR #14            OPEN, DRAFT, MERGEABLE, base docs/canonical-source-of-truth,
@@ -285,26 +315,24 @@ PR #14            OPEN, DRAFT, MERGEABLE, base docs/canonical-source-of-truth,
 
 The feature branch contains both the base and Arena branches. The initial
 promotion was a normal fast-forward (`5af5bc7..d801661`); subsequent docs-only
-commits increased the feature-vs-Arena count. The current local edits are
-uncommitted and therefore are not on either remote ref. At the latest recorded
-ancestry inspection, feature-vs-Arena was `5 0` (feature-only 5, Arena-only 0).
-No force, history rewrite, base change or draft-state change was used.
+commits increased the feature-vs-Arena count. The final documentation/registry
+reconciliation was then committed as `9b0698f` and pushed by ordinary
+fast-forward (`fa69d53..9b0698f`). No force, history rewrite, base change or
+draft-state change was used.
 
-CI on code revision `d8016610aa7ebf82263413c48b1164e4a64d13df` passed runs
-`40616497449` (push) and `40616501268` (pull_request). Earlier docs-only head
-`5c91603af18d42f03f53412f814a25833f2b3ea1` passed runs `40622384336` and
-`40622378634`. The pushed head immediately before the current uncommitted edits,
-`fa69d53f70535dec03dd7f48c1c0d212b565e336`, passed runs `40787633232` and
-`40787639350` (both `test`, success). These results are tied to that SHA and do
-not verify the current changes. Older runs `40398880548`/`40398888540` (head
-`5af5bc7`) and `40570468109` (Arena `c0cd3c1`) remain historical for their exact
-commits only.
+The released head `9b0698f86267973a220c914ac0802a5bba171374` passed both attached
+CI runs: `40795420005` (push) and `40795425900` (pull_request), each `test`
+conclusion `SUCCESS` on that exact SHA. Earlier heads remain historical for
+their own commits: `fa69d53` passed `40787633232`/`40787639350`, code revision
+`d801661` passed `40616497449`/`40616501268`, `5c91603` passed
+`40622384336`/`40622378634`, and older runs `40398880548`/`40398888540` (head
+`5af5bc7`) and `40570468109` (Arena `c0cd3c1`) apply only to those commits.
 
 PR #14 was advanced by non-forced fast-forward; no merge or draft-state change
-was made. The current live query reports it OPEN, DRAFT and MERGEABLE, with base
-`36b7b486bb60b54f3f19201f2e548b11e5f93197` and pushed head
-`fa69d53f70535dec03dd7f48c1c0d212b565e336`. The present local documentation and
-registry changes are uncommitted and are not included in that head.
+was made. The live query after the push reports it OPEN, DRAFT and MERGEABLE,
+with base `36b7b486bb60b54f3f19201f2e548b11e5f93197` and pushed head
+`9b0698f86267973a220c914ac0802a5bba171374`, whose two attached checks succeeded.
+The working tree matches that head.
 
 ## 8. Known limitations and external blockers
 
@@ -319,15 +347,34 @@ registry changes are uncommitted and are not included in that head.
   live-news requirement, news feature policy and final submission format/email.
 - Raw historical price snapshot is not committed and could not be refetched in
   this network-restricted sandbox.
-- The current live PR inspection found PR #14 OPEN/DRAFT/MERGEABLE at head
-  `fa69d53f70535dec03dd7f48c1c0d212b565e336`; runs `40787633232` and
-  `40787639350` passed on that exact head. The present local edits are not in that
-  commit. Any later pushed change requires its own fresh CI before being described
-  as green.
+- The live PR inspection found PR #14 OPEN/DRAFT/MERGEABLE at head
+  `9b0698f86267973a220c914ac0802a5bba171374`; runs `40795420005` and
+  `40795425900` passed on that exact head. Any later pushed change requires its
+  own fresh CI before being described as green.
 - Static typing is not configured as a CI gate; no claim of mypy-clean code is
   made. The defined offline checks and CI are the release gates.
 - CI proves offline code health only; it cannot prove data access, licence,
   model quality, profitability or employer acceptance.
+
+## 8.1 Final acceptance decision (2026-10-29)
+
+The dimensions are reported separately on purpose: a green test suite or a green
+PR does not close the data, model-quality, credential or delivery gates.
+
+| Dimension | Status | Evidence and exact remaining action |
+| --- | --- | --- |
+| Engineering correctness | **Implemented and locally verified within the documented scope** | 187 tests passed on 2026-10-29 at commit `9b0698f`, along with Ruff, compileall, both validators and the registry/docs tests; credentials, URL sanitization and publication-time rules have regression coverage. Scope exclusions are stated in the canonical documents. |
+| Automated verification | **Green for the released commit** | Local and clean-checkout suite runs at `9b0698f`; CI runs `40795420005` and `40795425900` succeeded on that SHA. Coverage is offline/fixture based. |
+| Real-data ingestion | **Partial: public prices only** | The historical run used 180 public Coinbase BTC-USD daily bars and zero X posts; the raw snapshot is not committed. Action: approved X source/Actor, licence, spend cap and credentials. |
+| Genuine model evaluation | **Partial and negative for the price-only model** | Per-horizon MAE/RMSE for `n+0`..`n+5`, plus Sharpe, Sortino and max drawdown for the predeclared strategy. Price-only mean MAE ($2,264.62) is worse than naive ($1,828.36); the sentiment model is not identifiable with zero scored posts. No sentiment claim is made. Action: run it on accepted X data. |
+| Provider reproducibility | **Not achieved** | Apify, Tavily and Exa are mocked or configuration-only; no Actor ID, no live call, no credentials and no approved credential channel. Action: select an Actor, record its ID, authorize one bounded call per provider and publish non-secret identifiers. |
+| GitHub release readiness | **Draft PR only; not merged** | PR #14 is OPEN, DRAFT and MERGEABLE at `9b0698f`, both checks green, no review approval and no merge. Action: employer/owner decision to merge; nothing is force-pushed. |
+| Submission package readiness | **Substantially assembled, not sendable as final** | Report, traceability matrix, audit, demo script, reproduction commands and an unsent email draft exist. Missing: real sentiment metrics, provider identifiers, a secure credential channel, confirmed deadline and confirmed format. |
+| Actual delivery confirmation | **None** | No email was sent, no employer response exists and the recipient address is unconfirmed against the original brief. |
+
+Therefore the project is **not fully submission-ready**: the engineering and offline
+verification gates are satisfied, while real-data, provider, format/deadline and
+delivery gates are only closable by the employer or by explicit authorization.
 
 ## 9. Submission artifacts and verified paths
 
@@ -346,6 +393,8 @@ registry changes are uncommitted and are not included in that head.
 - `reports/generated/final-submit-verify-2026-10-29/` — fresh two-run artefact
   set with sizes and SHA-256 values recorded above; these ignored generated
   artefacts remain local and are not tracked in Git.
+- Clean-checkout reproduction at `9b0698f` (temporary detached worktree, removed
+  after the run) — results recorded in the section above.
 - `reports/generated/final-verify-2026-10-28-82883/` — prior ignored two-run
   synthetic demonstration artifacts (historical evidence; unchanged).
 - `reports/generated/final-audit-2026-10-28.D0dgOZ/`,
