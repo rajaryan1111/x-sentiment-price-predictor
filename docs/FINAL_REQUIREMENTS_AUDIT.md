@@ -60,8 +60,8 @@ treated as market evidence.
 Total: **28 requirements**. Externally blocked or clarification-dependent
 rows: R2, A1 and A2. A3 is partially complete because the assessment resource is
 identified as a dataset-link index but no candidate has been accepted. The raw
-price snapshot is not present in this checkout; historical public-price metrics
-are retained as report/manifest artifacts only. Additional partial rows depend
+price snapshot is untracked but present in this working copy, and the committed
+public-price metrics reproduce exactly from it at `e22da11`; no X corpus exists. Additional partial rows depend
 indirectly on the accepted-X-data gate. PR #14 delivery was
 completed on 2026-10-28 (B8 resolved): the code change is in the feature branch.
 At the live PR metadata inspection on 2026-10-29, PR head was
@@ -131,9 +131,10 @@ against the actual working tree. The concrete checks were:
   documentation structure and the 12-entry dataset registry; they do **not**
   verify external URLs, licences or real provider behaviour.
 - Committed `reports/btc-usd-180d/` artifacts were cross-checked for internal
-  metric/manifest/report consistency. The original PDFs and raw price snapshot
-  are not present in this checkout, so primary-source wording and live price
-  re-fetch were not re-verified here. The assessment-linked Google Doc text export
+  metric/manifest/report consistency, and the run was then reproduced at
+  `e22da11` from the untracked local snapshot (SHA-256 matches): `metrics.json`
+  matched with zero numeric differences. The original PDFs are absent, so
+  primary-source wording was not re-verified; no live provider fetch was made. The assessment-linked Google Doc text export
   and three candidate dataset provider pages/cards were reviewed on 2026-10-29;
   no candidate was downloaded or approved.
 
@@ -177,7 +178,7 @@ external data/authorization gates into completion.
 | --- | --- | --- | --- | --- | --- |
 | A1 | T* | Submit within the stated timeline (the brief says both one week and 5–7 days) | NOT_VERIFIED | X: no employer message or calendar due date exists in the repository. The brief is recorded as saying both one week and 5–7 days. | Exact calendar deadline and timezone require employer clarification. Primary-source wording is also not re-verifiable from this checkout. |
 | A2 | T* | Provide the APIFY/Tavily/Exa tokens and Actor IDs used for scraping | BLOCKED_EXTERNAL | C/A: `.env.example` has placeholders only; no Actor ID or token exists and no private credential channel is defined. | Requires approved Actor/provider selection and a private credential channel; secrets must never be committed or shared in chat. |
-| A3 | T* | Use the historical tweets resource linked by the assessment | PARTIAL | C/T/A: `local_dataset_profile.py`, `profile_local_x_dataset.py`, dataset registry and validator; the Google Doc full text was re-fetched 2026-10-29 and is a 12-entry link compilation, not a post corpus. Three public candidate listing/card metadata were partially checked; this checkout has no raw price snapshot or X post-text corpus. | Requires employer-approved candidate selection, rights/terms review, permitted bounded inspection, row schema/text check and measured 180-day coverage profile. |
+| A3 | T* | Use the historical tweets resource linked by the assessment | PARTIAL | C/T/A: `local_dataset_profile.py`, `profile_local_x_dataset.py`, dataset registry and validator; the Google Doc full text was re-fetched 2026-10-29 and is a 12-entry link compilation, not a post corpus. Three public candidate listing/card metadata were partially checked; this checkout has no X post-text corpus. | Requires employer-approved candidate selection, rights/terms review, permitted bounded inspection, row schema/text check and measured 180-day coverage profile. |
 | A4 | T* | Ingest the most recent and relevant news with Tavily to complement X sentiment; Exa appears in the submission line | PARTIAL | C/T/M: `main.py` `fetch-news` and `run --news-file`, `tavily_news.py`, `pipeline/forecast_run.py`; mocked tests cover URL component sanitization before JSONL persistence, UTC-offset parsing, naive/malformed timestamp withholding, context-only behaviour, streaming bounds, no retry, offline network isolation and unchanged predictions/metrics. | Live Tavily behaviour and a real news snapshot require an approved key, authorization and confirmation that live news is mandatory (B6). |
 | A5 | T* | The brief offers a machine learning / reinforcement learning pipeline | COMPLETE | C/T: `models/baseline.py` and `forecasting.py` implement supervised multi-horizon ML with naive and price-only baselines; no RL environment is defined or claimed. | RL is not implemented; the brief does not define an RL environment. Reopen only on explicit employer instruction. |
 | A6 | T* | Reference inventory of historical Twitter/X datasets with verified download links | PARTIAL | C/T/A: `data/registry/historical_twitter_x_datasets.json` and `scripts/validate_dataset_registry.py`; structural validator checks platform identity, ID-only caveats, coverage limitations and the explicit `partially-reverified` state. Three candidate public listing/card metadata were checked on 2026-10-29. | Remaining registry entries, actual rows, current rights, availability and licenses remain unverified; no candidate is approved or coverage-profiled. |

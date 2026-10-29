@@ -28,7 +28,9 @@ The actual repository and PR state were rechecked without discarding work.
   `git diff --check` passed. The synthetic demo is labelled synthetic and is
   software evidence only; it is not a real sentiment evaluation. Exact scope and
   commands are in `FINAL_VERIFICATION_REPORT.md`.
-- Original assessment PDFs and raw BTC/X files are absent. No accepted X corpus,
+- Original assessment PDFs and raw X files are absent. The untracked price
+  snapshot is present with its recorded SHA-256 and reproduced the committed
+  real-price metrics exactly. No accepted X corpus,
   employer response, live provider call or delivery confirmation is available.
 
 ## Current phase

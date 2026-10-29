@@ -80,6 +80,9 @@ as a project failure. In the clean tree the documented commands then produced:
   synthetic bars, 209 synthetic posts, six artefacts and finite metrics for
   `n+0`..`n+5`; all labelled synthetic.
 - `git status --short --branch` -> clean before those ignored outputs were written.
+- The same suite was re-run on Python 3.12.4 in a separate temporary virtual
+  environment at the final tree -> 187 tests passed on 2026-10-29 and Ruff was
+  clean, matching the README's stated 3.11/3.12 support.
 
 The temporary worktree and its generated outputs were removed after the run, so
 this is a recorded reproduction rather than a committed artefact. It shows the
@@ -345,8 +348,9 @@ The working tree matches that head.
 - No live Tavily/Exa authorization; news CLI behaviour is mocked-verified only.
 - Employer clarifications are absent for the `n+0` convention, exact deadline,
   live-news requirement, news feature policy and final submission format/email.
-- Raw historical price snapshot is not committed and could not be refetched in
-  this network-restricted sandbox.
+- The raw historical price snapshot is untracked and therefore absent from a
+  fresh clone; it is present in this working copy and reproduced the committed
+  metrics exactly (section 7.1). Re-fetching it needs network access to Coinbase.
 - The live PR inspection found PR #14 OPEN/DRAFT/MERGEABLE at head
   `9b0698f86267973a220c914ac0802a5bba171374`; runs `40795420005` and
   `40795425900` passed on that exact head. Any later pushed change requires its
@@ -355,6 +359,42 @@ The working tree matches that head.
   made. The defined offline checks and CI are the release gates.
 - CI proves offline code health only; it cannot prove data access, licence,
   model quality, profitability or employer acceptance.
+
+## 7.1 Real-price reproduction from the local snapshot (2026-10-29)
+
+The committed historical report was generated on 2026-10-26 from a public
+Coinbase snapshot. That file is untracked (`.gitignore` covers `/data/*`) but
+present in this working copy at
+`data/btc-usd-daily-2026-04-29_2026-10-25.json`, with SHA-256
+`09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75` — identical
+to the hash recorded in `reports/btc-usd-180d/manifest.json`. It holds 180 BTC-USD
+daily candles for 2026-04-29..2026-10-25 UTC and carries no synthetic marker.
+
+Re-running the pipeline at `e22da11`:
+
+```bash
+python -m xsentiment run \
+  --prices data/btc-usd-daily-2026-04-29_2026-10-25.json \
+  --out reports/generated/repro-price-2026-10-29 \
+  --now 2026-10-26T00:00:00+00:00
+```
+
+reproduced the committed results exactly:
+
+- `metrics.json` compared field-by-field against `reports/btc-usd-180d/metrics.json`:
+  **0 differences** — same folds, 1,800 predictions, every per-horizon metric,
+  strategy statistic and warning.
+- Mean MAE: naive `$1,828.36`, price-only `$2,264.62`, sentiment-plus-price
+  `$2,264.62` (identical, because zero posts were scored).
+- Strategy: 32 long days, +10.91% cumulative net return, Sharpe 1.807, Sortino
+  3.979, maximum drawdown 4.08%.
+- The regenerated report body differs only by provenance fields added after the
+  original run (snapshot metadata, code revision, two extra limitation bullets).
+
+This is real public price data reproduced on the final commit. It is **not** X
+data and says nothing about sentiment value. The regenerated artefacts sit in the
+ignored `reports/generated/` tree and are not committed; a fresh clone must
+re-fetch the snapshot with `fetch-prices` because the raw file is untracked.
 
 ## 8.1 Final acceptance decision (2026-10-29)
 
@@ -365,8 +405,8 @@ PR does not close the data, model-quality, credential or delivery gates.
 | --- | --- | --- |
 | Engineering correctness | **Implemented and locally verified within the documented scope** | 187 tests passed on 2026-10-29 at commit `9b0698f`, along with Ruff, compileall, both validators and the registry/docs tests; credentials, URL sanitization and publication-time rules have regression coverage. Scope exclusions are stated in the canonical documents. |
 | Automated verification | **Green for the released commit** | Local and clean-checkout suite runs at `9b0698f`; CI runs `40795420005` and `40795425900` succeeded on that SHA. Coverage is offline/fixture based. |
-| Real-data ingestion | **Partial: public prices only** | The historical run used 180 public Coinbase BTC-USD daily bars and zero X posts; the raw snapshot is not committed. Action: approved X source/Actor, licence, spend cap and credentials. |
-| Genuine model evaluation | **Partial and negative for the price-only model** | Per-horizon MAE/RMSE for `n+0`..`n+5`, plus Sharpe, Sortino and max drawdown for the predeclared strategy. Price-only mean MAE ($2,264.62) is worse than naive ($1,828.36); the sentiment model is not identifiable with zero scored posts. No sentiment claim is made. Action: run it on accepted X data. |
+| Real-data ingestion | **Partial: public prices only** | The historical run used 180 public Coinbase BTC-USD daily bars and zero X posts; the untracked snapshot is present and reproduced the committed metrics exactly at `e22da11`. Action: approved X source/Actor, licence, spend cap and credentials. |
+| Genuine model evaluation | **Partial and negative for the price-only model** | Per-horizon MAE/RMSE for `n+0`..`n+5`, plus Sharpe, Sortino and max drawdown for the predeclared strategy, reproduced exactly at `e22da11` (section 7.1). Price-only mean MAE ($2,264.62) is worse than naive ($1,828.36); the sentiment model is not identifiable with zero scored posts. No sentiment claim is made. Action: run it on accepted X data. |
 | Provider reproducibility | **Not achieved** | Apify, Tavily and Exa are mocked or configuration-only; no Actor ID, no live call, no credentials and no approved credential channel. Action: select an Actor, record its ID, authorize one bounded call per provider and publish non-secret identifiers. |
 | GitHub release readiness | **Draft PR only; not merged** | PR #14 is OPEN, DRAFT and MERGEABLE at `9b0698f`, both checks green, no review approval and no merge. Action: employer/owner decision to merge; nothing is force-pushed. |
 | Submission package readiness | **Substantially assembled, not sendable as final** | Report, traceability matrix, audit, demo script, reproduction commands and an unsent email draft exist. Missing: real sentiment metrics, provider identifiers, a secure credential channel, confirmed deadline and confirmed format. |

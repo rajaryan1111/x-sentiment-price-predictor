@@ -146,7 +146,9 @@ outputs across all six files. Security regressions cover
 credential-bearing news URLs, timezone-aware/withheld publication dates,
 caller-supplied news files, Apify provenance URLs, streaming bounds and offline
 no-network execution. Synthetic results are software evidence, not market or
-sentiment performance evidence.
+sentiment performance evidence. Separately, the committed real-price run was
+reproduced from the untracked local snapshot at `e22da11` with zero differences in
+`metrics.json`; the verification report records the commands and comparison.
 
 ## 7. Key limitations
 
@@ -160,10 +162,12 @@ sentiment performance evidence.
   was found; no live provider call was made.
 - The employer has not confirmed the `n+0` target convention, exact calendar
   deadline, whether live Tavily news is mandatory or the final submission format.
-- The assignment PDFs and raw 180-day price snapshot are not present in this
-  checkout. The snapshot SHA-256 recorded from the historical 2026-10-26 run is
-  `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`; it was
-  not re-fetched or re-verified in this worktree.
+- The assignment PDFs are not present in this checkout. The raw 180-day price
+  snapshot is untracked but present in this working copy; its SHA-256,
+  `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`, matches the
+  committed manifest, and the committed real-price metrics reproduced exactly from
+  it at `e22da11` (zero differences). A fresh clone must re-fetch it with
+  `fetch-prices` because the file is not tracked.
 - No submission email was sent and PR #14 was not merged. At the current 2026-10-29
   live query, PR #14 was OPEN, DRAFT and MERGEABLE with head
   `9b0698f86267973a220c914ac0802a5bba171374` and base

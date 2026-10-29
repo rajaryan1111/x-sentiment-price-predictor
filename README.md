@@ -4,10 +4,12 @@ Research pipeline that tests whether timestamped X (Twitter) sentiment adds
 out-of-sample predictive value beyond price-only baselines for **BTC-USD** daily
 close forecasts at horizons `n+0` through `n+5`.
 
-> **Status: the pipeline, models, evaluation and reports are implemented.** A
-> historical Coinbase run and report are documented, but the raw price snapshot
-> is neither tracked nor present in this checkout, and no fresh provider response
-> was verified here. X data access remains blocked: no approved live corpus or
+> **Status: the pipeline, models, evaluation and reports are implemented.** The
+> historical Coinbase run and report are documented; its raw snapshot is untracked
+> but present in this working copy with the recorded SHA-256, and the committed
+> real-price metrics reproduce exactly from it with this code (see the verification
+> report). Because the snapshot is untracked, a fresh clone must re-fetch it with
+> `fetch-prices`. No fresh provider response was verified here. X data access remains blocked: no approved live corpus or
 > Actor has been used, and no sentiment benefit is claimed. The database schema, idempotent
 > repositories, cutoff join and persisted-input CLI path are implemented and
 > verified offline (R15). `fetch-news` is an opt-in, mocked-verified Tavily CLI
