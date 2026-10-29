@@ -148,7 +148,14 @@ placeholder and no adapter-level tests.
 > sentiment-change chart and a one-page outlook. Installation and reproduction
  > commands are in the README and the demo walkthrough.
 >
-> **Reproduction:** from the repository root, install with `python -m pip install -e '.[dev,storage]'`; run `pytest`, `ruff check src tests scripts`, `python scripts/validate_docs.py`, and `python scripts/validate_dataset_registry.py`. For a fully offline software demonstration, run `python scripts/make_offline_demo.py --out reports/generated/offline-demo-inputs/prices.json --posts-out reports/generated/offline-demo-inputs/posts.jsonl --generated-at 2026-10-27T00:00:00+00:00`, then follow the README's `python -m xsentiment run` command using those generated files and label outputs synthetic. The historical real-price report is an existing run artifact, not a fresh reproducibility claim from this checkout.
+> **Verification evidence.** On the final commit, 187 tests pass, together with
+> `ruff`, byte-compilation and both documentation/registry validators, locally and
+> in GitHub Actions. The documented setup was repeated from a clean checkout on
+> Python 3.11 and re-run on Python 3.12 with the same result. The committed
+> real-price metrics were independently re-derived from the recorded snapshot with
+> zero differences, so the report is reproducible rather than merely asserted.
+>
+> **Reproduction:** from the repository root, install with `python -m pip install -e '.[dev,storage]'`; run `pytest`, `ruff check src tests scripts`, `python scripts/validate_docs.py`, and `python scripts/validate_dataset_registry.py`. For a fully offline software demonstration, run `python scripts/make_offline_demo.py --out reports/generated/offline-demo-inputs/prices.json --posts-out reports/generated/offline-demo-inputs/posts.jsonl --generated-at 2026-10-27T00:00:00+00:00`, then follow the README's `python -m xsentiment run` command using those generated files and label outputs synthetic. The historical real-price report is also reproducible: re-running `python -m xsentiment run --prices data/btc-usd-daily-2026-04-29_2026-10-25.json --out <dir> --now 2026-10-26T00:00:00+00:00` reproduces its `metrics.json` with zero differences, provided that public snapshot is re-fetched with `fetch-prices` first (it is not committed).
 >
 > **Provider identifiers and credentials:** no Apify Actor was selected or run, so there is no Actor ID or Apify credential used to report. Tavily has a mocked-tested adapter but no live request/key was used. Exa is not integrated or used, and no Exa identifier exists. No secrets are included. No secure credential-transfer channel has been agreed; please specify an approved private method and recipient. I will not send tokens in plaintext email.
 >
