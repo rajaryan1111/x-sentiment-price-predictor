@@ -53,7 +53,7 @@ registry reconciliation was committed and pushed as
 `9b0698f86267973a220c914ac0802a5bba171374`; at that inspection GitHub reported it
 as the PR head with both push and pull-request CI runs (`40795420005`,
 `40795425900`) succeeding. This status text was committed after that inspection, so
-the live head may be one documentation commit later: query
+the live head may be a later documentation-only commit: query
 `gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`
 and inspect the checks for that exact SHA before quoting a head or a CI result. The
 code change remains `d8016610aa7ebf82263413c48b1164e4a64d13df`; later commits are

@@ -12,7 +12,7 @@ The actual repository and PR state were rechecked without discarding work.
   remote tracking branch and clean. The 19 documentation/registry files were
   committed in that commit and pushed by ordinary fast-forward (`fa69d53..9b0698f`).
   This checkpoint text was committed after that inspection, so the live head can be
-  one documentation commit later; query it rather than quoting a remembered SHA.
+  a later documentation commit; query it rather than quoting a remembered SHA.
 - PR #14 is OPEN, DRAFT and MERGEABLE. GitHub reports head
   `9b0698f86267973a220c914ac0802a5bba171374`; base is
   `36b7b486bb60b54f3f19201f2e548b11e5f93197`. Runs `40795420005` (push) and

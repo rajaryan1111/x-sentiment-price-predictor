@@ -28,8 +28,8 @@ push to the feature branch succeeded from here.
   `docs/canonical-source-of-truth` at
   `36b7b486bb60b54f3f19201f2e548b11e5f93197`.
 - That head is also the remote feature branch. The status wording in this file was
-  committed after the inspection, so the live head can be one documentation commit
-  later; re-query it rather than quoting a remembered SHA.
+  committed after the inspection, so the live head can be a later documentation
+  commit; re-query it rather than quoting a remembered SHA.
 - Remote Arena is `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
 - CI on that pushed head passed runs `40795420005` and `40795425900` —
   <https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/40795420005>
