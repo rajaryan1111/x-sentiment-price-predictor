@@ -1,0 +1,255 @@
+{
+  "forecast_metrics": [
+    {
+      "horizon": "n+0",
+      "mae": 946.7016999999993,
+      "mean_error": -211.58069999999992,
+      "model": "naive",
+      "rmse": 1462.9297195125257,
+      "samples": 100
+    },
+    {
+      "horizon": "n+1",
+      "mae": 1434.5893999999994,
+      "mean_error": -398.14119999999997,
+      "model": "naive",
+      "rmse": 2112.2552298214337,
+      "samples": 100
+    },
+    {
+      "horizon": "n+2",
+      "mae": 1758.9544999999996,
+      "mean_error": -593.3566999999999,
+      "model": "naive",
+      "rmse": 2653.797560364203,
+      "samples": 100
+    },
+    {
+      "horizon": "n+3",
+      "mae": 2003.4096000000002,
+      "mean_error": -769.0011999999999,
+      "model": "naive",
+      "rmse": 3190.9152229741235,
+      "samples": 100
+    },
+    {
+      "horizon": "n+4",
+      "mae": 2257.533100000001,
+      "mean_error": -957.0831,
+      "model": "naive",
+      "rmse": 3669.3736068090693,
+      "samples": 100
+    },
+    {
+      "horizon": "n+5",
+      "mae": 2568.9933,
+      "mean_error": -1149.7065,
+      "model": "naive",
+      "rmse": 4104.761423013888,
+      "samples": 100
+    },
+    {
+      "horizon": "n+0",
+      "mae": 1056.824121530154,
+      "mean_error": -146.4255604263147,
+      "model": "price_only",
+      "rmse": 1561.2896361199955,
+      "samples": 100
+    },
+    {
+      "horizon": "n+1",
+      "mae": 1665.0215437758372,
+      "mean_error": -295.5753239222909,
+      "model": "price_only",
+      "rmse": 2332.840636795133,
+      "samples": 100
+    },
+    {
+      "horizon": "n+2",
+      "mae": 2108.2193199068706,
+      "mean_error": -432.1817662174412,
+      "model": "price_only",
+      "rmse": 3115.2190413068743,
+      "samples": 100
+    },
+    {
+      "horizon": "n+3",
+      "mae": 2527.3390153309656,
+      "mean_error": -671.1698311094582,
+      "model": "price_only",
+      "rmse": 3831.4826964633357,
+      "samples": 100
+    },
+    {
+      "horizon": "n+4",
+      "mae": 2897.589870424787,
+      "mean_error": -1066.4431531458517,
+      "model": "price_only",
+      "rmse": 4384.24774116276,
+      "samples": 100
+    },
+    {
+      "horizon": "n+5",
+      "mae": 3332.7157001015835,
+      "mean_error": -1504.8215248851836,
+      "model": "price_only",
+      "rmse": 4952.220857469444,
+      "samples": 100
+    },
+    {
+      "horizon": "n+0",
+      "mae": 1056.824121530154,
+      "mean_error": -146.4255604263147,
+      "model": "sentiment_price",
+      "rmse": 1561.2896361199955,
+      "samples": 100
+    },
+    {
+      "horizon": "n+1",
+      "mae": 1665.0215437758372,
+      "mean_error": -295.5753239222909,
+      "model": "sentiment_price",
+      "rmse": 2332.840636795133,
+      "samples": 100
+    },
+    {
+      "horizon": "n+2",
+      "mae": 2108.2193199068706,
+      "mean_error": -432.1817662174412,
+      "model": "sentiment_price",
+      "rmse": 3115.2190413068743,
+      "samples": 100
+    },
+    {
+      "horizon": "n+3",
+      "mae": 2527.3390153309656,
+      "mean_error": -671.1698311094582,
+      "model": "sentiment_price",
+      "rmse": 3831.4826964633357,
+      "samples": 100
+    },
+    {
+      "horizon": "n+4",
+      "mae": 2897.589870424787,
+      "mean_error": -1066.4431531458517,
+      "model": "sentiment_price",
+      "rmse": 4384.24774116276,
+      "samples": 100
+    },
+    {
+      "horizon": "n+5",
+      "mae": 3332.7157001015835,
+      "mean_error": -1504.8215248851836,
+      "model": "sentiment_price",
+      "rmse": 4952.220857469444,
+      "samples": 100
+    }
+  ],
+  "mean_mae_by_model": {
+    "naive": 1828.3636,
+    "price_only": 2264.618261845033,
+    "sentiment_price": 2264.618261845033
+  },
+  "strategies": {
+    "naive": {
+      "assumptions": {
+        "fee_rate": 0.001,
+        "min_returns_for_risk_metrics": 30,
+        "minimum_acceptable_return": 0.0,
+        "periods_per_year": 365,
+        "risk_free_rate": 0.0
+      },
+      "benchmark_metrics": {
+        "annualised_volatility": 0.382545063089495,
+        "cumulative_return": 0.06114463258386871,
+        "max_drawdown": 0.10333766345065123,
+        "mean_period_return": 0.0007883299003265022,
+        "periods": 100.0,
+        "sharpe_ratio": 0.7521739041548093,
+        "sortino_ratio": 1.3772683802988024
+      },
+      "long_days": 0,
+      "metrics": {
+        "annualised_volatility": 0.0,
+        "cumulative_return": 0.0,
+        "exposure": 0.0,
+        "hit_rate": null,
+        "long_days": 0.0,
+        "max_drawdown": 0.0,
+        "mean_period_return": 0.0,
+        "periods": 100.0,
+        "sharpe_ratio": null,
+        "sortino_ratio": null
+      },
+      "risk_metrics_unavailable_reason": "the strategy return series has zero dispersion over this sample, so the risk ratios are undefined"
+    },
+    "price_only": {
+      "assumptions": {
+        "fee_rate": 0.001,
+        "min_returns_for_risk_metrics": 30,
+        "minimum_acceptable_return": 0.0,
+        "periods_per_year": 365,
+        "risk_free_rate": 0.0
+      },
+      "benchmark_metrics": {
+        "annualised_volatility": 0.382545063089495,
+        "cumulative_return": 0.06114463258386871,
+        "max_drawdown": 0.10333766345065123,
+        "mean_period_return": 0.0007883299003265022,
+        "periods": 100.0,
+        "sharpe_ratio": 0.7521739041548093,
+        "sortino_ratio": 1.3772683802988024
+      },
+      "long_days": 32,
+      "metrics": {
+        "annualised_volatility": 0.22251117942349924,
+        "cumulative_return": 0.1091086312730627,
+        "exposure": 0.32,
+        "hit_rate": 0.53125,
+        "long_days": 32.0,
+        "max_drawdown": 0.0408381035339052,
+        "mean_period_return": 0.0011014713162357396,
+        "periods": 100.0,
+        "sharpe_ratio": 1.8068172191063676,
+        "sortino_ratio": 3.9792230581342127
+      },
+      "risk_metrics_unavailable_reason": null
+    },
+    "sentiment_price": {
+      "assumptions": {
+        "fee_rate": 0.001,
+        "min_returns_for_risk_metrics": 30,
+        "minimum_acceptable_return": 0.0,
+        "periods_per_year": 365,
+        "risk_free_rate": 0.0
+      },
+      "benchmark_metrics": {
+        "annualised_volatility": 0.382545063089495,
+        "cumulative_return": 0.06114463258386871,
+        "max_drawdown": 0.10333766345065123,
+        "mean_period_return": 0.0007883299003265022,
+        "periods": 100.0,
+        "sharpe_ratio": 0.7521739041548093,
+        "sortino_ratio": 1.3772683802988024
+      },
+      "long_days": 32,
+      "metrics": {
+        "annualised_volatility": 0.22251117942349924,
+        "cumulative_return": 0.1091086312730627,
+        "exposure": 0.32,
+        "hit_rate": 0.53125,
+        "long_days": 32.0,
+        "max_drawdown": 0.0408381035339052,
+        "mean_period_return": 0.0011014713162357396,
+        "periods": 100.0,
+        "sharpe_ratio": 1.8068172191063676,
+        "sortino_ratio": 3.9792230581342127
+      },
+      "risk_metrics_unavailable_reason": null
+    }
+  },
+  "unavailable": {},
+  "warnings": [
+    "No eligible row has a scored-post sentiment mean, so the sentiment-plus-price candidate is not identifiable in this run and its coefficients cannot be interpreted."
+  ]
+}

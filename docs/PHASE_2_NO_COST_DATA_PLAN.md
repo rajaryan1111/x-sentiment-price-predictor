@@ -1,25 +1,28 @@
-# Phase 2 — No-cost X-data path
+# No-cost X-data path — Phase 2 workstream
+
+> Naming note: this file belongs to the repository's historical "Phase 2 data quality/alignment" workstream, which maps to canonical Phase 3 in [PHASES.md](../PHASES.md). It is not canonical documentation Phase 2.
 
 ## Goal
 
-Keep Phase 2 moving without requiring the project owner to purchase a scraper. The BTC-USD price path already uses Coinbase Exchange's public candles. X data must remain a separate, evidence-backed gate.
+Keep the data workstream moving without requiring the project owner to purchase a scraper. The BTC-USD price path already uses Coinbase Exchange's public candles. X data must remain a separate, evidence-backed gate.
 
 ## Current status
 
 - **Price history:** user-run profile verified 180/180 complete daily BTC-USD bars for 2026-04-29 through 2026-10-25 UTC (half-open end 2026-10-26), with no missing or duplicate timestamps in that checked range.
-- **Provider-neutral contracts and point-in-time alignment:** implemented and covered by unit tests.
-- **Apify adapter:** implemented and mocked in tests; no Actor is selected or run. Do not assume its free allowance will cover an Actor or 180-day search.
-- **Historical X collection:** not complete. No real X dataset has yet been retrieved, profiled, or accepted for use.
+- **Provider-neutral contracts, profiler and point-in-time alignment:** implemented and covered by unit tests. The profiler supports deterministic `--as-of` windows, daily coverage gaps, retrieval-column coverage, schema drift and invalid engagement counts.
+- **Apify adapter:** implemented and mocked in tests, including the documented `data` envelope and dataset offset/limit paging; no Actor is selected or run. Do not assume its free allowance will cover an Actor or 180-day search.
+- **Storage:** a versioned price/post schema, idempotent repositories, descriptive and leakage-safe cutoff joins, and `xsentiment persist` plus `run --database-url` are implemented and fixture-verified end-to-end. This verifies the offline persisted-input path for R15; no accepted real X rows are available to populate it.
+- **Historical X collection:** not complete. The assessment-linked Google Doc was retrieved on 2026-10-29 and is a 12-entry dataset-link compilation, not a tweet corpus. Three public candidate listing/card metadata were checked, but no candidate dataset has been downloaded, row-profiled, or accepted for use. No raw candidate corpus is present in this checkout.
 
 ## Zero-budget options to investigate
 
 ### Option A — Assessment-linked historical dataset
 
-Start with the historical dataset resource named in the assessment brief. Review access, schema, timestamp coverage, license/terms, whether full text is present, and whether the rows are actual X posts. Do not assume the resource is accessible simply because a link exists. If it is accessible and permitted, record the exact snapshot/version and file hash, then profile it locally without committing the data.
+The assessment-linked Google Doc full text was re-fetched on 2026-10-29. It is a 12-entry dataset-link compilation matching the previously recorded companion PDF, **not** a tweet corpus. Three candidate listings/cards were partially inspected and documented in `docs/data-sources.md`; this does not establish row contents, current 180-day coverage, complete schema, rights or license. Ask the employer to approve a candidate and permitted bounded inspection before downloading. If approved, record the exact snapshot/version and file hash, then profile it locally without committing the data.
 
 ### Option B — Existing public research corpus
 
-The repository's dataset registry includes historical Bitcoin/X candidates, but their listed coverage ends by 2023. They can help test parsing and feature plumbing, **not** satisfy the required recent 180-day window. Confirm the live dataset card, current access, license and schema before downloading. Do not hydrate tweet IDs unless permitted and available.
+The repository's dataset registry includes historical Bitcoin/X candidates. Most listed coverage ends by 2023, and two rolling entries have no verified coverage end. None alone proves the required recent 180-day window. They can help test parsing and feature plumbing, **not** satisfy the requirement without live coverage evidence. Confirm the live dataset card, current access, license and schema before downloading. Do not hydrate tweet IDs unless permitted and available.
 
 ### Option C — Free rolling public data offer
 
@@ -41,4 +44,4 @@ Before calling X ingestion complete, produce a sanitized profile containing:
 - counts of available engagement fields and their missingness;
 - explicit statement whether the source covers the entire required 180-day period and whether retrieval-time/point-in-time availability is known.
 
-Keep raw post text, cookies, API tokens and downloaded datasets out of Git. Do not claim a sentiment forecast, Sharpe ratio, Sortino ratio or drawdown until the corresponding model/backtest has actually run on valid out-of-sample data.
+Keep raw post text, cookies, API tokens and downloaded datasets out of Git. Do not claim a sentiment forecast, Sharpe ratio, Sortino ratio or drawdown until the corresponding model/backtest has actually run on valid out-of-sample data. The registry's `independent_verification.status` is `partially-reverified`: three candidate listing/card metadata were checked, but this is not independent confirmation of current access, row schema, 180-day coverage or license.

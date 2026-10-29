@@ -7,10 +7,7 @@ import pytest
 from pydantic import SecretStr
 
 from xsentiment.config.settings import Settings
-from xsentiment.ingestion.apify_x import (
-    ApifyXAdapter,
-    normalize_apify_post,
-)
+from xsentiment.ingestion.apify_x import ApifyXAdapter, normalize_apify_post
 
 
 def configured_settings() -> Settings:
@@ -20,6 +17,30 @@ def configured_settings() -> Settings:
         http_timeout_seconds=2,
         http_max_response_bytes=500_000,
     )
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://user:pass@x.com/example/status/123?api_key=post-secret&id=123#token=fragment-secret",
+        "https://x.com/example/status/123?%61ccess_token=post-secret&id=123",
+    ],
+)
+def test_normalize_apify_post_sanitizes_provenance_url(url: str) -> None:
+    record = normalize_apify_post(
+        {
+            "id": "123",
+            "text": "BTC price action is interesting",
+            "createdAt": "2026-10-25T12:30:00Z",
+            "url": url,
+        },
+        retrieved_at=datetime(2026, 10, 26, tzinfo=UTC),
+    )
+
+    assert record.provenance_url is not None
+    for secret in ("pass", "post-secret", "fragment-secret"):
+        assert secret not in record.provenance_url
+    assert "id=123" in record.provenance_url
 
 
 def test_normalize_apify_post_supports_common_schema_and_preserves_nulls() -> None:
@@ -46,6 +67,13 @@ def test_normalize_apify_post_supports_common_schema_and_preserves_nulls() -> No
     assert record.author_followers == 500
     assert record.provenance_url == "https://x.com/example/status/123"
     assert record.sentiment_score is None
+    assert record.source_platform == "x"
+    assert record.source_created_at_raw == "2026-10-25T12:30:00.000Z"
+    assert record.source_utc_offset == "+00:00"
+    assert record.schema_version == "apify-x-post-v1"
+    assert record.source_record_hash is not None
+    assert len(record.source_record_hash) == 64
+    assert record.author_id is None
 
 
 def test_normalize_apify_post_supports_rfc822_timestamp_and_missing_engagement() -> None:
@@ -57,6 +85,25 @@ def test_normalize_apify_post_supports_rfc822_timestamp_and_missing_engagement()
     assert record.reposts is None
     assert record.views is None
     assert record.author_followers is None
+    assert record.source_created_at_raw == "Sun Oct 25 12:30:00 +0000 2026"
+    assert record.source_utc_offset == "+00:00"
+
+
+def test_normalize_apify_post_preserves_non_utc_offset_and_author_and_query() -> None:
+    record = normalize_apify_post(
+        {
+            "id": "x-2",
+            "text": "Bitcoin update",
+            "createdAt": "2026-10-25T07:30:00-05:00",
+            "author": {"id": "author-9", "followers_count": 10},
+            "ticker": "BTC",
+        }
+    )
+    assert record.created_at == datetime(2026, 10, 25, 12, 30, tzinfo=UTC)
+    assert record.source_utc_offset == "-05:00"
+    assert record.author_id == "author-9"
+    assert record.query_mode == "ticker"
+    assert record.query == "BTC"
 
 
 @pytest.mark.parametrize(
@@ -105,10 +152,24 @@ def test_apify_run_uses_bearer_auth_cost_and_item_caps_and_fetches_dataset() -> 
             return httpx.Response(
                 201,
                 json={
-                    "id": "run-1",
-                    "status": "SUCCEEDED",
-                    "exitCode": 0,
-                    "defaultDatasetId": "ds-1",
+                    "data": {
+                        "id": "run-1",
+                        "status": "RUNNING",
+                        "exitCode": None,
+                        "defaultDatasetId": "ds-1",
+                    }
+                },
+            )
+        if request.method == "GET" and "/actor-runs/" in request.url.path:
+            return httpx.Response(
+                200,
+                json={
+                    "data": {
+                        "id": "run-1",
+                        "status": "SUCCEEDED",
+                        "exitCode": 0,
+                        "defaultDatasetId": "ds-1",
+                    }
                 },
             )
         if request.method == "GET" and "/datasets/" in request.url.path:
@@ -126,6 +187,8 @@ def test_apify_run_uses_bearer_auth_cost_and_item_caps_and_fetches_dataset() -> 
                     max_items=25,
                     max_total_charge_usd=0.75,
                     timeout_seconds=120,
+                    query_mode="cashtag",
+                    query="$BTC",
                 )
 
     import asyncio
@@ -139,6 +202,8 @@ def test_apify_run_uses_bearer_auth_cost_and_item_caps_and_fetches_dataset() -> 
     }
     assert "token=" not in str(launch.url)
     assert records[0].post_id == "p1"
+    assert records[0].query_mode == "cashtag"
+    assert records[0].query == "$BTC"
 
 
 def test_apify_rejects_bad_caps_before_network_activity() -> None:

@@ -4,7 +4,13 @@
   "source_document": {
     "filename": "Historical Twitter_X Datasets_ Verified Download Links.pdf",
     "compiled_date": "2026-10-21",
-    "note": "Dataset facts and license/access descriptions are transcribed from the user-provided PDF. The PDF says entries were verified against live pages on its compilation date; this project has not independently re-verified each provider page."
+    "note": "Dataset facts and license/access descriptions are transcribed from the user-provided PDF. The assessment-linked Google Doc was retrieved on 2026-10-29 and its exported text matches this 12-entry list. The PDF says entries were verified against live pages on its compilation date; this project partially re-checked metadata/cards for three candidates on 2026-10-29, but has not independently verified all 12 sources, licenses, row contents, or coverage."
+  },
+  "independent_verification": {
+    "status": "partially-reverified",
+    "checked_date": "2026-10-29",
+    "scope": "The assessment-linked Google Doc was re-fetched as a full text export and three candidate listings were checked using Kaggle metadata and Hugging Face card/API/first-rows metadata. No bulk dataset was downloaded; no row-level coverage, complete schema, rights, license or terms were approved. The remaining registry entries and the original source PDFs were not re-verified in this checkout.",
+    "next_action": "With employer approval, verify the selected candidate's current terms and rights, download only an authorized bounded sample, and profile its actual schema, timestamps, coverage and data quality before use."
   },
   "usage_policy": {
     "download_policy": "Do not download datasets automatically as part of normal setup or CI. Review the provider page, license, terms, schema, and size first.",

@@ -2,19 +2,19 @@
 
 ## Before any run
 
-1. Choose an Actor in your Apify account and verify its current terms, pricing model, input schema, data retention rules and ability to collect the target BTC-related posts over the requested 180-day window.
-2. Check the Actor's output dataset in the Apify console using a tiny test first. Confirm stable post IDs, original creation timestamps, actual text, engagement fields and nested author fields. Field aliases supported by this adapter are common conventions, not a guarantee of a particular Actor's schema.
+1. Choose an Actor in your Apify account and verify its current terms, pricing model, input schema, data retention rules and ability to collect the target BTC-related posts over the requested 180-day window using **ticker, cashtag and keyword searches**.
+2. Check the Actor's output dataset in the Apify console using a tiny test first. Confirm stable post IDs, original creation timestamps (with UTC/EST offset information), actual text, likes, reposts, views, author follower counts and nested author fields. Field aliases supported by this adapter are common conventions, not a guarantee of a particular Actor's schema.
 3. Agree on a maximum spend. The adapter sends Apify run options for `maxItems`, `maxTotalChargeUsd` and `timeout`. Apify documents these as run options; actual billing behavior depends on the Actor's pricing model/account. Do not rely on these controls instead of checking the Actor's pricing.
 4. Never put an API token in the URL, code, JSON input file or Git. Configure `APIFY_API_TOKEN` in your private local environment or secret manager and `APIFY_ACTOR_ID` with the reviewed actor ID.
 
-## Input configuration
+## Input configuration and query modes
 
-Actor input schemas vary, so there is deliberately no universal default query payload. Create a **local, untracked** JSON file using the input schema shown by the reviewed Actor. Keep query dates explicitly bounded to the desired 180-day window and asset-relevant search terms. Do not include credentials in the payload.
+Actor input schemas vary, so there is deliberately no universal default query payload. Create a **local, untracked** JSON file using the input schema shown by the reviewed Actor. Keep query dates explicitly bounded to the desired 180-day window and include the three search modes required by the brief: the asset ticker (for example `BTC`), the cashtag (for example `$BTC`) and relevant keywords (for example `Bitcoin`). Verify with the Actor's own documentation that the selected input fields actually implement all three modes; do not assume that one search field covers them. Do not include credentials in the payload.
 
 Example shell configuration:
 
 ```bash
-export APIFY_API_TOKEN='set-locally-without-sharing-it'
+read -rsp "Apify token: " APIFY_API_TOKEN; echo; export APIFY_API_TOKEN
 export APIFY_ACTOR_ID='owner~reviewed-actor-name'
 ```
 
@@ -28,11 +28,21 @@ The adapter:
 - passes the token as a Bearer header, never as a query parameter;
 - applies explicit run item, cost and timeout options;
 - caps response-body size and result item count;
+- unwraps the documented `data` envelope for run responses while reading dataset items as the documented JSON array;
+- pages the dataset-items endpoint with `offset` and `limit`, and stops at the caller's item cap;
 - normalizes common tweet ID/text/date/engagement field names;
 - requires real ID, text and timezone-aware event timestamp;
+- preserves the raw provider timestamp, supplied UTC offset, payload hash, author reference and ticker/cashtag/keyword query provenance;
 - preserves engagement fields as null when the Actor did not return them;
 - records retrieval time separately from event time;
 - leaves sentiment unscored (null) until a separately specified sentiment model is configured;
 - does not persist raw posts automatically.
+
+Apify's official API documentation describes the run response as a `data` object
+(https://docs.apify.com/api/v2/actors-runs-post) and the dataset endpoint as supporting
+`offset`/`limit` with a JSON-array response (https://docs.apify.com/api/v2/dataset-items-get).
+The documented `maxItems` run option caps charges for pay-per-result Actors; it does **not**
+by itself guarantee how many rows the Actor returns. The adapter therefore enforces its
+own returned-row cap and never trusts the provider to honour it.
 
 No live Apify run is included in CI. Tests use mocked HTTP responses and incur no provider costs. A green test suite does not certify the Actor's current availability, legal terms, historical reach, or actual output schema.

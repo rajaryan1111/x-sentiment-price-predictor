@@ -1,0 +1,119 @@
+{
+  "asset": "BTC-USD",
+  "dataset": {
+    "first_cutoff": "2026-04-29T00:00:00+00:00",
+    "last_cutoff": "2026-10-25T00:00:00+00:00",
+    "posts": 0,
+    "rows": 180,
+    "rows_with_full_horizon": 175,
+    "rows_with_sentiment": 0,
+    "scored_posts": 0,
+    "unfinished_day_dropped": false
+  },
+  "evaluation": {
+    "assumptions": {
+      "eligible_rows": 174,
+      "eligible_rows_with_sentiment": 0,
+      "embargo_samples": 5,
+      "feature_groups": {
+        "price_only": [
+          "return_1d",
+          "return_3d",
+          "return_7d",
+          "volatility_7d",
+          "range_1d",
+          "close_vs_sma_7d"
+        ],
+        "sentiment_price": [
+          "return_1d",
+          "return_3d",
+          "return_7d",
+          "volatility_7d",
+          "range_1d",
+          "close_vs_sma_7d",
+          "post_count_24h",
+          "scored_post_count_24h",
+          "mean_sentiment_24h",
+          "positive_share_24h",
+          "negative_share_24h"
+        ]
+      },
+      "folds": 5,
+      "horizons": [
+        "n+0",
+        "n+1",
+        "n+2",
+        "n+3",
+        "n+4",
+        "n+5"
+      ],
+      "max_folds": null,
+      "min_train_samples": 60,
+      "ridge_lambda": 1.0,
+      "rows": 180,
+      "strategy": {
+        "fee_rate": 0.001,
+        "min_returns_for_risk_metrics": 30,
+        "minimum_acceptable_return": 0.0,
+        "periods_per_year": 365,
+        "risk_free_rate": 0.0
+      },
+      "test_samples": 20
+    },
+    "folds": [
+      {
+        "embargo_rows": 5,
+        "index": 0,
+        "test_rows": 20,
+        "train_rows": 60
+      },
+      {
+        "embargo_rows": 5,
+        "index": 1,
+        "test_rows": 20,
+        "train_rows": 80
+      },
+      {
+        "embargo_rows": 5,
+        "index": 2,
+        "test_rows": 20,
+        "train_rows": 100
+      },
+      {
+        "embargo_rows": 5,
+        "index": 3,
+        "test_rows": 20,
+        "train_rows": 120
+      },
+      {
+        "embargo_rows": 5,
+        "index": 4,
+        "test_rows": 20,
+        "train_rows": 140
+      }
+    ],
+    "predictions": 1800,
+    "untestable": {},
+    "warnings": [
+      "No eligible row has a scored-post sentiment mean, so the sentiment-plus-price candidate is not identifiable in this run and its coefficients cannot be interpreted."
+    ]
+  },
+  "generated_at": "2026-10-26T00:00:00+00:00",
+  "provenance": {
+    "asset": "BTC-USD",
+    "input_source": "file_snapshot",
+    "pipeline_versions": {
+      "platform": "macOS-26.1-arm64-arm-64bit",
+      "pydantic": "2.14.1",
+      "python": "3.11.15",
+      "vaderSentiment": "3.3.2",
+      "x-sentiment-price-predictor": "0.1.0"
+    },
+    "posts_supplied": 0,
+    "price_candles_supplied": 180,
+    "price_snapshot": "data/btc-usd-daily-2026-04-29_2026-10-25.json",
+    "price_snapshot_sha256": "09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75",
+    "sentiment_scorer": "vader 3.3.2"
+  },
+  "run_id": "run-20261026T000000Z"
+}

@@ -109,3 +109,23 @@ def test_close_targets_omit_horizons_crossing_missing_daily_bars() -> None:
     targets = build_close_targets(candles, max_horizon=2)
     assert datetime(2026, 10, 1, tzinfo=UTC) not in targets
     assert datetime(2026, 10, 4, tzinfo=UTC) in targets
+
+
+def test_close_targets_never_label_the_unfinished_current_day() -> None:
+    candles = [candle(day, str(100 + day)) for day in range(1, 7)]
+    now = datetime(2026, 10, 6, 9, tzinfo=UTC)
+    targets = build_close_targets(candles, max_horizon=1, now=now)
+    assert datetime(2026, 10, 6, tzinfo=UTC) not in targets
+    assert datetime(2026, 10, 5, tzinfo=UTC) not in targets
+    assert datetime(2026, 10, 4, tzinfo=UTC) in targets
+    assert targets[datetime(2026, 10, 4, tzinfo=UTC)]["n+1"] == Decimal("105")
+    assert len(build_close_targets(candles, max_horizon=1)) == 5
+
+
+def test_point_in_time_features_drop_the_unfinished_current_day() -> None:
+    candles = [candle(day, str(100 + day)) for day in range(1, 7)]
+    now = datetime(2026, 10, 6, 9, tzinfo=UTC)
+    rows = build_point_in_time_features(candles, [], now=now)
+    assert [row.cutoff for row in rows] == [
+        datetime(2026, 10, day, tzinfo=UTC) for day in range(1, 6)
+    ]

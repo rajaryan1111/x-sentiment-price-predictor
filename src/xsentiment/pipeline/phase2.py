@@ -56,6 +56,24 @@ def _utc(value: datetime, name: str) -> datetime:
     return value.astimezone(UTC)
 
 
+def completed_candles(
+    candles: Sequence[PriceCandle], now: datetime | None
+) -> list[PriceCandle]:
+    """Return only candles whose UTC day has finished when ``now`` is supplied.
+
+    The unfinished current UTC day is dropped so a partial intraday close can
+    never be used as a completed prior close or as a horizon label.
+    """
+    if now is None:
+        return list(candles)
+    day_start = _utc(now, "now").replace(hour=0, minute=0, second=0, microsecond=0)
+    return [
+        candle
+        for candle in candles
+        if _utc(candle.timestamp, "candle.timestamp") < day_start
+    ]
+
+
 def profile_daily_price_coverage(
     candles: Sequence[PriceCandle], start: datetime, end: datetime, *, now: datetime
 ) -> PriceCoverageReport:
@@ -115,19 +133,23 @@ def deduplicate_posts(posts: Iterable[XPostRecord]) -> list[XPostRecord]:
 
 
 def build_point_in_time_features(
-    candles: Sequence[PriceCandle], posts: Iterable[XPostRecord]
+    candles: Sequence[PriceCandle],
+    posts: Iterable[XPostRecord],
+    *,
+    now: datetime | None = None,
 ) -> list[DailyFeatureRow]:
     """Build features at each UTC candle start using only information available by cutoff.
 
     Price features use prior completed candles only. Sentiment features aggregate
     posts in (cutoff-24h, cutoff] that were published and retrieved by cutoff.
     Current engagement counts are deliberately excluded as historical features.
+    When ``now`` is supplied, an unfinished current UTC day is dropped entirely.
     """
     normalized_posts = deduplicate_posts(posts)
     rows: list[DailyFeatureRow] = []
     prior_close: Decimal | None = None
     prior_prior_close: Decimal | None = None
-    for candle in sorted(candles, key=lambda item: item.timestamp):
+    for candle in sorted(completed_candles(candles, now), key=lambda item: item.timestamp):
         cutoff = _utc(candle.timestamp, "candle.timestamp")
         window_start = cutoff - timedelta(days=1)
         available = [
@@ -159,12 +181,16 @@ def build_point_in_time_features(
 
 
 def build_close_targets(
-    candles: Sequence[PriceCandle], *, max_horizon: int = 5
+    candles: Sequence[PriceCandle], *, max_horizon: int = 5, now: datetime | None = None
 ) -> dict[datetime, dict[str, Decimal]]:
-    """Build n+0 through n+max_horizon labels; omit incomplete forward horizons."""
+    """Build n+0 through n+max_horizon labels; omit incomplete forward horizons.
+
+    When ``now`` is supplied, the unfinished current UTC day is dropped so a
+    partial intraday close can never become a label.
+    """
     if max_horizon < 0:
         raise ValueError("max_horizon must be non-negative")
-    ordered = sorted(candles, key=lambda candle: candle.timestamp)
+    ordered = sorted(completed_candles(candles, now), key=lambda candle: candle.timestamp)
     result: dict[datetime, dict[str, Decimal]] = {}
     for index, candle in enumerate(ordered):
         if index + max_horizon >= len(ordered):
