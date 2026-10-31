@@ -3,6 +3,10 @@
 This command may incur charges. Run it only after reviewing the selected Actor's
 current terms, input schema and pricing. It prints only aggregate/schema metadata,
 never post text or credentials, and persists no raw records.
+
+Use ``--validate-only`` first: it validates the local JSON contract and reports
+whether credentials are configured without making any network call or launching a
+paid run.
 """
 from __future__ import annotations
 
@@ -11,10 +15,12 @@ import asyncio
 import json
 from pathlib import Path
 
+from xsentiment.config.settings import get_settings
+from xsentiment.ingestion.apify_preflight import load_actor_input, validate_actor_input
 from xsentiment.ingestion.apify_x import ApifyXAdapter
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--input-json",
@@ -25,29 +31,73 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-items", type=int, default=10)
     parser.add_argument("--max-total-charge-usd", type=float, default=0.25)
     parser.add_argument("--timeout-seconds", type=int, default=300)
-    args = parser.parse_args()
+    parser.add_argument(
+        "--validate-only",
+        action="store_true",
+        help="validate the local input and credential presence; make no network call",
+    )
+    args = parser.parse_args(argv)
     if not args.input_json.is_file():
         parser.error(f"input file not found: {args.input_json}")
     return args
 
 
-async def run(args: argparse.Namespace) -> int:
+def _credential_status() -> dict[str, bool]:
+    """Report presence only; never print or return a credential value."""
+    settings = get_settings()
+    token = settings.apify_api_token
+    return {
+        "APIFY_API_TOKEN": bool(token and token.get_secret_value().strip()),
+        "APIFY_ACTOR_ID": bool(settings.apify_actor_id and settings.apify_actor_id.strip()),
+    }
+
+
+def _validate(args: argparse.Namespace) -> tuple[dict[str, object] | None, int]:
     try:
-        actor_input = json.loads(args.input_json.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        print(f"ERROR: could not read valid JSON input: {exc.__class__.__name__}")
-        return 2
-    if not isinstance(actor_input, dict):
-        print("ERROR: Actor input JSON root must be an object")
+        actor_input = load_actor_input(args.input_json)
+        report = validate_actor_input(actor_input)
+    except (OSError, ValueError) as exc:
+        print(f"ERROR: {exc}")
+        return None, 2
+    output = {
+        "valid": True,
+        "network_call_made": False,
+        "paid_run_launched": False,
+        "query_modes": list(report.query_modes),
+        "window_start": report.window_start.isoformat(),
+        "window_end": report.window_end.isoformat(),
+        "window_days": report.window_days,
+        "max_items": report.max_items,
+        "credentials_configured": _credential_status(),
+        "warnings": list(report.warnings),
+    }
+    return output, 0
+
+
+async def run(args: argparse.Namespace) -> int:
+    output, status = _validate(args)
+    if output is None:
+        return status
+    if args.validate_only:
+        print(json.dumps(output, indent=2))
+        return 0
+
+    if not all(_credential_status().values()):
+        print("ERROR: Apify credentials are not configured; no run was launched")
         return 2
 
-    async with ApifyXAdapter() as adapter:
-        posts = await adapter.run_and_fetch(
-            actor_input,
-            max_items=args.max_items,
-            max_total_charge_usd=args.max_total_charge_usd,
-            timeout_seconds=args.timeout_seconds,
-        )
+    try:
+        actor_input = load_actor_input(args.input_json)
+        async with ApifyXAdapter() as adapter:
+            posts = await adapter.run_and_fetch(
+                actor_input,
+                max_items=args.max_items,
+                max_total_charge_usd=args.max_total_charge_usd,
+                timeout_seconds=args.timeout_seconds,
+            )
+    except (OSError, ValueError, RuntimeError) as exc:
+        print(f"ERROR: {exc.__class__.__name__}: {exc}")
+        return 1
 
     ids = {post.post_id for post in posts}
     output = {

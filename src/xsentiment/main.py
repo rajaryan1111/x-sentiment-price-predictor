@@ -12,7 +12,9 @@ Four commands are provided:
 * ``run`` executes the whole offline pipeline on a price snapshot plus optional
   JSONL posts, or on the persisted storage rows via ``--database-url``, and writes
   the evaluation report, outlook, chart and manifest. ``--news-file`` adds outlook
-  context only; it never changes model features or predictions.
+  context only; it never changes model features or predictions. Post availability
+  defaults to the leakage-safe ``observed`` rule; ``--availability-basis
+  archive_created_at`` is an explicitly disclosed retrospective mode.
 
 Only ``fetch-news`` can launch a provider request, and it refuses to do so without
 explicit confirmation. X ingestion requires an approved Apify Actor and an
@@ -29,6 +31,7 @@ from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+from xsentiment.availability import AVAILABILITY_BASES, validate_availability_basis
 from xsentiment.backtesting.strategy import StrategyAssumptions
 from xsentiment.config.settings import get_settings
 from xsentiment.errors import PayloadTooLargeError
@@ -100,6 +103,16 @@ def _parse_input_note(value: str) -> str:
     note = " ".join(value.split())
     if len(note) > 200:
         raise argparse.ArgumentTypeError("--input-note must not exceed 200 characters")
+    return note
+
+
+def _parse_availability_note(value: str) -> str:
+    """Keep the retrospective-availability disclosure short and single-line."""
+    note = " ".join(value.split())
+    if not note:
+        raise argparse.ArgumentTypeError("--availability-note must not be empty")
+    if len(note) > 300:
+        raise argparse.ArgumentTypeError("--availability-note must not exceed 300 characters")
     return note
 
 
@@ -382,6 +395,12 @@ def _command_persist(args: argparse.Namespace) -> int:
 
 def _command_run(args: argparse.Namespace) -> int:
     try:
+        validate_availability_basis(args.availability_basis, args.availability_note)
+        availability_note = (
+            _redact_credentials(args.availability_note)
+            if args.availability_note is not None
+            else None
+        )
         provenance: dict[str, object] = {}
         if args.database_url is not None:
             if args.prices is not None or args.posts is not None:
@@ -460,6 +479,8 @@ def _command_run(args: argparse.Namespace) -> int:
             news_context=news,
             provenance=provenance,
             limitations=limitations,
+            availability_basis=args.availability_basis,
+            availability_note=availability_note,
         )
     except (OSError, ValueError, RuntimeError) as exc:
         print(f"run failed: {exc}", file=sys.stderr)
@@ -558,6 +579,21 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--embargo", type=int, default=5, help="purge rows between train and test")
     run.add_argument("--ridge-lambda", type=float, default=1.0, help="ridge penalty")
     run.add_argument("--fee-rate", type=float, default=0.001, help="per-side trading fee")
+    run.add_argument(
+        "--availability-basis",
+        choices=AVAILABILITY_BASES,
+        default="observed",
+        help=(
+            "post availability rule: 'observed' (default, leakage-safe) or "
+            "'archive_created_at' (retrospective; requires --availability-note)"
+        ),
+    )
+    run.add_argument(
+        "--availability-note",
+        type=_parse_availability_note,
+        default=None,
+        help="disclosure required with --availability-basis archive_created_at",
+    )
     run.set_defaults(handler=_command_run)
     return parser
 

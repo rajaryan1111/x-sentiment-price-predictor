@@ -150,3 +150,35 @@ async def test_cutoff_join_uses_prior_close_and_excludes_late_or_future_posts(se
     assert second.previous_close == Decimal("110")
     assert second.post_count == 0
     assert second.mean_sentiment is None
+
+
+@pytest.mark.asyncio
+async def test_cutoff_join_archive_basis_is_opt_in_and_requires_note(session) -> None:
+    await upsert_price_bars(session, [candle(19, "90"), candle(20, "100"), candle(21, "110")])
+    await upsert_posts(session, [post("archive", at(20, 12), at(31, 12), 0.5)])
+    await session.commit()
+
+    strict = await cutoff_post_price_join(
+        session, product_id="BTC-USD", start=date(2026, 10, 21), end=date(2026, 10, 21)
+    )
+    assert strict[0].post_count == 0
+
+    with pytest.raises(ValueError, match="requires a non-empty availability_note"):
+        await cutoff_post_price_join(
+            session,
+            product_id="BTC-USD",
+            start=date(2026, 10, 21),
+            end=date(2026, 10, 21),
+            availability_basis="archive_created_at",
+        )
+
+    archived = await cutoff_post_price_join(
+        session,
+        product_id="BTC-USD",
+        start=date(2026, 10, 21),
+        end=date(2026, 10, 21),
+        availability_basis="archive_created_at",
+        availability_note="Kaggle archive snapshot collected 2026-11-01",
+    )
+    assert archived[0].post_count == 1
+    assert archived[0].mean_sentiment == pytest.approx(0.5)

@@ -11,6 +11,11 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from statistics import fmean
 
+from xsentiment.availability import (
+    ARCHIVE_AVAILABILITY,
+    AvailabilityBasis,
+    validate_availability_basis,
+)
 from xsentiment.ingestion.contracts import XPostRecord
 from xsentiment.ingestion.prices import PriceCandle
 
@@ -137,14 +142,22 @@ def build_point_in_time_features(
     posts: Iterable[XPostRecord],
     *,
     now: datetime | None = None,
+    availability_basis: AvailabilityBasis = "observed",
+    availability_note: str | None = None,
 ) -> list[DailyFeatureRow]:
     """Build features at each UTC candle start using only information available by cutoff.
 
     Price features use prior completed candles only. Sentiment features aggregate
-    posts in (cutoff-24h, cutoff] that were published and retrieved by cutoff.
-    Current engagement counts are deliberately excluded as historical features.
-    When ``now`` is supplied, an unfinished current UTC day is dropped entirely.
+    posts in (cutoff-24h, cutoff] that were published and, under the default
+    ``observed`` basis, first retrieved by cutoff. Current engagement counts are
+    deliberately excluded as historical features.
+
+    ``archive_created_at`` is an opt-in retrospective basis for an archive whose
+    first-observation times are unknowable. It treats event time as availability,
+    requires ``availability_note``, and cannot exclude look-ahead bias. When
+    ``now`` is supplied, an unfinished current UTC day is dropped entirely.
     """
+    validate_availability_basis(availability_basis, availability_note)
     normalized_posts = deduplicate_posts(posts)
     rows: list[DailyFeatureRow] = []
     prior_close: Decimal | None = None
@@ -152,11 +165,15 @@ def build_point_in_time_features(
     for candle in sorted(completed_candles(candles, now), key=lambda item: item.timestamp):
         cutoff = _utc(candle.timestamp, "candle.timestamp")
         window_start = cutoff - timedelta(days=1)
-        available = [
-            post for post in normalized_posts
-            if window_start < _utc(post.created_at, "created_at") <= cutoff
-            and _utc(post.retrieved_at, "retrieved_at") <= cutoff
-        ]
+        available: list[XPostRecord] = []
+        for post in normalized_posts:
+            created_at = _utc(post.created_at, "created_at")
+            retrieved_at = _utc(post.retrieved_at, "retrieved_at")
+            if not window_start < created_at <= cutoff:
+                continue
+            if availability_basis != ARCHIVE_AVAILABILITY and retrieved_at > cutoff:
+                continue
+            available.append(post)
         scores = [post.sentiment_score for post in available if post.sentiment_score is not None]
         mean_score = fmean(scores) if scores else None
         positive_share = sum(score > 0 for score in scores) / len(scores) if scores else None

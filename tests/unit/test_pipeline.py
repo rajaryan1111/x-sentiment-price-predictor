@@ -231,6 +231,7 @@ def test_pipeline_writes_every_documented_artefact(tmp_path: Path) -> None:
     metrics = json.loads(artifacts.metrics_path.read_text())
 
     assert manifest["asset"] == "BTC-USD"
+    assert manifest["availability"]["basis"] == "observed"
     assert manifest["dataset"]["rows_with_sentiment"] > 0
     assert manifest["evaluation"]["folds"]
     assert manifest["provenance"]["price_snapshot_sha256"] == sha256_file(prices)
@@ -360,6 +361,96 @@ def test_cli_run_command_produces_a_report_and_reports_input_errors(tmp_path: Pa
     assert (output / "evaluation-report.md").exists()
     assert (output / "manifest.json").exists()
     assert main(["run", "--prices", str(tmp_path / "missing.json"), "--out", str(output)]) == 1
+
+
+def test_archive_availability_is_opt_in_recorded_and_disclosed(tmp_path: Path) -> None:
+    prices = write_prices(tmp_path / "prices.json", 120)
+    candles = snapshot_candles(120)
+    retrieved_at = START + timedelta(days=120)
+    posts = tmp_path / "retrospective.jsonl"
+    posts.write_text(
+        "\n".join(
+            json.dumps(
+                {
+                    "post_id": f"r{index}",
+                    "created_at": (
+                        datetime.fromisoformat(row["timestamp"]) - timedelta(hours=1)
+                    ).isoformat(),
+                    "retrieved_at": retrieved_at.isoformat(),
+                    "text": f"synthetic retrospective post {index}",
+                    "sentiment_score": round(math.sin(index / 3.0), 4),
+                }
+            )
+            for index, row in enumerate(candles[1:], start=1)
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    now = (START + timedelta(days=121)).isoformat()
+
+    strict_out = tmp_path / "strict-run"
+    assert (
+        main(
+            [
+                "run",
+                "--prices",
+                str(prices),
+                "--posts",
+                str(posts),
+                "--out",
+                str(strict_out),
+                "--now",
+                now,
+            ]
+        )
+        == 0
+    )
+    strict_manifest = json.loads((strict_out / "manifest.json").read_text())
+    assert strict_manifest["dataset"]["rows_with_sentiment"] == 0
+
+    missing_note = tmp_path / "missing-note"
+    assert main(
+        [
+            "run",
+            "--prices",
+            str(prices),
+            "--posts",
+            str(posts),
+            "--out",
+            str(missing_note),
+            "--now",
+            now,
+            "--availability-basis",
+            "archive_created_at",
+        ]
+    ) == 1
+    assert not missing_note.exists()
+
+    archive_out = tmp_path / "archive-run"
+    assert main(
+        [
+            "run",
+            "--prices",
+            str(prices),
+            "--posts",
+            str(posts),
+            "--out",
+            str(archive_out),
+            "--now",
+            now,
+            "--availability-basis",
+            "archive_created_at",
+            "--availability-note",
+            "Synthetic retrospective archive used only to test the opt-in basis.",
+        ]
+    ) == 0
+
+    manifest = json.loads((archive_out / "manifest.json").read_text())
+    report = (archive_out / "evaluation-report.md").read_text()
+    assert manifest["availability"]["basis"] == "archive_created_at"
+    assert "Synthetic retrospective archive" in manifest["availability"]["note"]
+    assert manifest["dataset"]["rows_with_sentiment"] > 0
+    assert "look-ahead bias cannot be excluded" in report
 
 
 def test_hash_helper_is_stable_for_the_same_content(tmp_path: Path) -> None:

@@ -129,3 +129,42 @@ def test_point_in_time_features_drop_the_unfinished_current_day() -> None:
     assert [row.cutoff for row in rows] == [
         datetime(2026, 10, day, tzinfo=UTC) for day in range(1, 6)
     ]
+
+
+def test_archive_availability_includes_retrospectively_collected_posts() -> None:
+    candles = [candle(20, "100"), candle(21, "110")]
+    cutoff = datetime(2026, 10, 21, tzinfo=UTC)
+    retrospective = post(
+        "archive", cutoff - timedelta(hours=2), cutoff + timedelta(days=10), 0.6
+    )
+
+    strict = build_point_in_time_features(candles, [retrospective])
+    archived = build_point_in_time_features(
+        candles,
+        [retrospective],
+        availability_basis="archive_created_at",
+        availability_note="Kaggle archive snapshot collected 2026-11-01",
+    )
+
+    assert strict[1].post_count_24h == 0
+    assert strict[1].mean_sentiment_24h is None
+    assert archived[1].post_count_24h == 1
+    assert archived[1].mean_sentiment_24h == pytest.approx(0.6)
+
+
+@pytest.mark.parametrize("note", [None, "", "   "])
+def test_archive_availability_requires_a_disclosure_note(note: str | None) -> None:
+    with pytest.raises(ValueError, match="requires a non-empty availability_note"):
+        build_point_in_time_features(
+            [candle(20, "100")],
+            [],
+            availability_basis="archive_created_at",
+            availability_note=note,
+        )
+
+
+def test_unknown_availability_basis_fails_closed() -> None:
+    with pytest.raises(ValueError, match="availability_basis must be one of"):
+        build_point_in_time_features(
+            [candle(20, "100")], [], availability_basis="backdated"
+        )

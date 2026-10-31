@@ -23,6 +23,11 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
 )
 
+from xsentiment.availability import (
+    ARCHIVE_AVAILABILITY,
+    AvailabilityBasis,
+    validate_availability_basis,
+)
 from xsentiment.ingestion.contracts import XPostRecord
 from xsentiment.ingestion.prices import PriceCandle
 from xsentiment.storage.models import Base, PriceBar, XPost
@@ -219,15 +224,21 @@ async def cutoff_post_price_join(
     product_id: str,
     start: date,
     end: date,
+    availability_basis: AvailabilityBasis = "observed",
+    availability_note: str | None = None,
 ) -> list[CutoffPostPriceRow]:
     """Join eligible posts to the last completed bar before each UTC cutoff.
 
-    A post is eligible only when ``created_at`` is in ``(cutoff - 24h, cutoff]`` and
-    ``retrieved_at <= cutoff``. The joined close belongs to the previous completed
-    bar, never the bar whose close is the n+0 target.
+    Under the default ``observed`` basis a post is eligible only when
+    ``created_at`` is in ``(cutoff - 24h, cutoff]`` and ``retrieved_at <= cutoff``.
+    ``archive_created_at`` is the opt-in retrospective basis: it keeps the event
+    window but does not require first observation, requires ``availability_note``,
+    and cannot exclude look-ahead bias. The joined close belongs to the previous
+    completed bar, never the bar whose close is the n+0 target.
     """
     if start > end:
         raise ValueError("start must not be later than end")
+    validate_availability_basis(availability_basis, availability_note)
     bars = (
         await session.execute(
             select(PriceBar)
@@ -243,17 +254,19 @@ async def cutoff_post_price_join(
     for bar in bars:
         if previous is not None and start <= bar.bar_date <= end:
             cutoff = datetime.combine(bar.bar_date, time.min, tzinfo=UTC)
+            eligibility = [
+                XPost.created_at > cutoff - timedelta(days=1),
+                XPost.created_at <= cutoff,
+            ]
+            if availability_basis != ARCHIVE_AVAILABILITY:
+                eligibility.append(XPost.retrieved_at <= cutoff)
             aggregate = (
                 await session.execute(
                     select(
                         func.count(XPost.post_id),
                         func.count(XPost.sentiment_score),
                         func.avg(XPost.sentiment_score),
-                    ).where(
-                        XPost.created_at > cutoff - timedelta(days=1),
-                        XPost.created_at <= cutoff,
-                        XPost.retrieved_at <= cutoff,
-                    )
+                    ).where(*eligibility)
                 )
             ).one()
             rows.append(

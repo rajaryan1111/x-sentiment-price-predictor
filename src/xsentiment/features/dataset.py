@@ -18,6 +18,7 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
+from xsentiment.availability import AvailabilityBasis
 from xsentiment.features.price_features import PRICE_FEATURE_NAMES, price_features
 from xsentiment.features.sentiment import coverage
 from xsentiment.ingestion.contracts import XPostRecord
@@ -92,17 +93,26 @@ def build_supervised_dataset(
     *,
     max_horizon: int = MAX_HORIZON,
     now: datetime | None = None,
+    availability_basis: AvailabilityBasis = "observed",
+    availability_note: str | None = None,
 ) -> list[SupervisedRow]:
     """Assemble point-in-time rows for evaluation and for the current outlook.
 
     Pass already-scored posts (see ``xsentiment.features.sentiment.score_posts``);
     unscored posts still contribute to post volume but never to sentiment means.
+    ``availability_basis`` is forwarded to the point-in-time aggregation; the
+    default ``observed`` basis keeps the leakage guard intact.
     """
     if max_horizon < 0:
         raise ValueError("max_horizon must be non-negative")
     ordered = sorted(completed_candles(candles, now), key=lambda candle: candle.timestamp)
     deduped_posts = deduplicate_posts(posts)
-    feature_rows = build_point_in_time_features(ordered, deduped_posts)
+    feature_rows = build_point_in_time_features(
+        ordered,
+        deduped_posts,
+        availability_basis=availability_basis,
+        availability_note=availability_note,
+    )
     targets = build_close_targets(ordered, max_horizon=max_horizon)
     if len(feature_rows) != len(ordered):  # pragma: no cover - defensive alignment guard
         raise ValueError("feature rows and completed candles are misaligned")

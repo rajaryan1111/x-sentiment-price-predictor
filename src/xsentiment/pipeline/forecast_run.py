@@ -20,6 +20,12 @@ from decimal import Decimal, InvalidOperation
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
+from xsentiment.availability import (
+    ARCHIVE_AVAILABILITY,
+    ARCHIVE_LIMITATION,
+    AvailabilityBasis,
+    validate_availability_basis,
+)
 from xsentiment.backtesting.strategy import StrategyAssumptions
 from xsentiment.features.dataset import (
     MAX_HORIZON,
@@ -312,14 +318,30 @@ def run_forecast_pipeline(
     news_context: Sequence[str] = (),
     provenance: dict[str, object] | None = None,
     limitations: Sequence[str] = (),
+    availability_basis: AvailabilityBasis = "observed",
+    availability_note: str | None = None,
 ) -> RunArtifacts:
-    """Run the full offline pipeline and write every artefact to ``output_dir``."""
+    """Run the full offline pipeline and write every artefact to ``output_dir``.
+
+    ``availability_basis`` defaults to the leakage-safe ``observed`` rule. The
+    retrospective ``archive_created_at`` basis requires ``availability_note`` and
+    adds an explicit look-ahead limitation to the report, outlook and manifest.
+    """
     as_of = now.astimezone(UTC) if now is not None else datetime.now(UTC)
+    validate_availability_basis(availability_basis, availability_note)
+    active_limitations = list(limitations)
+    if availability_basis == ARCHIVE_AVAILABILITY:
+        active_limitations.append(ARCHIVE_LIMITATION)
     active_scorer = scorer or VaderSentimentScorer()
     scored_posts = score_posts(posts, active_scorer)
 
     rows: list[SupervisedRow] = build_supervised_dataset(
-        candles, scored_posts, max_horizon=MAX_HORIZON, now=now
+        candles,
+        scored_posts,
+        max_horizon=MAX_HORIZON,
+        now=now,
+        availability_basis=availability_basis,
+        availability_note=availability_note,
     )
     summary: DatasetSummary = summarize(
         rows, scored_posts, candles=candles, max_horizon=MAX_HORIZON, now=now
@@ -341,13 +363,18 @@ def run_forecast_pipeline(
         scorer=scorer_id,
         news_context=news_context,
         ridge_lambda=ridge_lambda,
-        caller_limitations=limitations,
+        caller_limitations=active_limitations,
     )
 
     run_provenance: dict[str, object] = dict(provenance or {})
     if "code_revision" not in run_provenance:
         run_provenance.update(_code_revision())
     run_provenance.setdefault("asset", asset)
+    run_provenance.setdefault("availability_basis", availability_basis)
+    if availability_note:
+        run_provenance.setdefault("availability_note", availability_note)
+    if availability_basis == ARCHIVE_AVAILABILITY:
+        run_provenance.setdefault("availability_limitation", ARCHIVE_LIMITATION)
     run_provenance.setdefault("price_candles_supplied", len(candles))
     run_provenance.setdefault("posts_supplied", len(posts))
     run_provenance.setdefault("sentiment_scorer", f"{scorer_id['scorer']} {scorer_id['version']}")
@@ -372,7 +399,7 @@ def run_forecast_pipeline(
             outlook=outlook,
             provenance=run_provenance,
             generated_at=as_of,
-            limitations=limitations,
+            limitations=active_limitations,
         ),
         encoding="utf-8",
     )
@@ -541,6 +568,10 @@ def _manifest(
         "run_id": as_of.strftime("run-%Y%m%dT%H%M%SZ"),
         "generated_at": as_of.isoformat(),
         "asset": asset,
+        "availability": {
+            "basis": provenance.get("availability_basis", "observed"),
+            "note": provenance.get("availability_note"),
+        },
         "dataset": {
             "rows": summary.rows,
             "rows_with_full_horizon": summary.rows_with_full_horizon,
