@@ -13,15 +13,15 @@ the exact next safe commands, and the blockers. It is not a completion claim.
   checks. The diff against `main` is 87 files. CI runs `40799393484` (push) and
   `40799399662` (pull_request) succeeded on `848de00`. The PR is not merged.
 - Local branch `feat/availability-basis-and-preflight` is at
-  `d4cd4050bcab7354fc8998c2b0acc7b44cbd6b79`, one commit on top of `848de00`.
-  It adds the explicit availability basis and the offline Apify preflight. It is
-  committed locally and **not pushed**; push and merge await explicit
-  authorization.
-- A clean-copy run on 2026-11-01 at `d4cd405` (excluding the unrelated untracked
-  `aicte-compliance-ai/` directory) passed 204 tests in 4.19s, Ruff, compileall,
-  the documentation validator, the dataset-registry validator and
-  `git diff --check`. The working-tree copy with the unrelated directory present
-  shows one environment-only docs-validator failure; that is not a code failure.
+  `4264469cd96b5692320af9e695dc39b6f3666e95`, three commits on top of `848de00`.
+  It adds the explicit availability basis, the offline Apify preflight and the
+  bounded ingestion command. It is committed locally and **not pushed**; push and
+  merge await explicit authorization.
+- A clean-copy run on 2026-11-01 at `4264469` (excluding the unrelated untracked
+  `aicte-compliance-ai/` directory) passed 209 tests, Ruff, compileall, the
+  documentation validator, the dataset-registry validator and `git diff --check`.
+  The working-tree copy with the unrelated directory present shows one
+  environment-only docs-validator failure; that is not a code failure.
 - The code now has two named availability bases. `observed` is the default and
   keeps `retrieved_at <= cutoff`. `archive_created_at` is opt-in, requires
   `--availability-note`, and records a look-ahead limitation in the manifest,
@@ -30,7 +30,9 @@ the exact next safe commands, and the blockers. It is not a completion claim.
 - `docs/ACTOR_REVIEW.md` records the `apidojo/tweet-scraper` candidate and its
   unverified pricing/schema items. `config/apify_actor_input.example.json` is
   placeholder-only. `scripts/smoke_test_apify_x.py --validate-only` makes no
-  network call and launches no paid run.
+  network call and launches no paid run. `scripts/ingest_apify_x.py` runs one
+  confirmed query under caps and writes normalized JSONL plus a sanitized manifest;
+  it has only been tested with a fake adapter.
 - No real X corpus, Actor ID, token, live provider call, employer answer, merge
   or submission email exists. The raw BTC price snapshot is present locally and
   ignored; its SHA-256 matches `reports/btc-usd-180d/manifest.json`.
@@ -68,7 +70,7 @@ No live provider call is authorized.
 
 ## Pending tasks
 
-1. Push `d4cd405` to `feat/sentiment-features-and-forecasting` and let CI run on
+1. Push `4264469` to `feat/sentiment-features-and-forecasting` and let CI run on
    the exact SHA — only after explicit push authorization.
 2. Merge PR #14 with a merge commit — only after explicit merge authorization.
 3. Close or annotate PRs #9–#13 only with patch-equivalence evidence. #9–#11 are
@@ -112,10 +114,9 @@ No live provider call is authorized.
 
 ## Latest verification evidence
 
-On 2026-11-01 at local commit `d4cd405`, a clean copy passed 204 tests in 4.19s,
-Ruff, compileall, the documentation validator (all links, 24 test-count claims and
-28 requirement rows valid), the dataset-registry validator (12 records) and
-`git diff --check`. These results do not cover live providers, real X data or
+On 2026-11-01 at local commit `4264469`, a clean copy passed 209 tests, Ruff,
+compileall, the documentation validator (all links and 28 requirement rows valid),
+the dataset-registry validator (12 records) and `git diff --check`. These results do not cover live providers, real X data or
 model quality. Exact commands are in `FINAL_VERIFICATION_REPORT.md`. No live
 provider request was made.
 

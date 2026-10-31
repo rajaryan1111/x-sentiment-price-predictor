@@ -39,6 +39,31 @@ or price. Replace the example dates and confirm the reviewed Actor's exact input
 schema first. The operator sequence is: review `ACTOR_REVIEW.md` -> `--validate-only`
 -> a 10-item paid smoke test -> a 7-day pilot -> the full bounded run.
 
+## Bounded ingestion command
+
+After the pilot is approved, run one query per invocation so provenance records the
+mode exactly:
+
+```bash
+python scripts/ingest_apify_x.py \
+  --input-json config/apify_actor_input.example.json \
+  --query-mode ticker \
+  --query "BTC" \
+  --posts-out data/apify-x-ticker.jsonl \
+  --manifest-out reports/generated/apify-x-ticker/manifest.json \
+  --max-items 500 \
+  --max-total-charge-usd 0.50 \
+  --timeout-seconds 600 \
+  --confirm-paid-run
+```
+
+Without `--confirm-paid-run` the command refuses and constructs no adapter. It
+requires configured `APIFY_API_TOKEN`/`APIFY_ACTOR_ID`, writes normalized JSONL to
+the local ignored path and writes a sanitized manifest containing counts, daily
+coverage, caps and a hashed query label, never post text. Repeat for `cashtag` and
+`keyword`; then feed the JSONL to `xsentiment persist --posts` or
+`xsentiment run --posts`.
+
 ## Adapter behavior
 
 `ApifyXAdapter.run_and_fetch(...)` is explicit and never runs merely by importing the module. The caller must supply the Actor input plus an item cap, dollar cap and timeout. The initial POST is not automatically retried because a network timeout may leave a paid run's result ambiguous. In that case, inspect the Apify console before another attempt.

@@ -136,3 +136,13 @@ result is not a fully leakage-safe historical backtest. The CLI exposes
 join accepts the same parameter. Tests cover the default exclusion, the archive
 inclusion, the mandatory note, the unknown-basis failure and the manifest/report
 disclosure. No real archive was collected and no real-data result is claimed.
+
+## D-032 One bounded ingestion run per query mode
+Status: implemented and offline-tested (2026-11-01). `scripts/ingest_apify_x.py`
+runs exactly one ticker, cashtag or keyword query per invocation, under explicit
+item, USD and time caps, so the normalized records carry an exact query mode rather
+than a guessed or mixed label. It refuses without `--confirm-paid-run`, configured
+credentials and a preflight-valid local input. The JSONL output is written to an
+ignored local path and is accepted by `persist`/`run`; the manifest contains counts,
+per-day coverage, caps and a SHA-256 of the query label, never post text or the raw
+query. Tests use a fake adapter and make no network call. No live Actor run exists.

@@ -76,7 +76,7 @@ verified as offline engineering, not as live provider or real-X acceptance.
 
 ## 4. Verification basis
 
-- The local commit `d4cd405` passed 204 tests on 2026-11-01 in a clean copy,
+- The local commit `4264469` passed 209 tests on 2026-11-01 in a clean copy,
   together with Ruff, compileall, the documentation validator, the dataset-registry
   validator and `git diff --check`. The earlier 2026-10-29 verification context at
   `d801661` passed 187 tests and 64 focused tests. Neither run implies real
@@ -110,8 +110,8 @@ Documentation claims were not counted as implementation evidence. For every
 requirement row, the named source path and automated-test path were checked
 against the actual working tree. The concrete checks were:
 
-- The latest clean-copy `.venv/bin/python -m pytest -q` run passed 204 tests on
-  2026-11-01 at local commit `d4cd405`; the prior 2026-10-29 document
+- The latest clean-copy `.venv/bin/python -m pytest -q` run passed 209 tests on
+  2026-11-01 at local commit `4264469`; the prior 2026-10-29 document
   synchronization passed 187. Exact focused and full-suite results are in
   `FINAL_VERIFICATION_REPORT.md`.
 - `tests/unit/test_coinbase_prices.py`, `test_contracts.py`,

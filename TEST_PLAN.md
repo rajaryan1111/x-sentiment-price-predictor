@@ -1,11 +1,13 @@
 # Test Plan
 A passing suite proves only the cases it actually exercises. Current collection on
-2026-11-01 is **204 offline tests** using Python 3.11.15 and the existing
-`.[dev,storage,analysis]` environment. The current verification adds 17 collected
+2026-11-01 is **209 offline tests** using Python 3.11.15 and the existing
+`.[dev,storage,analysis]` environment. The current verification adds 22 collected
 cases over the previous 187-case checkpoint: five for the explicit availability
 basis (default exclusion, opt-in archive inclusion, mandatory disclosure note,
 unknown-basis failure, manifest/report disclosure), one storage-join archive case,
-one persisted-pipeline disclosure case and ten Apify input-preflight cases. The full
+one persisted-pipeline disclosure case, ten Apify input-preflight cases and five
+bounded-ingestion cases (confirmation gate, credential gate, query-mode gate,
+sanitized manifest and JSONL output). The full
 rerun for this exact working tree is recorded in
 [FINAL_VERIFICATION_REPORT.md](docs/FINAL_VERIFICATION_REPORT.md). CI supports
 Python 3.11 and installs `.[dev,storage]`.

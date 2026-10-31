@@ -10,9 +10,9 @@ registry evidence and its registry test only. PR #14 and CI were live queried at
 that released head. Historical source review is distinguished from the current
 documentation and registry checks.
 
-## 2026-11-01 — availability basis and Apify preflight (local commit `d4cd405`)
+## 2026-11-01 — availability basis, preflight and ingestion (local commit `4264469`)
 
-The local branch `feat/availability-basis-and-preflight` adds one code commit on
+The local branch `feat/availability-basis-and-preflight` adds three commits on
 top of PR #14 head `848de0033f36341d2b85bf060aeeccc674686de5`:
 
 - an explicit availability basis: `observed` remains the leakage-safe default,
@@ -22,6 +22,9 @@ top of PR #14 head `848de0033f36341d2b85bf060aeeccc674686de5`:
 - an offline `scripts/smoke_test_apify_x.py --validate-only` preflight for query
   modes, the 180-day window, item caps and credential presence; it constructs no
   HTTP client and launches no paid run;
+- a bounded `scripts/ingest_apify_x.py` command that runs one explicitly
+  confirmed ticker, cashtag or keyword query under item/USD/time caps, writes
+  normalized JSONL and a sanitized manifest, and refuses without confirmation;
 - a placeholder-only Actor input example and the `docs/ACTOR_REVIEW.md` operator
   runbook.
 
@@ -29,7 +32,7 @@ Verification was run on 2026-11-01 in a clean copy that excludes the unrelated
 untracked `aicte-compliance-ai/` directory (its presence makes the documentation
 validator scan a different project):
 
-- `.venv/bin/python -m pytest -q` -> **204 passed in 4.19s**.
+- `.venv/bin/python -m pytest -q` -> **209 passed**.
 - `.venv/bin/python -m ruff check src tests scripts` -> all checks passed.
 - `.venv/bin/python -m compileall -q src tests scripts` -> exit 0.
 - `.venv/bin/python scripts/validate_docs.py` -> OK; 103 relative links, 24
@@ -41,7 +44,7 @@ the validator and is not a permanent claim.
 
 No live Apify, Tavily, Exa or Coinbase request was made. No real X corpus was
 collected, no archive-mode experiment was run, and no PR was merged. The local
-commit was not pushed at the time of this report.
+commits were not pushed at the time of this report.
 
 ## Code verification and current documentation checks (2026-10-29)
 

@@ -150,7 +150,7 @@ placeholder and no adapter-level tests.
 > sentiment-change chart and a one-page outlook. Installation and reproduction
  > commands are in the README and the demo walkthrough.
 >
-> **Verification evidence.** On the final verified local commit (2026-11-01), 204
+> **Verification evidence.** On the final verified local commit (2026-11-01), 209
 > tests pass, together with `ruff`, byte-compilation and both
 > documentation/registry validators. The earlier 2026-10-29 checkpoint passed 187
 > tests and its GitHub Actions runs were green. The documented setup was repeated from a clean checkout on
