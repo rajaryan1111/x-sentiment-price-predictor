@@ -130,8 +130,9 @@ that question remains untestable without accepted X data.
 
 ### Local verification state (2026-11-01)
 
-On top of PR #14 head `848de0033f36341d2b85bf060aeeccc674686de5`, local commit
-`4264469cd96b5692320af9e695dc39b6f3666e95` adds the explicit availability basis,
+On top of PR #14 head `848de0033f36341d2b85bf060aeeccc674686de5`, branch tip
+`346a18c253e587fefb5db413e7843684097a538e` (code commit
+`4264469cd96b5692320af9e695dc39b6f3666e95`) adds the explicit availability basis,
 the offline Apify preflight and a bounded ingestion command. A clean-copy run on
 2026-11-01 that excluded the unrelated untracked `aicte-compliance-ai/` directory
 passed 209 tests, Ruff, compileall, the documentation validator (all links and 28
@@ -209,7 +210,7 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 - CI at that head: runs `40799393484` (push) and `40799399662` (pull_request),
   both successful. Earlier checks are historical for their own SHAs.
 - Local branch `feat/availability-basis-and-preflight` is at
-  `4264469cd96b5692320af9e695dc39b6f3666e95`, three commits ahead of the PR head.
+  `346a18c253e587fefb5db413e7843684097a538e`, four commits ahead of the PR head.
   It is committed locally but not pushed; push and merge await explicit
   authorization.
 - PR #14 is not merged and has not been marked ready for review. The historical
@@ -238,7 +239,7 @@ authorization and delivery items remain pending.
   outlook and evaluation report implemented and tested.
 - [x] `README.md`, architecture, data policy, tech stack and reproduction
   commands present; `TEST_PLAN.md` is the authoritative test count.
-- [x] The full offline suite (209 passed on 2026-11-01 at `4264469`, in a
+- [x] The full offline suite (209 passed on 2026-11-01 at code `4264469`, in a
   clean copy excluding the unrelated nested project), Ruff, compileall, both
   validators and `git diff --check` passed. Historical 2026-10-29 evidence and
   the two-run synthetic demo remain recorded in the verification report.

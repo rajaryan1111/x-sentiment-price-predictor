@@ -10,9 +10,9 @@ registry evidence and its registry test only. PR #14 and CI were live queried at
 that released head. Historical source review is distinguished from the current
 documentation and registry checks.
 
-## 2026-11-01 — availability basis, preflight and ingestion (local commit `4264469`)
+## 2026-11-01 — availability basis, preflight and ingestion (code `4264469`; docs tip `346a18c`)
 
-The local branch `feat/availability-basis-and-preflight` adds three commits on
+The local branch `feat/availability-basis-and-preflight` adds four commits on
 top of PR #14 head `848de0033f36341d2b85bf060aeeccc674686de5`:
 
 - an explicit availability basis: `observed` remains the leakage-safe default,

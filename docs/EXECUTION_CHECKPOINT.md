@@ -13,13 +13,15 @@ the exact next safe commands, and the blockers. It is not a completion claim.
   checks. The diff against `main` is 87 files. CI runs `40799393484` (push) and
   `40799399662` (pull_request) succeeded on `848de00`. The PR is not merged.
 - Local branch `feat/availability-basis-and-preflight` is at
-  `4264469cd96b5692320af9e695dc39b6f3666e95`, three commits on top of `848de00`.
-  It adds the explicit availability basis, the offline Apify preflight and the
-  bounded ingestion command. It is committed locally and **not pushed**; push and
-  merge await explicit authorization.
-- A clean-copy run on 2026-11-01 at `4264469` (excluding the unrelated untracked
-  `aicte-compliance-ai/` directory) passed 209 tests, Ruff, compileall, the
-  documentation validator, the dataset-registry validator and `git diff --check`.
+  `346a18c253e587fefb5db413e7843684097a538e`, four commits on top of `848de00`.
+  Code commit `4264469` adds the explicit availability basis, the offline Apify
+  preflight and the bounded ingestion command; the tip `346a18c` records their
+  documentation. It is committed locally and **not pushed**; push and merge await
+  explicit authorization.
+- A clean-copy run on 2026-11-01 at code `4264469` / branch tip `346a18c`
+  (excluding the unrelated untracked `aicte-compliance-ai/` directory) passed 209
+  tests, Ruff, compileall, the documentation validator, the dataset-registry
+  validator and `git diff --check`.
   The working-tree copy with the unrelated directory present shows one
   environment-only docs-validator failure; that is not a code failure.
 - The code now has two named availability bases. `observed` is the default and
@@ -70,7 +72,7 @@ No live provider call is authorized.
 
 ## Pending tasks
 
-1. Push `4264469` to `feat/sentiment-features-and-forecasting` and let CI run on
+1. Push `346a18c` to `feat/sentiment-features-and-forecasting` and let CI run on
    the exact SHA — only after explicit push authorization.
 2. Merge PR #14 with a merge commit — only after explicit merge authorization.
 3. Close or annotate PRs #9–#13 only with patch-equivalence evidence. #9–#11 are

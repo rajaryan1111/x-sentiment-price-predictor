@@ -76,7 +76,7 @@ verified as offline engineering, not as live provider or real-X acceptance.
 
 ## 4. Verification basis
 
-- The local commit `4264469` passed 209 tests on 2026-11-01 in a clean copy,
+- The code commit `4264469` (docs tip `346a18c`) passed 209 tests on 2026-11-01 in a clean copy,
   together with Ruff, compileall, the documentation validator, the dataset-registry
   validator and `git diff --check`. The earlier 2026-10-29 verification context at
   `d801661` passed 187 tests and 64 focused tests. Neither run implies real

@@ -54,8 +54,8 @@ ancestor of the PR head. The head is
 `main`), and both CI runs `40799393484` (push) and `40799399662` (pull_request)
 succeeded on that exact SHA. The PR is not merged.
 
-The local branch `feat/availability-basis-and-preflight` adds three commits on
-top of that head, currently at `4264469`: an explicit
+The local branch `feat/availability-basis-and-preflight` adds four commits on
+top of that head, currently at `346a18c` (code commit `4264469`): an explicit
 `observed`/`archive_created_at` availability basis, an offline Apify preflight and
 a bounded ingestion command. It is committed locally and not pushed;
 push and merge await explicit authorization. The clean-copy suite passed 209
