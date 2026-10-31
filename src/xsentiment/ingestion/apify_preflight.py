@@ -71,8 +71,14 @@ def validate_actor_input(
     *,
     today: date | None = None,
     max_window_days: int = _MAX_WINDOW_DAYS,
+    required_modes: tuple[str, ...] = ("ticker", "cashtag", "keyword"),
 ) -> PreflightReport:
-    """Validate the local contract without any network or credential access."""
+    """Validate the local contract without any network or credential access.
+
+    ``required_modes`` defaults to all three assignment modes. A single-query
+    ingestion run may require only the mode it is about to exercise; provenance is
+    then recorded per run instead of being guessed from a mixed result set.
+    """
     _reject_credential_keys(actor_input)
     terms = actor_input.get("searchTerms")
     if not isinstance(terms, list) or not terms:
@@ -84,7 +90,7 @@ def validate_actor_input(
         normalized.append(term.strip())
 
     modes = classify_query_modes(normalized)
-    missing = [mode for mode in ("ticker", "cashtag", "keyword") if mode not in modes]
+    missing = [mode for mode in required_modes if mode not in modes]
     if missing:
         raise ValueError(
             "searchTerms must cover ticker, cashtag and keyword queries; missing: "
