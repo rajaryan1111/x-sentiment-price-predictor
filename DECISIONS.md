@@ -120,3 +120,19 @@ PDF, which is not in this checkout.
 
 ## D-030 Tavily URL sanitization and publication timestamp handling
 Status: implemented and offline-tested (2026-10-28). Provider result URLs are parsed structurally before persistence: user-info and fragments are removed; credential-like query keys (case/encoding-insensitive, including common token, API key, signature, auth, session and cloud-signature names) have values replaced while useful non-secret article and attribution parameters are preserved; unsafe schemes and malformed URLs are excluded without echoing the raw URL. UTC-aware publication timestamps are normalized to UTC. Naive timestamps are withheld, with a reason and bounded raw source string retained; malformed/missing timestamps also have explicit reasons. This avoids host-timezone-dependent inference. Regression coverage includes encoded/case-varied auth keys, query and URL component redaction, output artifact checks, timezone offsets, naive/invalid/missing timestamps and a non-UTC host TZ. Provider payload hashes still identify the source payload but are one-way digests; raw URL strings are never written into news records or logs. This hardening does not establish live Tavily compatibility; no provider call was made.
+
+## D-031 Explicit availability basis for historical X archives
+Status: implemented and offline-tested (2026-11-01). The default
+`observed` basis is unchanged: a post enters a historical cutoff only when it was
+published in `(cutoff - 24h, cutoff]` and first retrieved by that cutoff. A
+retrospective Apify or dataset archive collected today stamps every record with
+today's `retrieved_at`, so under `observed` it contributes zero historical
+sentiment. The new, explicitly opt-in `archive_created_at` basis keeps the event
+time window but treats event time as availability. It requires a non-empty
+`--availability-note`, records the basis and note in the manifest and report, and
+adds a visible limitation stating that look-ahead bias cannot be excluded and the
+result is not a fully leakage-safe historical backtest. The CLI exposes
+`run --availability-basis {observed,archive_created_at}` and the storage cutoff
+join accepts the same parameter. Tests cover the default exclusion, the archive
+inclusion, the mandatory note, the unknown-basis failure and the manifest/report
+disclosure. No real archive was collected and no real-data result is claimed.

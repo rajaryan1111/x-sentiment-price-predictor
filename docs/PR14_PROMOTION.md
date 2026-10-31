@@ -1,5 +1,12 @@
 # Safe PR #14 promotion procedure
 
+**2026-11-01 update:** PR #14 is now based on **`main`**, not
+`docs/canonical-source-of-truth`. Head is
+`848de0033f36341d2b85bf060aeeccc674686de5`; the diff is 87 files and CI runs
+`40799393484` and `40799399662` succeeded on that SHA. The paragraphs below
+record the 2026-10-28 promotion to the old base and are historical, not a current
+instruction. Query the live PR metadata before acting.
+
 **Code promotion status: COMPLETED on 2026-10-28.** The verified work was committed
 as `d8016610aa7ebf82263413c48b1164e4a64d13df` and pushed to
 `feat/sentiment-features-and-forecasting` with a normal non-forced fast-forward

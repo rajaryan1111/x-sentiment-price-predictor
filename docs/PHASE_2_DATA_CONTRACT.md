@@ -45,8 +45,9 @@ The JSONL loader round-trips these fields and rejects malformed timestamps or an
 For a forecast issued at UTC midnight t:
 
 - Price-derived input features use only previously completed candles, never the close of the candle beginning at t.
-- A post is eligible only if its event time and system retrieval time are both at or before t.
-- The current implementation aggregates the trailing 24-hour interval (t - 24h, t]. A post retrieved after t is excluded even if its event time is earlier.
+- Under the default `observed` basis, a post is eligible only if its event time and system retrieval time are both at or before t.
+- The implementation aggregates the trailing 24-hour interval (t - 24h, t]. A post retrieved after t is excluded even if its event time is earlier.
+- `archive_created_at` is an explicit opt-in basis for a retrospective archive whose first-observation times are unknowable. It keeps the event-time window but not the retrieval guard, requires a disclosure note, and is recorded with a look-ahead limitation in the manifest and report. It is not the default and is not a leakage-safe historical backtest.
 - Engagement values are retained for provenance but not used as historical predictors absent point-in-time snapshots.
 - Sentiment features are null when no scored posts exist; do not replace null with zero without an explicit, train-fitted missing-data policy.
 

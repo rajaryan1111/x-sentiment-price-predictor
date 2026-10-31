@@ -76,14 +76,12 @@ verified as offline engineering, not as live provider or real-X acceptance.
 
 ## 4. Verification basis
 
-- The full code suite (187 tests), focused Apify/Tavily/news CLI/pipeline command
-  (64 tests), Ruff, compileall and synthetic CLI demo are recorded against code
-  commit `d801661` and its verification context. The final documentation/registry
-  reconciliation passed the same full suite, both validators, the focused
-  registry/docs tests and `git diff --check`, was committed as `9b0698f`, and then
-  reproduced from a detached clean worktree at that commit with Python 3.11.15.
-  These checks do not imply real provider behavior or model quality. Exact commands
-  and hashes are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
+- The local commit `d4cd405` passed 204 tests on 2026-11-01 in a clean copy,
+  together with Ruff, compileall, the documentation validator, the dataset-registry
+  validator and `git diff --check`. The earlier 2026-10-29 verification context at
+  `d801661` passed 187 tests and 64 focused tests. Neither run implies real
+  provider behavior or model quality. Exact commands and hashes are in
+  [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
 - On 2026-10-29, the docs-synchronized local synthetic demo generated six
   artifacts, six folds, 2,160 predictions and 18 metric rows from 210 synthetic
   bars and 209 synthetic posts. Two independent CLI runs matched byte-for-byte on
@@ -112,10 +110,10 @@ Documentation claims were not counted as implementation evidence. For every
 requirement row, the named source path and automated-test path were checked
 against the actual working tree. The concrete checks were:
 
-- The latest `.venv/bin/python -m pytest -q` run after document
-  synchronization passed 187 tests (run on 2026-10-29). Exact focused and full-suite results
-  are in `FINAL_VERIFICATION_REPORT.md`; an initial documentation-validator
-  failure from missing date qualifiers was corrected before this passing run.
+- The latest clean-copy `.venv/bin/python -m pytest -q` run passed 204 tests on
+  2026-11-01 at local commit `d4cd405`; the prior 2026-10-29 document
+  synchronization passed 187. Exact focused and full-suite results are in
+  `FINAL_VERIFICATION_REPORT.md`.
 - `tests/unit/test_coinbase_prices.py`, `test_contracts.py`,
   `test_phase2_pipeline.py`, `test_dataset.py`, `test_features.py`,
   `test_walk_forward.py`, `test_models.py`, `test_evaluation.py`,

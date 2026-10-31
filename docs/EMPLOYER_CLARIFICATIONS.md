@@ -70,6 +70,8 @@ none has an employer answer on record.
 | Q7 | What is the hard spend ceiling (USD) and per-run item cap for any paid Apify/Tavily operation? If Exa is expected, please confirm that separately before integration. | Paid Actor launches cost money; no provider call is authorized without a cap. | B3 / R2, NFR4, O13 |
 | Q8 | What is the accepted final submission format and packet? Please confirm whether a Markdown evaluation report is sufficient or a PDF is additionally required, whether a video/screenshots are expected, and the delivery channel. Also re-confirm the recipient address in Q9. | Determines the exact artifacts to produce before submitting. | B7 / A7, A1 |
 | Q9 | Please confirm the submission email recipient is `gilad@crowdwisdomtrading.com` (recorded from the brief) and state who should receive it. | Avoids sending to an unverified address. | B5 / A7 |
+| Q10 | For a historical archive collected after the fact, may we treat post creation time as its availability time for the 180-day backtest, provided every report discloses that look-ahead bias cannot be excluded? The alternative is a forward-collected window that cannot cover the most recent 180 days. | The leakage-safe default excludes every post whose first-observation time is after the cutoff, so a retrospective archive otherwise yields zero sentiment. This decision determines whether a real 180-day experiment is possible at all. | B9 / R2, R4, R9 |
+| Q11 | If Q10 is not acceptable, should we (a) run a shorter forward-collected experiment, (b) accept a descriptive-only sentiment analysis, or (c) change the required evaluation window? | Provides an honest fallback instead of overstating a price-only result. | B9, B10 / R2, R9, A1 |
 
 ## 3. Provider / credential authorization checklist
 
@@ -148,9 +150,10 @@ placeholder and no adapter-level tests.
 > sentiment-change chart and a one-page outlook. Installation and reproduction
  > commands are in the README and the demo walkthrough.
 >
-> **Verification evidence.** On the final commit, 187 tests pass, together with
-> `ruff`, byte-compilation and both documentation/registry validators, locally and
-> in GitHub Actions. The documented setup was repeated from a clean checkout on
+> **Verification evidence.** On the final verified local commit (2026-11-01), 204
+> tests pass, together with `ruff`, byte-compilation and both
+> documentation/registry validators. The earlier 2026-10-29 checkpoint passed 187
+> tests and its GitHub Actions runs were green. The documented setup was repeated from a clean checkout on
 > Python 3.11 and re-run on Python 3.12 with the same result. The committed
 > real-price metrics were independently re-derived from the recorded snapshot with
 > zero differences, so the report is reproducible rather than merely asserted.

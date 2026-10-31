@@ -25,6 +25,18 @@ Record source/platform/provider and URL; dataset version or non-secret run ID; q
 ## Point-in-time and engagement
 created_at is event time; retrieved_at is when first observed. Never backdate retrieval. Old posts downloaded today are not automatically valid historical features. Only records with defensible availability evidence may enter a historical cutoff. Current likes/reposts/views/follower counts are not historical predictors unless time-stamped snapshots prove their values at cutoff.
 
+### Availability basis
+The pipeline has two explicit bases. `observed` is the default and the only
+leakage-safe historical rule: a post must be published and first retrieved by the
+cutoff. `archive_created_at` is an opt-in retrospective basis for a historical
+archive whose true first-observation times are unknowable; it treats event time as
+availability, refuses to run without a caller-supplied disclosure note, records the
+basis and note in the manifest, and prints the look-ahead limitation in the report
+and outlook. Results produced under `archive_created_at` must be described as
+retrospective and conditional; they are not a fully leakage-safe historical
+backtest. Do not use the archive basis to imply that collection happened in the
+past.
+
 ## Security, retention and cost
 Keep raw datasets, private exports, hydrated text, cookies and secrets out of Git. Use ignored local paths or approved private storage; honor retention/deletion terms. Share credentials only through a verified employer-approved private channel. Bound items, timeout and spend; use a small schema test first; no automatic retries of non-idempotent paid launches.
 

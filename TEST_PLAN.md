@@ -1,10 +1,13 @@
 # Test Plan
 A passing suite proves only the cases it actually exercises. Current collection on
-2026-10-28 is **187 offline tests** using Python 3.11.15 and the existing
-`.[dev,storage,analysis]` environment. The current verification adds 18 collected
-Tavily URL/timestamp and caller-supplied-news sanitization cases plus two Apify
-provenance-URL cases over the previous 167-case checkpoint. The full rerun for this
-exact working tree is recorded in [FINAL_VERIFICATION_REPORT.md](docs/FINAL_VERIFICATION_REPORT.md). CI supports
+2026-11-01 is **204 offline tests** using Python 3.11.15 and the existing
+`.[dev,storage,analysis]` environment. The current verification adds 17 collected
+cases over the previous 187-case checkpoint: five for the explicit availability
+basis (default exclusion, opt-in archive inclusion, mandatory disclosure note,
+unknown-basis failure, manifest/report disclosure), one storage-join archive case,
+one persisted-pipeline disclosure case and ten Apify input-preflight cases. The full
+rerun for this exact working tree is recorded in
+[FINAL_VERIFICATION_REPORT.md](docs/FINAL_VERIFICATION_REPORT.md). CI supports
 Python 3.11 and installs `.[dev,storage]`.
 CI runs lint, registry validation, documentation validation and pytest.
 
@@ -15,7 +18,7 @@ case and an offline network-isolation case. The security pass adds 18 collected
 Tavily and saved-news-context cases for sensitive URL components, credential-key
 spellings, provider text sanitization, publication timestamp normalization and
 withholding, DST offsets and host-timezone independence.
-Earlier figures (149, 152, 161, 165, 167) are historical results for their
+Earlier figures (149, 152, 161, 165, 167, 187) are historical results for their
 respective revisions.
 
 **This file is the single authoritative source for the current count.** Counts quoted

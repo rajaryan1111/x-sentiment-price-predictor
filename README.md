@@ -45,26 +45,22 @@ The matrix covers the 12 dataset candidates and outstanding requirements, includ
 provider access (R2) and the email submission packet (A7). The database join (R15) is
 recorded as verified complete offline.
 
-## Delivery status (live GitHub inspection on 2026-10-29)
+## Delivery status (live GitHub inspection on 2026-11-01)
 
-PR #14 remains OPEN, DRAFT and MERGEABLE against `docs/canonical-source-of-truth`
-(base SHA `36b7b486bb60b54f3f19201f2e548b11e5f93197`). The final documentation and
-registry reconciliation was committed and pushed as
-`9b0698f86267973a220c914ac0802a5bba171374`; at that inspection GitHub reported it
-as the PR head with both push and pull-request CI runs (`40795420005`,
-`40795425900`) succeeding. This status text was committed after that inspection, so
-the live head may be a later documentation-only commit: query
-`gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`
-and inspect the checks for that exact SHA before quoting a head or a CI result. The
-code change remains `d8016610aa7ebf82263413c48b1164e4a64d13df`; later commits are
-documentation/registry updates. The Arena branch remains
-`c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`. PR #14 remains unmerged and draft;
-no ready-for-review change was made. See [docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md).
-GitHub's live PR head can change with each commit; recheck with
-`gh pr view 14 --repo rajaryan1111/x-sentiment-price-predictor --json headRefOid`
-and inspect checks for that exact SHA. The Arena branch remains
-`c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`. PR #14 remains unmerged and draft;
-no ready-for-review change was made. See [docs/PR14_PROMOTION.md](docs/PR14_PROMOTION.md).
+PR #14 is OPEN, DRAFT and MERGEABLE against `main`; it was retargeted from
+`docs/canonical-source-of-truth` after verification that `main` is a strict
+ancestor of the PR head. The head is
+`848de0033f36341d2b85bf060aeeccc674686de5` (112 files; 87 files changed against
+`main`), and both CI runs `40799393484` (push) and `40799399662` (pull_request)
+succeeded on that exact SHA. The PR is not merged.
+
+The local branch `feat/availability-basis-and-preflight` adds commit `d4cd405`
+on top of that head: an explicit `observed`/`archive_created_at` availability
+basis and an offline Apify preflight. It is committed locally and not pushed;
+push and merge await explicit authorization. The clean-copy suite passed 204
+tests on 2026-11-01 at `d4cd405`. See
+[docs/EXECUTION_CHECKPOINT.md](docs/EXECUTION_CHECKPOINT.md) for the exact state
+and next commands.
 
 Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
 [Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),
@@ -109,8 +105,15 @@ python -m xsentiment run \
   --now 2026-10-26T00:00:00+00:00
 ```
 
-Add `--posts posts.jsonl` (normalized post records) to include sentiment. News is a
-deliberately separate, two-step workflow: the only live-capable command is
+Add `--posts posts.jsonl` (normalized post records) to include sentiment. Post
+availability defaults to the leakage-safe `observed` rule: a post must have been
+published and first retrieved by the cutoff. A historical archive scraped after
+the fact is therefore excluded from every earlier cutoff. If such a retrospective
+archive is explicitly approved, run with `--availability-basis archive_created_at
+--availability-note "<disclosure>"`; the manifest, report and outlook then carry a
+look-ahead limitation. The archive basis is never the default.
+
+News is a deliberately separate, two-step workflow: the only live-capable command is
 `fetch-news`, and `run --news-file` is entirely offline.
 
 ```bash

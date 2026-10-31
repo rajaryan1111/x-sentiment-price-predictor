@@ -4,7 +4,7 @@
 **Repository:** <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 **Assessment PR:** <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
 **Verified working branch:** `feat/sentiment-features-and-forecasting`
-**Status on 2026-10-29:** READY WITH DOCUMENTED LIMITATIONS for engineering delivery; not assignment-complete or externally submitted. PR #14 is open and draft, not merged. Current verification details are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
+**Status on 2026-11-01:** READY WITH DOCUMENTED LIMITATIONS for engineering delivery; not assignment-complete or externally submitted. PR #14 is open and draft, now based on `main`, not merged. Current verification details are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
 
 ## 1. Assignment objective
 
@@ -128,27 +128,18 @@ cross-checked for internal consistency, not recomputed from raw rows.
 persistence on forecast error. No claim is made that sentiment improves forecasting;
 that question remains untestable without accepted X data.
 
-### Local verification state (2026-10-29)
+### Local verification state (2026-11-01)
 
-The source-code verification recorded in
-[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) ran on 2026-10-29:
-187 suite tests and 64 focused Apify/Tavily/news CLI/pipeline tests passed, along
-with Ruff, compileall, registry/docs validation and diff checks. The code change
-set is committed at `d801661`, followed by documentation-only commits, the last
-verified one being `9b0698f86267973a220c914ac0802a5bba171374`. At that inspection
-PR #14's head was that commit; CI runs `40795420005` and `40795425900` both passed
-on that exact SHA, and the same suite and validators were reproduced from a
-detached clean worktree at it with Python 3.11.15. Status text committed after the
-inspection can advance the head, so query it before quoting a SHA. Two CLI runs at `reports/generated/final-submit-verify-2026-10-29/run-a/` and
-`run-b/`, on 210 synthetic bars and 209 synthetic posts, produced six artefacts,
-six walk-forward folds, 2,160 predictions and 18 metric rows, with byte-identical
-outputs across all six files. Security regressions cover
-credential-bearing news URLs, timezone-aware/withheld publication dates,
-caller-supplied news files, Apify provenance URLs, streaming bounds and offline
-no-network execution. Synthetic results are software evidence, not market or
-sentiment performance evidence. Separately, the committed real-price run was
-reproduced from the untracked local snapshot at `e22da11` with zero differences in
-`metrics.json`; the verification report records the commands and comparison.
+On top of PR #14 head `848de0033f36341d2b85bf060aeeccc674686de5`, local commit
+`d4cd4050bcab7354fc8998c2b0acc7b44cbd6b79` adds the explicit availability basis
+and the offline Apify preflight. A clean-copy run on 2026-11-01 that excluded the
+unrelated untracked `aicte-compliance-ai/` directory passed 204 tests in 4.19s,
+Ruff, compileall, the documentation validator (all links and 28 matrix rows valid),
+the dataset-registry validator (12 records) and `git diff --check`. The PR itself
+is OPEN, DRAFT and MERGEABLE against `main`; its diff is 87 files and CI runs
+`40799393484` and `40799399662` are green on `848de00`. The local commit is not
+pushed. No live provider call, real X corpus, merge or submission email exists.
+Historical 2026-10-29 evidence remains in the verification report.
 
 ## 7. Key limitations
 
@@ -210,22 +201,18 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 
 - Repository: <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 - Existing draft PR #14: <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
-  (base branch `docs/canonical-source-of-truth`; head branch
-  `feat/sentiment-features-and-forecasting`). At the latest live query on
-  2026-10-29, base SHA was `36b7b486bb60b54f3f19201f2e548b11e5f93197`; head
-  SHA was `9b0698f86267973a220c914ac0802a5bba171374`.
-- The current checked-out branch is the feature branch, clean at that head. It
-  contains the delivered code revision
-  `d8016610aa7ebf82263413c48b1164e4a64d13df`, followed by documentation-only
-  commits `fb1fc3f`, `5c91603`, `2d5e2f7`, `6a41980`, `fa69d53` and `9b0698f`.
-- The remote Arena branch remains `c0cd3c113c71a25d02ebf9931b6d7b2f42b5109f`.
-  At the recorded ref inspection, the feature branch was a superset of Arena
-  (five feature-only commits, zero Arena-only commits).
-- PR #14 CI at the latest live inspected head: runs `40795420005` and
-  `40795425900`, both completed successfully on
-  `9b0698f86267973a220c914ac0802a5bba171374`. Earlier code/Arena checks are
-  historical only. See [PR14_PROMOTION.md](PR14_PROMOTION.md) for the promotion
-  history.
+  (base branch `main`; head branch `feat/sentiment-features-and-forecasting`).
+  On 2026-11-01 the head was
+  `848de0033f36341d2b85bf060aeeccc674686de5`; the PR changes 87 files against
+  `main` and is MERGEABLE.
+- CI at that head: runs `40799393484` (push) and `40799399662` (pull_request),
+  both successful. Earlier checks are historical for their own SHAs.
+- Local branch `feat/availability-basis-and-preflight` is at
+  `d4cd4050bcab7354fc8998c2b0acc7b44cbd6b79`, one commit ahead of the PR head.
+  It is committed locally but not pushed; push and merge await explicit
+  authorization.
+- PR #14 is not merged and has not been marked ready for review. The historical
+  promotion procedure is in [PR14_PROMOTION.md](PR14_PROMOTION.md).
 
 ## 10. Submission documents
 
@@ -240,34 +227,29 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
 ## 11. Final submission checklist
 
 The source-code verification recorded in
-[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) passed on 2026-10-29
-at code commit `d801661`, and the released documentation/registry commit
-`9b0698f` passed the full suite, both validators and a clean-checkout
-reproduction. At the latest live PR inspection, head was `9b0698f`; both CI
-checks passed on that SHA. External data, authorization and delivery items remain
-pending.
+[FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) passed on 2026-11-01
+at local commit `d4cd405`: 204 tests in a clean copy, Ruff, compileall, both
+validators and `git diff --check`. PR #14 is retargeted to `main`, head
+`848de00`, 87 files changed, with both CI runs green on that SHA. External data,
+authorization and delivery items remain pending.
 
 - [x] Reproducible pipeline, gated news CLI, offline demo, database join, chart,
   outlook and evaluation report implemented and tested.
 - [x] `README.md`, architecture, data policy, tech stack and reproduction
   commands present; `TEST_PLAN.md` is the authoritative test count.
-- [x] The full offline suite (187 passed on 2026-10-29), focused source
-  regressions (64 passed on 2026-10-29), source gates and two-run synthetic demo
-  were verified with code unchanged at `d801661`; docs-only commits followed. The
-  final documentation/registry change also passed the full suite, the focused
-  registry/docs tests (20 passed on 2026-10-29), both validators and
-  `git diff --check`, and its released commit `9b0698f` passed both CI runs and a
-  clean-checkout reproduction.
+- [x] The full offline suite (204 passed on 2026-11-01 at `d4cd405`, in a
+  clean copy excluding the unrelated nested project), Ruff, compileall, both
+  validators and `git diff --check` passed. Historical 2026-10-29 evidence and
+  the two-run synthetic demo remain recorded in the verification report.
 - [x] Requirements audit (28 IDs), traceability matrix, external blockers and
   employer clarifications reconciled to 11 complete, 14 partial, 2 externally
   blocked and 1 needing clarification.
 - [x] GitHub repository link, draft PR #14 link and Markdown evaluation report
   (Sharpe, Sortino, max drawdown) available.
 - [x] Timed 5–7 minute demo script and submission-package documents present.
-- [x] PR #14 head was advanced by non-forced fast-forward to contain `d801661`,
-  and again to `9b0698f` for the final documentation/registry reconciliation;
-  both attached CI runs succeeded on that head and the tree is clean (B8
-  resolved; see [PR14_PROMOTION.md](PR14_PROMOTION.md)).
+- [x] PR #14 is retargeted to `main` (head `848de00`, 87 files) and both CI runs
+  succeeded on that exact SHA. The local follow-up commit `d4cd405` is not
+  pushed; push and merge await explicit authorization (B8 remains historical).
 - [ ] Accepted licensed 180-day X corpus / Actor / spend cap provided (B1/B3),
   and sentiment-enhanced evaluation run with real metrics (R2, R9).
 - [ ] Provider tokens / Actor IDs delivered through an approved private channel

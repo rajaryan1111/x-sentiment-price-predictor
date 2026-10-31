@@ -20,6 +20,25 @@ export APIFY_ACTOR_ID='owner~reviewed-actor-name'
 
 Do not paste the token into chat or commit it. Prefer setting it through your own shell/secret manager rather than storing it in a tracked file.
 
+## Offline preflight (no network, no charge)
+
+Before a paid run, validate the local input file and credential presence:
+
+```bash
+python scripts/smoke_test_apify_x.py \
+  --input-json config/apify_actor_input.example.json \
+  --validate-only
+```
+
+The preflight checks that `searchTerms` covers the ticker, cashtag and keyword
+modes, that every term has one ordered `since:`/`until:` window of at most 180
+days, that `maxItems` is bounded, and that no credential-shaped key is present.
+It reports only boolean credential presence, never a value, and prints
+`network_call_made: false`. It does not prove the Actor's current schema, recall
+or price. Replace the example dates and confirm the reviewed Actor's exact input
+schema first. The operator sequence is: review `ACTOR_REVIEW.md` -> `--validate-only`
+-> a 10-item paid smoke test -> a 7-day pilot -> the full bounded run.
+
 ## Adapter behavior
 
 `ApifyXAdapter.run_and_fetch(...)` is explicit and never runs merely by importing the module. The caller must supply the Actor input plus an item cap, dollar cap and timeout. The initial POST is not automatically retried because a network timeout may leave a paid run's result ambiguous. In that case, inspect the Apify console before another attempt.
