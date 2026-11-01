@@ -44,7 +44,12 @@ the validator and is not a permanent claim.
 
 No live Apify, Tavily, Exa or Coinbase request was made. No real X corpus was
 collected, no archive-mode experiment was run, and no PR was merged. The local
-commits were not pushed at the time of this report.
+commits were not pushed at the time of this report. (Follow-up 2026-11-01: the
+branch was subsequently pushed normally to
+`origin/feat/availability-basis-and-preflight` at tip
+`a75b1595cb9cb418362a332b320c5a734c86991d` after local and remote SHAs were
+verified equal; CI run `41235279232` succeeded on that SHA. This remains the same
+verification evidence; no new QA claim is attached to the push.)
 
 ## Code verification and current documentation checks (2026-10-29)
 

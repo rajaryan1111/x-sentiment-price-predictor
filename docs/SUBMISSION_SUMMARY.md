@@ -4,7 +4,7 @@
 **Repository:** <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 **Assessment PR:** <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
 **Verified working branch:** `feat/sentiment-features-and-forecasting`
-**Status on 2026-11-01:** READY WITH DOCUMENTED LIMITATIONS for engineering delivery; not assignment-complete or externally submitted. PR #14 is open and draft, now based on `main`, not merged. Current verification details are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
+**Status on 2026-11-01:** READY WITH DOCUMENTED LIMITATIONS for engineering delivery; not assignment-complete or externally submitted. PR #14 is open and draft, now based on `main`, not merged. Current verification details are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). The evaluator-facing submission package is in [`submission/`](../submission/).
 
 ## 1. Assignment objective
 
@@ -130,17 +130,20 @@ that question remains untestable without accepted X data.
 
 ### Local verification state (2026-11-01)
 
-On top of PR #14 head `848de0033f36341d2b85bf060aeeccc674686de5`, branch tip
-`346a18c253e587fefb5db413e7843684097a538e` (code commit
-`4264469cd96b5692320af9e695dc39b6f3666e95`) adds the explicit availability basis,
-the offline Apify preflight and a bounded ingestion command. A clean-copy run on
+On top of PR #14 head `848de0033f36341d2b85bf060aeeccc674686de5`, pushed branch
+`feat/availability-basis-and-preflight` at tip
+`a75b1595cb9cb418362a332b320c5a734c86991d` (code commit
+`4264469cd96b5692320af9e695dc39b6f3666e95`; docs commits after it) adds the
+explicit availability basis, the offline Apify preflight and a bounded ingestion
+command. A clean-copy run on
 2026-11-01 that excluded the unrelated untracked `aicte-compliance-ai/` directory
 passed 209 tests, Ruff, compileall, the documentation validator (all links and 28
 matrix rows valid), the dataset-registry validator (12 records) and
 `git diff --check`. The PR itself
 is OPEN, DRAFT and MERGEABLE against `main`; its diff is 87 files and CI runs
-`40799393484` and `40799399662` are green on `848de00`. The local commit is not
-pushed. No live provider call, real X corpus, merge or submission email exists.
+`40799393484` and `40799399662` are green on `848de00`. The branch tip `a75b159`
+was pushed on 2026-11-01 and CI run `41235279232` succeeded on that exact SHA.
+No live provider call, real X corpus, merge or submission email exists.
 Historical 2026-10-29 evidence remains in the verification report.
 
 ## 7. Key limitations
@@ -209,9 +212,10 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
   `main` and is MERGEABLE.
 - CI at that head: runs `40799393484` (push) and `40799399662` (pull_request),
   both successful. Earlier checks are historical for their own SHAs.
-- Local branch `feat/availability-basis-and-preflight` is at
-  `346a18c253e587fefb5db413e7843684097a538e`, four commits ahead of the PR head.
-  It is committed locally but not pushed; push and merge await explicit
+- Branch `feat/availability-basis-and-preflight` is pushed to origin at
+  `a75b1595cb9cb418362a332b320c5a734c86991d` (`a75b159`; code commit `4264469`),
+  five commits ahead of the PR head, with CI run `41235279232` green on that SHA.
+  Neither branch is merged; PR #14 remains draft and both merges await explicit
   authorization.
 - PR #14 is not merged and has not been marked ready for review. The historical
   promotion procedure is in [PR14_PROMOTION.md](PR14_PROMOTION.md).
@@ -250,8 +254,10 @@ authorization and delivery items remain pending.
   (Sharpe, Sortino, max drawdown) available.
 - [x] Timed 5–7 minute demo script and submission-package documents present.
 - [x] PR #14 is retargeted to `main` (head `848de00`, 87 files) and both CI runs
-  succeeded on that exact SHA. The local follow-up commits ending at `4264469` are not
-  pushed; push and merge await explicit authorization (B8 remains historical).
+  succeeded on that exact SHA. The follow-up work is pushed on
+  `feat/availability-basis-and-preflight` (`a75b159`, CI `41235279232` green).
+  Neither branch is merged; PR #14 remains draft and both merges await explicit
+  authorization (B8 remains historical).
 - [ ] Accepted licensed 180-day X corpus / Actor / spend cap provided (B1/B3),
   and sentiment-enhanced evaluation run with real metrics (R2, R9).
 - [ ] Provider tokens / Actor IDs delivered through an approved private channel

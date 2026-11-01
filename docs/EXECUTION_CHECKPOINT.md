@@ -12,12 +12,14 @@ the exact next safe commands, and the blockers. It is not a completion claim.
   `docs/canonical-source-of-truth` to **`main`** after the ancestry and secret
   checks. The diff against `main` is 87 files. CI runs `40799393484` (push) and
   `40799399662` (pull_request) succeeded on `848de00`. The PR is not merged.
-- Local branch `feat/availability-basis-and-preflight` is at
-  `346a18c253e587fefb5db413e7843684097a538e`, four commits on top of `848de00`.
+- Branch `feat/availability-basis-and-preflight` is **pushed to origin** at
+  `a75b1595cb9cb418362a332b320c5a734c86991d`, five commits on top of `848de00`.
   Code commit `4264469` adds the explicit availability basis, the offline Apify
-  preflight and the bounded ingestion command; the tip `346a18c` records their
-  documentation. It is committed locally and **not pushed**; push and merge await
-  explicit authorization.
+  preflight and the bounded ingestion command; the following docs-only commits end
+  at `a75b159`, the pushed tip. CI run `41235279232` succeeded on that exact SHA.
+  Push and merge authorization for this state was granted on 2026-11-01 for this
+  branch only; PR #14 remains draft and unmerged and merging still awaits explicit
+  authorization.
 - A clean-copy run on 2026-11-01 at code `4264469` / branch tip `346a18c`
   (excluding the unrelated untracked `aicte-compliance-ai/` directory) passed 209
   tests, Ruff, compileall, the documentation validator, the dataset-registry
@@ -42,11 +44,13 @@ the exact next safe commands, and the blockers. It is not a completion claim.
 ## Current phase
 
 Priority 1 (PR #14 integration) is prepared: the PR is retargeted to `main` and
-mergeable with green CI. Priority 2 (offline engineering) is complete for the
+mergeable with green CI, and the follow-up availability/preflight branch is
+pushed with green CI. Priority 2 (offline engineering) is complete for the
 availability basis and Apify preflight. The remaining work is external or needs
 authorization:
 
-1. Push the local commit and/or merge PR #14 — explicit authorization required.
+1. Merge PR #14 (and then, in dependency order, the follow-up branch) — explicit
+   authorization required.
 2. Answer B9 (availability basis) and B10 (stale registry snapshot) and approve
    one X source, a paid plan, a hard spend cap and a private credential route.
 3. Run the 7-day pilot, then the bounded 180-day ingestion, then the real
@@ -72,8 +76,9 @@ No live provider call is authorized.
 
 ## Pending tasks
 
-1. Push `346a18c` to `feat/sentiment-features-and-forecasting` and let CI run on
-   the exact SHA — only after explicit push authorization.
+1. ~~Push the local commits~~ **Done 2026-11-01**: the branch was pushed normally
+   (no force) to `origin/feat/availability-basis-and-preflight` at `a75b159`; local
+   and remote SHAs match and CI run `41235279232` is green on that SHA.
 2. Merge PR #14 with a merge commit — only after explicit merge authorization.
 3. Close or annotate PRs #9–#13 only with patch-equivalence evidence. #9–#11 are
    fully contained in `848de00`; #12/#13 have 5 and 9 non-contained commits, so
