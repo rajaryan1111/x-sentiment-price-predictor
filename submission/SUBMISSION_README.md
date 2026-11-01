@@ -41,6 +41,7 @@ remains blocked on employer/provider authorization (see
 | [DEMO_SCRIPT.md](DEMO_SCRIPT.md) | 5–7 minute evaluator walkthrough |
 | [SUBMISSION_CHECKLIST.md](SUBMISSION_CHECKLIST.md) | Completed vs outstanding, and the unsent email draft pointer |
 | [FINAL_EVALUATION_REPORT.md](FINAL_EVALUATION_REPORT.md) | Independent final-gate audit: coverage, verified evidence, defects fixed and the final verdict |
+| [EMPLOYER_EMAIL_DRAFT.md](EMPLOYER_EMAIL_DRAFT.md) | Unsent ready-to-send clarification email (snapshot; canonical text in `docs/EMPLOYER_CLARIFICATIONS.md`) |
 
 Canonical engineering documentation stays in the repository root
 (`PRD.md`, `ARCHITECTURE.md`, `DESIGN.md`, `DATA_POLICY.md`, `MODEL_PLAN.md`,

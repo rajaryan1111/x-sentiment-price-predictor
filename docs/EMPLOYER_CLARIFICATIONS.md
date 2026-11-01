@@ -183,9 +183,14 @@ placeholder and no adapter-level tests.
 >    confirmation of 180-day coverage (Q5).
 > 5. The approved private channel for delivering any provider tokens/Actor IDs,
 >    since I will not put secrets in email, chat or the repository (Q6).
-> 6. A hard spend cap for any paid collection (Q7).
+> 6. A hard item-count **and** USD spend cap for any paid collection (Q7).
 > 7. The accepted final submission format (Markdown vs PDF, video/screenshots),
 >    delivery channel, and re-confirmation of this recipient address (Q8, Q9).
+> 8. For any historical archive collected after the fact, whether post creation
+>    time may be treated as its availability time for the 180-day backtest, with
+>    the mandatory disclosure in every report that look-ahead bias cannot be
+>    excluded — or whether a forward-collected window is preferred (Q10, Q11;
+>    the code supports both, disclosed and opt-in only).
 >
 > Once the data source, credential route, spend cap and target convention are
 > confirmed, I can run the sentiment-enhanced evaluation, record the actual
