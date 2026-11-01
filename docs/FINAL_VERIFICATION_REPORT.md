@@ -9,7 +9,7 @@ The full source-tree verification was run on the execution changes:
 | `uv run pytest -q -ra` | See the current count in [TEST_PLAN.md](../TEST_PLAN.md); this report follows the 2026-11-01 run. |
 | `uv run ruff check src tests scripts` | Pass |
 | `uv run python -m compileall -q src tests scripts` | Pass |
-| `uv run python scripts/validate_docs.py` | Pass: 102 relative links, 4 test-count claims, 28 matrix rows |
+| `uv run python scripts/validate_docs.py` | Pass: 102 relative links, 5 test-count claims, 28 matrix rows |
 | `uv run python scripts/validate_dataset_registry.py` | Pass: 12 records structurally valid |
 | Apify `--validate-only` preflight | `valid: true`; `network_call_made: false`; `paid_run_launched: false` |
 | Binance archive build | 36 published checksum matches; 180 complete, unique daily rows |

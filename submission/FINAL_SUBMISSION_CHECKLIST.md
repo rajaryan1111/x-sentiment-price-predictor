@@ -27,7 +27,7 @@
 | Full pytest suite | Current count and command: [TEST_PLAN.md](../TEST_PLAN.md). |
 | Ruff | Pass |
 | Python compilation | Pass |
-| Documentation validation | Pass: 102 relative links, 4 test-count claims, 28 requirement rows |
+| Documentation validation | Pass: 102 relative links, 5 test-count claims, 28 requirement rows |
 | Dataset registry validation | Pass: 12 records structurally valid |
 | Apify validate-only preflight | Pass; no network call and no paid run |
 | Binance archive builder | Pass: 36 published checksum matches, 180 complete bars |
