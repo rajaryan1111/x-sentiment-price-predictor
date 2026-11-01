@@ -62,7 +62,7 @@ snapshot is intentionally not committed; refetch it:
 ```bash
 python -m xsentiment fetch-prices \
   --start 2026-04-29 --end 2026-10-26 \
-  --out data/btc-usd-180d-snapshot.json --now 2026-10-26T00:00:00+00:00
+  --out data/btc-usd-180d-snapshot.json
 
 python -m xsentiment run \
   --prices data/btc-usd-180d-snapshot.json \
@@ -71,13 +71,16 @@ python -m xsentiment run \
   --input-note "refetch of the committed BTC-USD 180d snapshot"
 ```
 
-`fetch-prices` needs outbound HTTPS to Coinbase. The regenerated snapshot's
-SHA-256 must match the committed manifest's
-`09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`; the
-2026-10-27 fresh-clone verification reproduced every metric within 5e-13.
-Output writes to `reports/regenerated-btc-usd-180d/` (inside the ignored
-`reports/generated`-style path pattern); the original committed report is
-never overwritten.
+`fetch-prices` needs outbound HTTPS to Coinbase. The committed manifest records
+`provenance.price_snapshot_sha256` =
+`09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75` for the
+original 2026-10-26 snapshot. Your refetched file will NOT be byte-identical to
+that hash: every snapshot embeds the UTC moment of its own fetch in
+`fetched_at`, by design. Compare at the data level instead — the
+2026-11-01 clean-environment verifier confirmed a fresh refetch is byte-equal to
+a second refetch on `candles` (180/180 rows) and reproduced every committed
+forecast metric exactly with `--now 2026-10-26T00:00:00+00:00`.Output writes to `reports/regenerated-btc-usd-180d/`; the original committed
+report is never overwritten.
 
 ## Persisted-database path (R15)
 
@@ -111,7 +114,8 @@ python -m xsentiment run --prices <prices.json> --posts <posts.jsonl> \
 Judge the wiring without spending anything:
 
 ```bash
-python scripts/smoke_test_apify_x.py --validate-only    # no network call
+python scripts/smoke_test_apify_x.py \
+  --input-json config/apify_actor_input.example.json --validate-only    # no network call
 ```
 
 Bounded ingestion — a real Actor run is prohibited until the employer selects

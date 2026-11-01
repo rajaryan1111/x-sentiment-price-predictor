@@ -67,7 +67,7 @@ reported truthfully (as unavailable or sparse Hollander-Hinkle ICB).
 
 ```bash
 python -m xsentiment fetch-prices --start 2026-04-29 --end 2026-10-26 \
-  --out data/btc-usd-180d-snapshot.json --now 2026-10-26T00:00:00+00:00
+  --out data/btc-usd-180d-snapshot.json
 python -m xsentiment run --prices data/btc-usd-180d-snapshot.json \
   --out reports/regenerated-btc-usd-180d --now 2026-10-26T00:00:00+00:00
 ```
@@ -91,7 +91,8 @@ and talk through the three headline facts:
 
 ```bash
 python scripts/ingest_apify_x.py --help
-python scripts/smoke_test_apify_x.py --validate-only   # zero-cost configuration check
+python scripts/smoke_test_apify_x.py \
+  --input-json config/apify_actor_input.example.json --validate-only   # zero-cost configuration check
 ```
 
 Show [docs/APIFY_X_SETUP.md](../docs/APIFY_X_SETUP.md) and
