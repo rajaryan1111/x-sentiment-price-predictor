@@ -14,6 +14,10 @@ reason is stated.
 - **Asset:** BTC-USD daily, UTC. **Price source:** Coinbase Exchange public
   candles — 180/180 bars, 2026-04-29 → 2026-10-25 UTC, no gaps or duplicates.
 - **X data:** none accepted — 0 posts. This is the crunch limitation.
+- **Cutoff counts:** the dataset profile has 180 forecast cutoffs, 175 with a
+  complete `n+0`…`n+5` target, while evaluation has 174 eligible rows. One
+  full-horizon cutoff lacks a reference close and is excluded by the evaluator;
+  these counts describe different populations, not a report/manifest conflict.
 - **Evaluation:** 5 purged expanding walk-forward folds (60→140 training rows,
   20-row test blocks, 5-row purge); 100 out-of-sample days per model and
   horizon; 1,800 stored predictions.

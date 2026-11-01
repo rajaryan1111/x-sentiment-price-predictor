@@ -14,10 +14,11 @@ source .venv/bin/activate
 python -m pip install -e '.[dev,storage]'
 ```
 
-Copy `.env.example` to `.env` if you want configuration anywhere; all values
-are placeholders. **Never put real tokens in `.env`-tracked files or in Git.**
-Optional credentials (`APIFY_API_TOKEN`, `APIFY_ACTOR_ID`, `TAVILY_API_KEY`,
-`EXA_API_KEY`) remain unset unless you have authorized sources.
+Copy `.env.example` to `.env` if you want local configuration; its provider
+entries are blank placeholders. **Never put real tokens in tracked files or
+Git.** Configuring a token or candidate Actor ID does not establish employer
+approval, licensing, permission to spend, or an approved private transfer route.
+Do not make live calls until those decisions are confirmed.
 
 ## Verify the project first (about 1 minute)
 

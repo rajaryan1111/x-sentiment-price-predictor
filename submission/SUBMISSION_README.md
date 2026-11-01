@@ -2,7 +2,7 @@
 
 **Candidate project:** `rajaryan1111/x-sentiment-price-predictor`
 **Assessment PR (draft, not merged):** <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
-**Assessment recipient:** gilad@crowdwisdomtrading.com
+**Recipient recorded from the historical brief transcription (unconfirmed):** gilad@crowdwisdomtrading.com
 **Package date:** 2026-11-01
 
 ## What this project is
@@ -100,7 +100,8 @@ reproduction steps, including the labelled synthetic demo, are in
   metrics, chart, outlook and evaluation report.
 - **Not yet demonstrated:** a genuine sentiment-versus-price comparison on
   accepted real X posts (R2/R9), a live Apify or Tavily call, and the email
-  submission itself.
+  submission itself. Local Apify/Tavily configuration is not employer approval;
+  the candidate Actor and recipient remain unconfirmed.
 - **Overall verdict:** see [SUBMISSION_CHECKLIST.md](SUBMISSION_CHECKLIST.md).
 
 ## Top limitations

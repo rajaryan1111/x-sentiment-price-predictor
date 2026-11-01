@@ -79,13 +79,15 @@ none has an employer answer on record.
 
 | Provider | Assignment role | Repository integration evidence | Identifiers / live status | Assessment |
 | --- | --- | --- | --- | --- |
-| **Apify** | Named by the assessment's X-post scraping requirement and submission credential/Actor-ID request. | A real configurable adapter exists at `src/xsentiment/ingestion/apify_x.py`, settings/environment configuration and `.env.example` placeholders exist, and `tests/unit/test_apify_x.py` plus end-to-end fixture tests cover mocked payloads. Setup guidance is in `docs/APIFY_X_SETUP.md`. | No Actor ID or configured credential is available in the inspected environment. No authorized live run, accepted post corpus, or live integration test has occurred. | Required adapter path is engineering-ready but actual 180-day data collection is blocked on employer source/terms approval, Actor choice, credentials and an explicit cost ceiling. Never infer Actor identity from an adapter. |
-| **Tavily** | The assessment names Tavily for recent relevant news to complement X sentiment; conservative project interpretation is context for outlook only, not a model feature. | A working bounded Tavily adapter, explicitly gated CLI (`fetch-news --confirm-live-call`), offline JSONL handoff and tests exist. Provider behavior is mocked, including bounds and sanitization. | No key was available in the inspected environment; no live call or integration test. | Engineering adapter complete offline; whether a live call is required and its spend limit need employer/user authorization. |
-| **Exa** | Appears in the assessment's submission line requesting credentials; the detailed project scope names Tavily, not Exa. No other required Exa operation is evidenced by the recorded brief. | No Exa client/adapter, Exa-specific tests or usage documentation were found. There is only a SecretStr configuration placeholder and a configuration-presence check; that is not an integration. | No key was available in the inspected environment and no usage was found; no Exa identifier is required or available. | Do not add an unnecessary Exa integration. Ask whether Exa is actually required. If not used, report no Exa credential/identifier rather than claiming integration. |
+| **Apify** | Named by the assessment's X-post scraping requirement and submission credential/Actor-ID request. | A configurable adapter exists at `src/xsentiment/ingestion/apify_x.py`; fixture tests cover mocked payloads. Setup guidance is in `docs/APIFY_X_SETUP.md`. | A token and a candidate Actor ID are present in local configuration. No employer approval, licence confirmation, authorized live run, accepted post corpus or live integration test exists. | The adapter path is offline-tested; actual collection remains blocked on employer source/terms approval, candidate Actor review, an explicit cost ceiling and private credential handling. Local configuration is not authorization. |
+| **Tavily** | The assessment names Tavily for recent relevant news to complement X sentiment; conservative project interpretation is context for outlook only, not a model feature. | A working bounded Tavily adapter, explicitly gated CLI (`fetch-news --confirm-live-call`), offline JSONL handoff and tests exist. Provider behavior is mocked, including bounds and sanitization. | A key is present in local configuration, but no live call or integration test has occurred. | Engineering adapter complete offline; whether a live call is required and its spend limit need employer/user authorization. |
+| **Exa** | Appears in the assessment's submission line requesting credentials; the detailed project scope names Tavily, not Exa. No other required Exa operation is evidenced by the recorded brief. | No Exa client/adapter, Exa-specific tests or usage documentation were found. A configuration placeholder/presence check is not an integration. | The local Exa setting is blank; no use or integration exists. | Do not claim Exa integration. Ask whether Exa is required before considering implementation. |
 
-Provider configuration was inspected without displaying values: `.env.example` contains placeholders only, and the prior 2026-10-29 environment inspection recorded `APIFY_TOKEN`,
-`APIFY_API_TOKEN`, `APIFY_ACTOR_ID`, `TAVILY_API_KEY` and `EXA_API_KEY` absent
-from the process environment and project `.env`. No live API calls were made in this audit.
+Provider configuration was inspected on 2026-11-01 without displaying values:
+`.env.example` contains placeholders only; the ignored local `.env` has Apify
+token, candidate Actor ID and Tavily key entries configured, while Exa is blank.
+This local setup is not employer approval, licence confirmation, authorization
+to spend, or an approved credential-transfer route. No live API calls were made.
 
 ### 3B. Candidate dataset checks (2026-10-29; page/metadata review only)
 
@@ -127,7 +129,7 @@ placeholder and no adapter-level tests.
 
 ## 4. Ready-to-send email draft (NOT SENT)
 
-**To:** `gilad@crowdwisdomtrading.com` (re-verify against the original brief — Q9)
+**Recorded recipient (unconfirmed):** `gilad@crowdwisdomtrading.com` (re-verify against the original brief — Q9)
 **Subject:** X Sentiment Price Predictor — internship assignment deliverables and clarification request
 
 > Hello,
@@ -136,8 +138,8 @@ placeholder and no adapter-level tests.
 >
 > **Repository:** <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 > **Assessment PR:** <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
-> **Branch:** `feat/sentiment-features-and-forecasting` (PR #14; check GitHub for the live SHA)
-> **Evaluation report:** [Markdown report](https://github.com/rajaryan1111/x-sentiment-price-predictor/blob/feat/sentiment-features-and-forecasting/reports/btc-usd-180d/evaluation-report.md) (per-horizon MAE/RMSE and methodology, plus Sharpe, Sortino and max drawdown where valid).
+> **Branch:** `feat/availability-basis-and-preflight` (local branch at the time this draft was reconciled; verify PR #14's live head before sending)
+> **Evaluation report:** [Markdown report](https://github.com/rajaryan1111/x-sentiment-price-predictor/blob/feat/availability-basis-and-preflight/reports/btc-usd-180d/evaluation-report.md) (per-horizon MAE/RMSE and methodology, plus Sharpe, Sortino and max drawdown where valid; verify the live branch head before sending).
 > **Documentation:** the submission summary, requirements audit, verification
 > report, demo walkthrough and outlook/chart artifacts are also in the repository.
 >
@@ -160,7 +162,7 @@ placeholder and no adapter-level tests.
 >
 > **Reproduction:** from the repository root, install with `python -m pip install -e '.[dev,storage]'`; run `pytest`, `ruff check src tests scripts`, `python scripts/validate_docs.py`, and `python scripts/validate_dataset_registry.py`. For a fully offline software demonstration, run `python scripts/make_offline_demo.py --out reports/generated/offline-demo-inputs/prices.json --posts-out reports/generated/offline-demo-inputs/posts.jsonl --generated-at 2026-10-27T00:00:00+00:00`, then follow the README's `python -m xsentiment run` command using those generated files and label outputs synthetic. The historical real-price report is also reproducible: re-running `python -m xsentiment run --prices data/btc-usd-daily-2026-04-29_2026-10-25.json --out <dir> --now 2026-10-26T00:00:00+00:00` reproduces its `metrics.json` with zero differences, provided that public snapshot is re-fetched with `fetch-prices` first (it is not committed).
 >
-> **Provider identifiers and credentials:** no Apify Actor was selected or run, so there is no Actor ID or Apify credential used to report. Tavily has a mocked-tested adapter but no live request/key was used. Exa is not integrated or used, and no Exa identifier exists. No secrets are included. No secure credential-transfer channel has been agreed; please specify an approved private method and recipient. I will not send tokens in plaintext email.
+> **Provider identifiers and credentials:** an Apify token, candidate Actor ID and Tavily key are configured locally, but no employer approval, licence confirmation, spend cap, private transfer channel or live provider call exists. No accepted X corpus has been collected. Exa is not integrated. No secret values are included here; please confirm an approved source and private credential method. I will not send tokens in plaintext email.
 >
 > **Verified results (honest).** On the committed historical real-price run (180
 > public Coinbase daily bars, zero X posts), mean MAE was naive $1,828.36 vs

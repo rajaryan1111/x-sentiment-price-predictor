@@ -17,7 +17,8 @@ manifest behind them; next to each item is the evidence source. Items marked
 - ✅ Naive / price-only / sentiment-plus-price comparison — empirically
   honest: naive wins; sentiment price model is not identifiable because no
   accepted posts exist (visible in `metrics.json` warnings rather than hidden).
-- ✅ Walk-forward validation across 6 folds with identical training rows;
+- ✅ Walk-forward validation across **5 purged folds** with identical training rows;
+  the six forecast horizons (`n+0` through `n+5`) are distinct from the fold count;
   `tests/unit/test_walk_forward.py`.
 - ✅ Strategy/risk metrics: Sharpe, Sortino, max drawdown, annualisation,
   fees, sample counts, hit rate, exposure — nulls carry an explicit reason
@@ -68,10 +69,11 @@ manifest behind them; next to each item is the evidence source. Items marked
 - ✅ This submission package: overview, requirement traceability,
   methodology, verified-results-only page, limitations, reproducibility,
   demo script, this checklist.
-- ✅ 209 offline tests at the 2026-11-01 verification (authoritative count in
-  `TEST_PLAN.md`), Ruff clean, compileall clean, both validators passing,
-  `git diff --check` clean, CI green at the verified SHAs
-  (`docs/FINAL_VERIFICATION_REPORT.md`).
+- ✅ 209 offline tests passed at the 2026-11-01 recorded verification
+  (authoritative count in `TEST_PLAN.md`), with Ruff, compileall, both
+  validators and `git diff --check` clean. CI success is recorded for the
+  earlier pushed SHA in `docs/FINAL_VERIFICATION_REPORT.md`; it does not verify
+  this documentation-only reconciliation.
 
 ## Externally blocked (exact missing inputs)
 

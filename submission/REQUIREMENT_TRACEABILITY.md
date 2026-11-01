@@ -26,7 +26,7 @@ clarification.**
 | R10 | Visual matrix: sentiment **change** vs price | `reporting/charts.py` (`sentiment_change_points`) | `test_reporting.py`; committed SVG renders with labelled empty sentiment panels | Partially complete |
 | R11 | One-page current sentiment outlook | `reporting/outlook.py` + page contract check | `reports/btc-usd-180d/outlook.md`; contract tests | Partially complete |
 | R12 | Evaluation report with Sharpe/Sortino/max drawdown where valid | `backtesting/metrics.py`, `strategy.py`, `reporting/report.py` | `reports/btc-usd-180d/evaluation-report.md`; metric/strategy tests | Verified complete |
-| R13 | Reproducibility package (setup, queries, hashes, secret route) | README, `.env.example`, manifest provenance | fresh-clone verification 2026-10-27 at `ed2c5a4`; placeholder-only env; no Actor ID yet | Partially complete |
+| R13 | Reproducibility package (setup, queries, hashes, secret route) | README, `.env.example`, manifest provenance | fresh-clone verification 2026-10-27 at `ed2c5a4`; placeholder-only env; candidate Actor ID is locally configured but not employer-approved | Partially complete |
 | R14 | Automated schema/timestamp/alignment/feature/target/metric/report tests | `tests/unit`, `tests/integration` | 209 tests passed 2026-11-01 (code `4264469`); CI lint+validators green | Partially complete |
 | R15 | Persist and join X posts and price bars in a database | `storage/models.py`, `repositories.py`, `persist` + `run --database-url` | `test_storage_join.py`, `test_phase3_ingestion_e2e.py` (manifest `input_source=persisted_storage`) | Verified complete |
 | NFR1 | Reproducibility metadata without secrets | `forecast_run.py` provenance/lineage | `test_pipeline.py`, offline-demo lineage checks | Verified complete |
@@ -36,12 +36,12 @@ clarification.**
 | NFR5 | Exclusions audited; post text never logged by default | `local_dataset_profile.py`, `reporting/report.py` | `test_local_dataset_profile.py`, `test_reporting.py` | Verified complete |
 | NFR6 | Fixtures/in-sample never presented as real OOS | reports, docs validator | `test_reporting.py`, `scripts/validate_docs.py` | Verified complete |
 | A1 | Submit within the stated timeline | n/a | brief gives "one week" and "5–7 days", no calendar date; employer reply needed | Needs clarification |
-| A2 | Provide Apify/Tavily/Exa tokens and Actor IDs | `.env.example` placeholders only | no Actor ID/token exists; private transfer route undefined | **Blocked by external dependency** |
+| A2 | Provide Apify/Tavily/Exa tokens and Actor IDs | `.env.example` placeholders only | Apify and Tavily credentials plus a candidate Actor ID are configured locally; no employer approval, spend cap, private transfer route or live call exists | **Blocked by external dependency** |
 | A3 | Use the linked historical tweet resource | registry + profiler | Google Doc re-fetched 2026-10-29 = 12-link compilation, not a corpus; no rows profiled | Partially complete |
 | A4 | Ingest recent news with Tavily (context) | `fetch-news --confirm-live-call`, `run --news-file` | mocked tests cover streaming bounds, sanitization, no-retry, offline isolation | Partially complete |
 | A5 | ML / RL offering | supervised ML path | naive + price-only + candidate model unit-tested; no RL environment defined | Verified complete |
 | A6 | Historical dataset link inventory | `data/registry/historical_twitter_x_datasets.json` + validator | 12 records validated; independently reverified three listing/card metadata | Partially complete |
-| A7 | Email the repository link, tokens/Actor IDs, evaluation report | this package + `docs/EMPLOYER_CLARIFICATIONS.md` draft | no email sent; no tokens exist; packet assembled | Partially complete |
+| A7 | Email the repository link, tokens/Actor IDs, evaluation report | this package + `docs/EMPLOYER_CLARIFICATIONS.md` draft | no email sent; Apify/Tavily credentials and a candidate Actor ID are configured locally but not approved or delivered; packet assembled | Partially complete |
 
 Legend: statuses use the canonical vocabulary **Verified complete /
 Partially complete / Not implemented / Blocked by external dependency /

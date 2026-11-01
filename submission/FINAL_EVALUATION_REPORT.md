@@ -2,7 +2,7 @@
 
 This report is the independent final-gate audit of the repository branch
 `feat/availability-basis-and-preflight`. It re-verified the implementation,
-.documentation, tests, CLI workflows and every artefact of this package from a
+documentation, tests, CLI workflows and every artifact of this package from a
 clean environment, fixed the defects it found, and states a final verdict.
 All numbers below were re-measured on 2026-11-01 unless marked historical.
 
@@ -44,7 +44,7 @@ one-page outlook, Markdown report and a lineage-complete manifest. Full text:
 | Source | Status on this branch |
 | --- | --- |
 | Coinbase public `BTC-USD` daily candles | **Verified.** 180/180 bars, 2026-04-29→2026-10-25 UTC, no gaps/duplicates; committed manifest pins the snapshot SHA-256 `09ce225a…` and every run records `fetched_at` |
-| X/Twitter posts | **Zero accepted.** No Actor, licence, token or spend cap exists (B1–B3, B10). Adapter, preflight and bounded ingest are implemented and fixture-tested only |
+| X/Twitter posts | **Zero accepted.** A candidate Actor ID and credentials are configured locally, but employer approval, licensing, spend cap and private credential route are absent (B1–B3, B10). No live Actor run or paid scrape occurred. |
 | Tavily news | Adapter + gated single-call CLI, mocked-verified; never called live; context-only, never a feature |
 | Registry candidates | 12 machine-validated records; none approved, downloaded or row-profiled |
 
@@ -76,6 +76,9 @@ From the committed historical run
   stated.
 - 5 purged folds, 100 out-of-sample days per (model, horizon), 1,800 stored
   predictions.
+- The dataset profile records 175 cutoffs with a full six-horizon target;
+  evaluation has 174 eligible rows because one full-horizon cutoff has no
+  reference close. The populations differ by that eligibility condition.
 
 ## 7. Data leakage and availability limitations
 
@@ -94,13 +97,13 @@ From the committed historical run
 
 | Gate | Result |
 | --- | --- |
-| `pytest -q` in a clean checkout of the pushed tip | **209 passed** (authoritative count: [TEST_PLAN.md](../TEST_PLAN.md)) |
+| `pytest -q` in a clean checkout of the pushed tip | **209 passed on 2026-11-01** (historical verification; authoritative count: [TEST_PLAN.md](../TEST_PLAN.md)) |
 | `ruff check src tests scripts` | clean |
 | `compileall -q src tests scripts` | clean |
 | `scripts/validate_docs.py` | OK — all links, 28 matrix rows valid |
 | `scripts/validate_dataset_registry.py` | OK — 12 records |
 | `git diff --check` | clean |
-| GitHub Actions CI | success: [run `41267305862`](https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/41267305862) checked out exact branch tip `33c24dcb7d9d6664bd456f00ae9f477278cdb8cf` (confirmed in checkout logs); lint, dataset-registry validation, documentation validation and pytest all succeeded; **209 passed** |
+| GitHub Actions CI | success: [run `41267305862`](https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/41267305862) checked out exact branch tip `33c24dcb7d9d6664bd456f00ae9f477278cdb8cf` (confirmed in checkout logs); lint, dataset-registry validation, documentation validation and pytest all succeeded; **209 passed on 2026-11-01**. This CI run predates the current local HEAD. |
 
 Clean-environment reproduction (fresh venv, install from committed
 `pyproject.toml` only, all offline):
@@ -159,31 +162,13 @@ The unsent email draft is in
 
 ## 11. Submission recommendation and verdict
 
-**Verdict: READY TO SUBMIT WITH DISCLOSED LIMITATIONS.**
+**Verdict: The technical submission package is prepared with disclosed limitations; external submission remains pending.**
 
 Every deliverable that does not require external authorization is complete,
-tested (209 offline tests re-passed on 2026-11-01 per
-[TEST_PLAN.md](../TEST_PLAN.md)), lint-clean, validator-clean and CI-green on the
-pushed tip, with a reproducible clean-environment workflow verified this
-audit. The only outstanding items — the real X corpus, its credentials and
-cap, and four employer convention decisions — are exactly the ones the
-original assignment requires the user/employer to provide, and they are
-documented with exact handoff instructions rather than hidden.
-
-## Scorecard (evidence-based, not inflated)
-
-| Dimension | Rating | Evidence |
-| --- | --- | --- |
-| Functional completeness | **4.5/5** with limits: | All offline mandatory requirements implemented and tested; the real-data path cannot be demonstrated by design until authorized (R2/A2 blocked, 1 clarification) |
-| ML methodology correctness | **4.5/5** | Point-in-time alignment, purged walk-forward, identical folds, honest nulls, fail-closed availability; `n+0` convention is a recorded working default (B4 open) |
-| Data integrity | **3/5** | Price data fully verified (coverage, gaps, duplicates, hash lineage); zero accepted X data, sentiment unmeasured |
-| Software engineering quality | **4.5/5** | Typed boundaries, bounded ingestion, no paid-call retries, idempotent storage, no secrets committed, 209 offline tests at the 2026-11-01 verification (see
-[TEST_PLAN.md](../TEST_PLAN.md)), gate discipline |
-| Reproducibility | **4.5/5** | Byte-identical demo re-runs; exact metric reproduction from both file and persisted-database paths; manifest lineage; `fetched_at` snapshot limitation now documented honestly |
-| Documentation quality | **4.5/5** | Nine canonical docs + 10-artifact package, machine-validated links/matrix; the audit's four defects fixed and re-verified |
-| Submission readiness | **4/5** | Everything submittable is submitted; empirical sentiment conclusion awaits the authorized corpus |
-
-The 0.5-point deductions across methodology/reproducibility/engineering are
-for the same root cause: without a live provider run, adapter behavior
-against the real Actor schema and the live-notifiable behavior of gated
-commands remain synthetically verified only.
+tested (209 offline tests passed on 2026-11-01 per
+[TEST_PLAN.md](../TEST_PLAN.md)), lint-clean and validator-clean, with a
+reproducible clean-environment workflow. Outstanding items include an approved
+X source and corpus, licensing confirmation, explicit spend caps, private
+credential transfer, employer decisions on conventions and submission format,
+recipient confirmation, and any required live Tavily call. The unsent email
+draft is not evidence of delivery or employer approval.

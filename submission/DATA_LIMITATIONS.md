@@ -8,8 +8,13 @@ this page consolidates the ones that affect the submitted evidence.
 
 ## 1. No accepted X corpus — the central limitation
 
-- No Apify Actor has been selected, licensed or run; no API token, Actor ID,
-  spend cap or private credential route exists (blockers R2, A2, B1–B3, O13).
+- No Apify Actor has been approved, licensed or run. Local configuration contains
+  an Apify token and a candidate Actor ID, but that does not establish employer
+  approval, licensing, a spend cap or an authorized private credential route
+  (blockers R2, A2, B1–B3, O13). No live Actor run or paid X scrape has occurred.
+- A Tavily key is locally configured, and the adapter exists, but no live Tavily
+  request has been made. Exa is not implemented as a provider integration; its
+  configuration placeholder is not evidence of working Exa support.
 - The assessment-linked Google Doc was re-fetched on 2026-10-29 and is a
   12-entry dataset-*link* compilation, not a tweet corpus. Three candidate
   public listing/card metadata were checked, but no candidate rows were

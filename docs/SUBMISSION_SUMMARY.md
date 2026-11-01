@@ -3,8 +3,8 @@
 **Project:** X Sentiment Price Predictor
 **Repository:** <https://github.com/rajaryan1111/x-sentiment-price-predictor>
 **Assessment PR:** <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
-**Verified working branch:** `feat/sentiment-features-and-forecasting`
-**Status on 2026-11-01:** READY WITH DOCUMENTED LIMITATIONS for engineering delivery; not assignment-complete or externally submitted. PR #14 is open and draft, now based on `main`, not merged. Current verification details are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). The evaluator-facing submission package is in [`submission/`](../submission/).
+**Verified working branch at the 2026-11-01 verification:** `feat/availability-basis-and-preflight`
+**Status on 2026-11-01:** READY WITH DOCUMENTED LIMITATIONS for engineering delivery; not assignment-complete or externally submitted. The last recorded PR #14 inspection says it was open and draft; its live state has not been rechecked in this reconciliation. Current verification details are in [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md). The evaluator-facing submission package is in [`submission/`](../submission/).
 
 ## 1. Assignment objective
 
@@ -86,7 +86,7 @@ and `ruff`; charts are dependency-free SVG. See
 | Source | Status in this submission | Use |
 | --- | --- | --- |
 | Coinbase Exchange public BTC-USD daily candles | Historical real-data run recorded on 2026-10-26; 180/180 bars, SHA-256 `09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`. The raw snapshot is not committed and was not refetched here. | Price features, targets, historical evaluation |
-| X/Twitter 180-day corpus | **Not accepted.** No approved Actor, licence, credential, spend cap or post-level text dataset exists. | Required for a genuine sentiment result; currently unavailable |
+| X/Twitter 180-day corpus | **Not accepted.** Candidate Actor ID and credentials are locally configured, but no employer-approved Actor, licence, spend cap or post-level text dataset exists. | Required for a genuine sentiment result; currently unavailable |
 | Tavily/Exa live news | **Not called.** Adapter and CLI are mocked-verified only. | Optional outlook context |
 | Assessment dataset-link Google Doc | Full text re-fetched 2026-10-29; 12-entry link compilation, not a tweet corpus. Three candidate listings/cards were partially checked; no dataset rows or rights were verified. | Candidate inventory only |
 | Synthetic offline demo | Deterministic generator; labelled `synthetic` in files, records, manifest, report and outlook. | Software demonstration only; never reported as market evidence |
@@ -152,10 +152,10 @@ Historical 2026-10-29 evidence remains in the verification report.
   checkout. R2 is externally blocked and the sentiment-versus-price comparison is
   unmeasured. Three public candidate listing/card metadata were checked but no rows
   or rights were verified.
-- A prior 2026-10-29 inspection recorded APIFY_TOKEN, APIFY_API_TOKEN,
-  TAVILY_API_KEY and EXA_API_KEY absent from the process environment and project-local
-  `.env` files. No Actor ID, approved private transfer channel or paid-spend authorization
-  was found; no live provider call was made.
+- The ignored local `.env` was inspected on 2026-11-01 without displaying values:
+  an Apify token, candidate Actor ID and Tavily key are configured; Exa is blank.
+  These are not employer approval, licensing confirmation, spend authorization
+  or an approved private transfer route. No live provider call was made.
 - The employer has not confirmed the `n+0` target convention, exact calendar
   deadline, whether live Tavily news is mandatory or the final submission format.
 - The assignment PDFs are not present in this checkout. The raw 180-day price
