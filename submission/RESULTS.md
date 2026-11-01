@@ -1,80 +1,36 @@
-# Results (verified artefacts only)
+# Historical results recorded in committed artifacts
 
-Everything below is read from committed, reproducible artefacts in
-[`reports/btc-usd-180d/`](../reports/btc-usd-180d/) (`manifest.json`,
-`metrics.json`, `evaluation-report.md`, `outlook.md`,
-`sentiment-vs-price.svg`), cross-checked against
-[`docs/SUBMISSION_SUMMARY.md`](../docs/SUBMISSION_SUMMARY.md) and
-[`docs/FINAL_VERIFICATION_REPORT.md`](../docs/FINAL_VERIFICATION_REPORT.md).
-No number here is invented; where a metric could not be computed honestly, the
-reason is stated.
+Source: `reports/btc-usd-180d/metrics.json`, `manifest.json`, `evaluation-report.md`, `outlook.md`, and `sentiment-vs-price.svg`. The underlying 180-day price snapshot and per-prediction rows are not present in this checkout. Values below were cross-checked against the aggregate metrics artifact and report; they were not freshly recomputed from raw data in this audit.
 
 ## Run basis
 
-- **Asset:** BTC-USD daily, UTC. **Price source:** Coinbase Exchange public
-  candles — 180/180 bars, 2026-04-29 → 2026-10-25 UTC, no gaps or duplicates.
-- **X data:** none accepted — 0 posts. This is the crunch limitation.
-- **Cutoff counts:** the dataset profile has 180 forecast cutoffs, 175 with a
-  complete `n+0`…`n+5` target, while evaluation has 174 eligible rows. One
-  full-horizon cutoff lacks a reference close and is excluded by the evaluator;
-  these counts describe different populations, not a report/manifest conflict.
-- **Evaluation:** 5 purged expanding walk-forward folds (60→140 training rows,
-  20-row test blocks, 5-row purge); 100 out-of-sample days per model and
-  horizon; 1,800 stored predictions.
-- **Models:** naive persistence; price-only ridge; sentiment-plus-price ridge.
+- BTC-USD daily, UTC; manifest records 180 bars from 2026-04-29 through 2026-10-25.
+- X posts supplied: 0; posts scored: 0; eligible cutoffs with scored sentiment: 0.
+- Five purged expanding walk-forward folds, 20-row test blocks and five-row purge.
+- The metrics artifact records 100 evaluation samples for each model/horizon and 1,800 model/horizon evaluations (3 × 6 × 100). Per-row `predictions.jsonl` is not included.
+- Models: naive persistence, price-only ridge, sentiment-plus-price ridge.
 
-## Forecast metrics (MAE in USD; RMSE in parentheses)
+## Forecast results (reported MAE in USD; RMSE in parentheses)
 
 | Horizon | Naive | Price-only ridge | Sentiment-plus-price ridge |
-| --- | --- | --- | --- |
-| n+0 | 946.70 (1462.93) | 1056.82 (1561.29) | 1056.82 (1561.29) |
-| n+1 | 1434.59 (2112.26) | 1665.02 (2332.84) | 1665.02 (2332.84) |
-| n+2 | 1758.95 (2653.80) | 2108.22 (3115.22) | 2108.22 (3115.22) |
-| n+3 | 2003.41 (3190.92) | 2527.34 (3831.48) | 2527.34 (3831.48) |
-| n+4 | 2257.53 (3669.37) | 2897.59 (4384.25) | 2897.59 (4384.25) |
-| n+5 | 2568.99 (4104.76) | 3332.72 (4952.22) | 3332.72 (4952.22) |
-| **Mean MAE** | **1828.36** | **2264.62** | **2264.62** |
+| --- | ---: | ---: | ---: |
+| n+0 | 946.70 (1,462.93) | 1,056.82 (1,561.29) | 1,056.82 (1,561.29) |
+| n+1 | 1,434.59 (2,112.26) | 1,665.02 (2,332.84) | 1,665.02 (2,332.84) |
+| n+2 | 1,758.95 (2,653.80) | 2,108.22 (3,115.22) | 2,108.22 (3,115.22) |
+| n+3 | 2,003.41 (3,190.92) | 2,527.34 (3,831.48) | 2,527.34 (3,831.48) |
+| n+4 | 2,257.53 (3,669.37) | 2,897.59 (4,384.25) | 2,897.59 (4,384.25) |
+| n+5 | 2,568.99 (4,104.76) | 3,332.72 (4,952.22) | 3,332.72 (4,952.22) |
+| **Mean MAE** | **1,828.36** | **2,264.62** | **2,264.62** |
 
-Each cell is over n = 100 out-of-sample days.
+The aggregate metrics say naive persistence outperformed price-only ridge by 23.86% on mean MAE. The sentiment-plus-price candidate is identical because no posts were scored; no sentiment benefit is shown.
 
-## What the comparison shows
+## Strategy metrics recorded in the artifact
 
-- The fitted price-only ridge is **23.86% worse** than naive persistence on
-  mean MAE. On this sample, the extra features hurt rather than help.
-- The sentiment-plus-price model is **identical, digit for digit**, to the
-  price-only model — because zero scored posts existed, all sentiment features
-  were null and the sentiment columns were not identifiable. The committed
-  metrics carry the warning: *"No eligible row has a scored-post sentiment
-  mean, so the sentiment-plus-price candidate is not identifiable in this run
-  and its coefficients cannot be interpreted."*
-- **Honest conclusion:** nothing here demonstrates that sentiment adds
-  predictive value. That experiment cannot run until an accepted, permitted
-  180-day X corpus exists (blockers R2/A2/B1–B10). We report the price-only
-  finding as measured rather than substituting synthetic sentiment.
+| Strategy | Cumulative net return | Sharpe | Sortino | Max drawdown | Exposure |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Naive rule | 0.00% (never trades) | undefined | undefined | 0.00% | 0/100 days |
+| Price-only | +10.91% | 1.807 | 3.979 | 4.08% | 32/100 days |
+| Sentiment-plus-price | +10.91% | 1.807 | 3.979 | 4.08% | 32/100 days |
+| Unconditional long benchmark | +6.11% | 0.752 | 1.377 | 10.33% | 100/100 days |
 
-## Strategy / risk metrics (predeclared long/flat, out-of-sample, net of 10 bps fees)
-
-| Metric | Naive-rule strategy | Price-only strategy | Sentiment strategy | Unconditional long benchmark |
-| --- | --- | --- | --- | --- |
-| Cumulative net return | 0.00% (never trades) | **+10.91%** | +10.91% | +6.11% |
-| Sharpe ratio | unavailable | **1.807** | 1.807 | 0.752 |
-| Sortino ratio | unavailable | **3.979** | 3.979 | 1.377 |
-| Max drawdown | 0.00% (never trades) | **4.08%** | 4.08% | 10.33% |
-| Annualized volatility | 0.00% | 22.25% | 22.25% | 38.25% |
-| Exposure / long days | 0.00 (0 days) | 32% (32 of 100) | 32% (32) | 100% |
-
-- Naive never trades on this sample, so its risk ratios are undefined; the
-  principled reason is preserved in `metrics.json`
-  (`risk_metrics_unavailable_reason`), it is not a hidden gap.
-- Fee rate 0.001 per side, 365-period annualization, zero risk-free rate,
-  minimum 30 return observations — all recorded in the metrics artefact.
-- Short-sample caveats: 32 long days, one asset, one 180-day period — the ratios
-  are strategy statistics over one regime, not a robust performance claim.
-
-## Availability-basis status
-
-No run in this submission uses `archive_created_at`. Retrospective archive mode
-is implemented and regression-tested but, by policy, unused until the
-employer explicitly approves the availability assumption and the disclosure
-note it requires (blocker B9). Every recorded artefact uses the leakage-safe
-`observed` basis only.
+The report records 0.1% fee per side and 365-period annualization. The values are sample-specific strategy statistics, not future-return claims. The naive ratios are undefined because its return series has no dispersion.

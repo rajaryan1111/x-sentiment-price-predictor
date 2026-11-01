@@ -4,20 +4,19 @@ Research pipeline that tests whether timestamped X (Twitter) sentiment adds
 out-of-sample predictive value beyond price-only baselines for **BTC-USD** daily
 close forecasts at horizons `n+0` through `n+5`.
 
-> **Status: the pipeline, models, evaluation and reports are implemented.** The
-> historical Coinbase run and report are documented; its raw snapshot is untracked
-> but present in this working copy with the recorded SHA-256, and the committed
-> real-price metrics reproduce exactly from it with this code (see the verification
-> report). Because the snapshot is untracked, a fresh clone must re-fetch it with
-> `fetch-prices`. No fresh provider response was verified here. X data access remains blocked: no approved live corpus or
-> Actor has been used, and no sentiment benefit is claimed. The database schema, idempotent
-> repositories, cutoff join and persisted-input CLI path are implemented and
-> verified offline (R15). `fetch-news` is an opt-in, mocked-verified Tavily CLI
-> step; no live Tavily or Exa request has been made. The assessment PDFs were recorded as read
-> on 2026-10-26 but are absent from this checkout and were not reopened during this audit; the linked Google Doc is a 12-entry
-> dataset-link compilation, not a tweet corpus. The pipeline reports sentiment as
-> unavailable when run without posts. CI does not prove provider access, data
-> licensing, model quality or profitability.
+> **Current evidence:** the offline pipeline, model comparison, evaluation,
+> reporting, persistence, and provider safety gates are implemented and tested.
+> The committed 2026-10-26 BTC evaluation artifacts record 180 price bars and
+> zero accepted X posts or scored sentiment observations. The raw price snapshot
+> and per-row predictions are not in this checkout, so those historic metrics are
+> not freshly recomputed from raw inputs here. No sentiment advantage is claimed.
+> No live Apify, Tavily, Exa, or Coinbase call was made during the final audit;
+> no paid Actor ran. Tavily is a mocked-verified, explicitly gated context-only
+> integration; Exa is not implemented. The original assignment and companion
+> dataset-reference PDFs were re-opened on 2026-11-01 from user-provided copies
+> outside Git; they are not included in the repository or ZIP. CI and offline
+> tests prove software behavior, not data access, licensing, model quality, or
+> profitability. See `submission/` for the exact final handoff and blockers.
 
 ## Canonical engineering documents
 
@@ -38,60 +37,32 @@ contracts and status, and they list what is verified versus still open.
 
 Phase 1 deliverable: the authoritative [requirements traceability matrix](docs/REQUIREMENTS_TRACEABILITY.md)
 (every requirement with its acceptance criterion, verification method, evidence, status,
-gap and external blocker, checked by `python scripts/validate_docs.py`). It preserves
-page counts and hashes from the assessment PDFs recorded as reviewed on 2026-10-26;
-the originals are absent from this checkout and were not re-opened in the current audit.
+gap and external blocker, checked by `python scripts/validate_docs.py`). It preserves page counts and hashes for the assessment PDFs, re-opened on 2026-11-01
+from user-provided copies outside the repository; they are not committed or included in the ZIP.
 The matrix covers the 12 dataset candidates and outstanding requirements, including
 provider access (R2) and the email submission packet (A7). The database join (R15) is
 recorded as verified complete offline.
 
-## Delivery status (live GitHub inspection on 2026-11-01)
+## Delivery status
 
-PR #14 is OPEN, DRAFT and MERGEABLE against `main`; it was retargeted from
-`docs/canonical-source-of-truth` after verification that `main` is a strict
-ancestor of the PR head. The head is
-`848de0033f36341d2b85bf060aeeccc674686de5` (112 files; 87 files changed against
-`main`), and both CI runs `40799393484` (push) and `40799399662` (pull_request)
-succeeded on that exact SHA. The PR is not merged.
-
-The branch `feat/availability-basis-and-preflight` is a dedicated feature branch
-built directly on the PR head. It was pushed to origin on 2026-11-01 at tip
-`a75b1595cb9cb418362a332b320c5a734c86991d` (`a75b159`; code commit `4264469`):
-an
-explicit `observed`/`archive_created_at` availability basis, an offline Apify
-preflight, a bounded ingestion command and their documentation. CI run
-`41235279232` succeeded on that exact SHA on 2026-11-01. Documentation-only
-commits have advanced the branch since (including the evaluator-facing
-`submission/` package); read the live pushed tip with
-`git rev-parse origin/feat/availability-basis-and-preflight`. The clean-copy suite
-passed 209 tests on 2026-11-01 at `4264469`; the branch is not merged and PR #14
-remains draft, so both merges still await explicit authorization. See
-[docs/EXECUTION_CHECKPOINT.md](docs/EXECUTION_CHECKPOINT.md) for the exact state
-and next commands.
-
-Supporting detail: [requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md),
-[Phase 1 requirements trace](docs/PHASE_1_REQUIREMENTS.md),
-[final requirements audit](docs/FINAL_REQUIREMENTS_AUDIT.md),
-[submission summary](docs/SUBMISSION_SUMMARY.md),
-[employer clarifications](docs/EMPLOYER_CLARIFICATIONS.md),
-[historical dataset registry](docs/data-sources.md),
-[Apify setup](docs/APIFY_X_SETUP.md),
-[Phase 2 data-quality workstream](docs/PHASE_2_PROGRESS.md).
-
-**Naming note:** the repository workstream labelled “Phase 2 data quality/alignment”
-is not canonical documentation Phase 2. See [PHASES.md](PHASES.md).
+The final branch is `feat/availability-basis-and-preflight`; its URL is
+<https://github.com/rajaryan1111/x-sentiment-price-predictor/tree/feat/availability-basis-and-preflight>.
+The exact final commit, remote state, current PR status, and successful Actions
+run are recorded in [submission/FINAL_HANDOFF.md](submission/FINAL_HANDOFF.md)
+after the release push. PR #14 was open/draft on an older head when this audit
+began; it is advanced only by a normal fast-forward if the final verified commit
+remains its strict descendant. It is not merged into `main`.
 
 ## Quick start
 
 Python 3.11+ (notably, a bare `python3` can be older than 3.11 on some hosts; use
-`python3.12` or `python3.11` there). Verified across a fresh clone of this branch on
-Python 3.11.15 and 3.12.4:
+`python3.11` there). The current verification and CI use Python 3.11:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev,storage]"   # same extras CI installs
-cp .env.example .env                        # required for fetch-prices; not needed for an existing snapshot
+# .env is optional; no credentials are needed for the offline demo or public prices
 pytest
 ruff check src tests scripts
 python scripts/validate_dataset_registry.py
@@ -249,47 +220,26 @@ executes the same CLI and validates every artefact and deterministic repeatabili
 7. **Report** — chart, one-page outlook and evaluation report that label observed
    facts, method, measured results and unavailable items separately.
 
-## Measured evidence (real data, 2026-10-26)
+## Historical recorded evidence (2026-10-26)
 
-From `reports/btc-usd-180d/`, computed by the commands above:
+The committed `reports/btc-usd-180d/` artifacts record 180 public Coinbase
+BTC-USD daily candles from 2026-04-29 through 2026-10-25 UTC and zero X posts.
+They report five purged expanding folds and 100 out-of-sample samples per model
+and horizon. Aggregate mean MAE is $1,828.36 for naive persistence and $2,264.62
+for price-only ridge; sentiment-plus-price is identical because no posts were
+scored. The report records price-only strategy results of +10.91% cumulative net
+return, Sharpe 1.807, Sortino 3.979 and maximum drawdown 4.08% over 32 long days.
+These are historical aggregate artifacts, not a fresh raw-data recalculation:
+the raw price snapshot and per-prediction rows are absent from this checkout.
+They are not claims of future accuracy or profitability.
 
-- **Prices:** 180/180 public Coinbase `BTC-USD` daily bars, 2026-04-29 → 2026-10-25
-  UTC, no missing or duplicate timestamps; unfinished current day excluded.
-- **X posts:** 0. No permitted post-level dataset is accepted yet, so sentiment is
-  reported unavailable and the candidate model is flagged as not identifiable.
-- **Historical fresh-clone reproduction (2026-10-27, commit `ed2c5a4`):** a clean
-  checkout installed from the committed `pyproject.toml` on Python 3.12.4 ran the 130
-  offline tests that existed at that revision, both validators and the documented
-  commands after refetching the public snapshot — whose SHA-256 matched the committed
-  provenance exactly — and reproduced every metric within 5e-13 (platform float noise
-  only). That refetch is not part of the current sandbox verification, whose outbound
-  network is restricted. The earlier [TEST_PLAN.md](TEST_PLAN.md) records 167 offline
-  tests at that checkpoint; the delivered tree (commit `d801661`) passes the full
-  suite; the exact collection
-  count is in [TEST_PLAN.md](TEST_PLAN.md). The first full-suite run found five
-  documentation-validation failures, which were repaired before the passing rerun.
-  See [FINAL_VERIFICATION_REPORT.md](docs/FINAL_VERIFICATION_REPORT.md) for evidence.
-  No credentials, paid services or network X calls are needed for the offline test
-  suite or the synthetic demo run.
-- **Mean MAE across horizons:** naive persistence **$1,828.36**, price-only ridge
-  **$2,264.62** (+23.86% worse), sentiment-plus-price identical to price-only
-  because no sentiment was available.
-- **Strategy (predeclared long/flat, 10 bps per side):** price-only cumulative
-  **+10.91%**, Sharpe **1.807**, Sortino **3.979**, max drawdown **4.08%** over 32
-  long days, versus a +6.11% / 0.752 / 1.377 / 10.33% unconditional-long benchmark.
-  The naive rule never trades, so its own risk ratios are undefined; the benchmark is the same windows held long.
-
-**Honest reading:** on this 180-day sample the fitted price-only model does *not*
-beat the naive persistence baseline on forecast error, so no claim is made that the
-model adds predictive value. The strategy numbers are short-sample research
-statistics on a single asset and period, not evidence of tradability.
-
-**Source audit:** both assessment PDFs were recorded as read in full on 2026-10-26,
-but are absent from this checkout and were not re-opened in the current audit. The
-linked Google Doc was re-fetched on 2026-10-29 as a dataset-link compilation, not a
-tweet corpus. Prior notes inventory uploaded local files, but those raw files are not
-present in this checkout. No candidate dataset has been accepted, licensed or profiled
-for 180-day text coverage.
+**Source audit:** the assignment PDF and companion dataset-reference PDF were
+re-opened and read in full on 2026-11-01; hashes and page counts are in the
+[traceability matrix](docs/REQUIREMENTS_TRACEABILITY.md). Their copies are outside
+the repository and not included in the submission ZIP. The linked Google Doc was
+reviewed as a 12-entry dataset-link compilation, not a tweet corpus. No candidate
+X dataset has been approved, licensed, downloaded or profiled as an accepted
+180-day corpus.
 
 ## Module map
 
@@ -346,7 +296,7 @@ for 180-day text coverage.
 - `main` — stable integration branch.
 - `feat/phase-2-data-quality-alignment` — price/post ingestion, profiler, point-in-time primitives.
 - `docs/canonical-source-of-truth` — the nine canonical documents.
-- `feat/sentiment-features-and-forecasting` — sentiment, features, models, evaluation, reporting, CLI.
+- `feat/availability-basis-and-preflight` — current reviewed submission branch, including the forecasting pipeline, preflight and bounded ingestion work.
 
 Feature work is merged through review after lint, registry validation, documentation
 validation and pytest pass, as configured in [.github/workflows/ci.yml](.github/workflows/ci.yml).

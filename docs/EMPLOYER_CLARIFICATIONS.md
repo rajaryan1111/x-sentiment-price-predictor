@@ -1,227 +1,37 @@
-# Employer clarifications and submission draft
+# Employer clarifications and authorization gates
 
-**Status:** prepared on 2026-10-28 and updated after rechecking available online
-source metadata on 2026-10-29, **not sent**. No question on this page has been answered
-by the employer, and no submission email has been delivered. This file
-consolidates the exact external decisions that engineering cannot resolve on its
-own, a provider/credential authorization checklist, and a ready-to-send email
-draft. It does **not** invent answers, employer intent, credentials, an accepted
-dataset, a submission format, or a delivery confirmation.
+**Status (2026-11-01):** no employer answers or submission delivery are recorded. The original assignment PDF was re-opened and read in full from a user-provided copy in Downloads; the companion historical-dataset PDF was also reviewed. Both are outside Git and excluded from the ZIP. The source names, page counts, and verified hashes are in [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md). The PDF specifies the recipient `gilad@crowdwisdomtrading.com`; this address is copied into the unsent draft and is not independently mailbox-verified. No address reconfirmation is requested.
 
-**Source-access outcome (2026-10-29).** The assessment PDF and companion
-`Historical Twitter_X Datasets_ Verified Download Links.pdf` are absent from this
-checkout (root and `docs/` checked). Their prior full inspection is recorded in
-D-023 with page counts and hashes, but could not be repeated here. The assessment-
-linked Google Doc was fetched as text at
-<https://docs.google.com/document/d/1w-Y86OjkiOjlIIth0VgTAohql9zcGi3uoDNYTaTsZuw/export?format=txt>
-and its full exported text was read: it is a 12-entry dataset-link list, not a
-post corpus. The earlier recorded export hash remains historical; no current hash
-was computed in this turn. Provider dataset pages and metadata were additionally
-checked; findings are summarized in §3A and the dataset registry documentation.
-The address `gilad@crowdwisdomtrading.com`, deadline wording and format remain
-based on the recorded PDF transcription and must be confirmed before sending.
+## Confirmed from the assignment source
 
-**Related documents.** The same blockers appear with owner/requirement detail in
-[EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md); the evaluator-facing status is in
-[SUBMISSION_SUMMARY.md](SUBMISSION_SUMMARY.md); the delivery procedure for the
-PR is in [PR14_PROMOTION.md](PR14_PROMOTION.md).
+- The assignment requests BTC/asset-related X posts from the most recent 180 days, searched by ticker, cashtag, and keywords; same-period prices; timestamp alignment and the listed post metadata; Tavily news; sentiment/price features; forecasts `n+0` through `n+5`; walk-forward evaluation; visual output; a one-page outlook; and an evaluation report containing Sharpe, Sortino, and maximum drawdown.
+- The submission page gives `gilad@crowdwisdomtrading.com` and asks for a repository link, provider credentials/Actor IDs used, and a PDF or Markdown evaluation report.
+- It gives both “within 1 week” and “5–7 days” without an absolute due date.
+- Security policy for this project forbids putting credentials in Git, chat, package files, or plaintext email. Employer-provided secure transfer instructions are needed if credentials are required.
 
----
+## Decisions still requiring an external answer
 
-## 1. Already resolved in the repository — do not re-ask
+| Question | Why it remains open | Owner / needed action |
+| --- | --- | --- |
+| What is the exact calendar deadline and timezone? | The source gives two relative durations but no receipt date or absolute due date. | Employer: provide the due date and timezone. |
+| What precisely does `n+0` mean? | The implementation's working default is the unfinished close for day `n`, issued at 00:00 UTC; the source does not define the cutoff convention. | Employer: confirm or specify the target and issue time. |
+| Is a live Tavily request mandatory? May news affect model features? | The brief asks for recent news to complement sentiment but separately limits model inputs to sentiment and price. The safe current policy keeps news as outlook context only. | Employer: state whether live news is required and whether the feature policy should change. |
+| Which X source/Actor and terms should be used? | No approved Actor, license, matching 180-day corpus, or live payload profile exists. `61RPP7dywgiy0JPD0` is only a candidate configured locally. | Employer: approve a provider/Actor or dataset, terms, fields, query modes, and 180-day coverage. |
+| What is the hard item and USD spend cap? | The adapter has local caps, but they do not verify Actor pricing or authorize a paid run. | Employer: specify per-run item and spend ceilings; user must authorize any paid run. |
+| How should required provider credentials be transferred? | Local presence is not approval. Secrets must not be sent by plaintext email or included in the ZIP. | Employer: name an approved private channel and recipient. |
+| Is Exa required? | The brief names Tavily in project scope and mentions Exa only on the submission page. No Exa adapter exists. | Employer: confirm whether Exa is actually required before implementation. |
+| Is a video or any format beyond the requested repository and Markdown/PDF report required? | The source does not specify a demo/video attachment. A demo script exists; no video is claimed. | Employer: specify any additional deliverables and delivery channel. |
+| May retrospective archive creation time be used as availability time? | This can introduce look-ahead bias. The implemented default is leakage-safe observed availability; archive mode is opt-in and disclosed. | Employer: explicitly approve or reject the disclosed retrospective assumption. |
 
-These are documented engineering defaults or verified facts from the recorded
-brief. Asking the employer to repeat them wastes time; they are listed so the
-questions in §2 stay short.
+## Provider status verified locally
 
-- **Asset, interval, price source:** BTC-USD daily candles from the public
-  Coinbase Exchange API; historical report artefacts record a 180/180-bar
-  snapshot verified on 2026-10-26 (SHA-256 in
-  [SUBMISSION_SUMMARY.md](SUBMISSION_SUMMARY.md)). The raw file is absent here, so
-  this pass could only check the committed record, not independently re-run it.
-- **Forecast cutoff:** 00:00 UTC; features use completed bars and posts available
-  by the cutoff only; the unfinished UTC day is dropped.
-- **Horizons:** six targets `n+0` through `n+5` are implemented. The *meaning* of
-  `n+0` still needs confirmation (Q2).
-- **ML vs RL:** the brief's "machine learning / reinforcement learning" is treated
-  as permitting the supervised ML path that is implemented (D-006).
-- **News role:** by conservative default Tavily news is outlook context only and
-  never a model feature; this still needs confirmation (Q4).
-- **Security:** tokens are never committed to Git or placed in reports; a private
-  credential-transfer channel is required (D-012, NFR3). The brief is recorded as asking
-  for tokens "by email", which conflicts with that rule and is raised in Q6; the original PDF is not present here to recheck the wording.
+Configuration was checked on 2026-11-01 without printing secret values. The ignored local `.env` has an Apify token entry, candidate Actor ID, and Tavily key entry configured; Exa is blank. `.env.example` contains placeholders only. This does not establish employer approval, licensing, permission to spend, or a secure credential-transfer route.
 
-Sources: [PHASE_1_REQUIREMENTS.md](PHASE_1_REQUIREMENTS.md),
-[DECISIONS.md](../DECISIONS.md), [PRD.md](../PRD.md).
+- **Apify:** adapter, local preflight, bounded ingest, normalization, pagination, provenance and mocked tests exist. Preflight reports all three query modes and verifies input only. No live Actor run or paid scrape was made. No accepted X posts or 180-day profile exist.
+- **Tavily:** bounded adapter, explicitly gated CLI and offline JSONL handoff exist and are mocked-tested. No live request was made.
+- **Exa:** no adapter, integration tests, or live use. The blank configuration slot is not an integration.
+- **Coinbase:** historical prices appear in committed result artifacts. The raw 180-day snapshot is not in the repository or ZIP, so this audit did not rerun the historical evaluation from raw data.
 
-## 2. Open questions for the employer
+## Submission draft
 
-Copy/paste this block. Each row maps to a documented blocker and requirement ID;
-none has an employer answer on record.
-
-| # | Question | Why it matters | Blocker / requirement IDs |
-| --- | --- | --- | --- |
-| Q1 | What is the exact calendar submission deadline, including timezone? The brief is recorded as saying both "one week" and "5–7 days" with no date. | Sets the delivery date; without it the submission timeline cannot be confirmed. | B5 / A1, A7, O11 |
-| Q2 | For the `n+0` target, should we forecast the current day's not-yet-completed close issued at that day's 00:00 UTC start (the current working default), or the next available close after the issue time? | Changing the convention changes labels, folds and recorded metrics; it must be fixed before the real-data evaluation. | B4 / R8, R9, O3, O4 |
-| Q3 | Is a live Tavily news call mandatory for submission, or is the implemented mocked-verified, gated `fetch-news` plus offline `run --news-file` context acceptable? | Determines whether one authorized, bounded provider call is needed. | B6 / A4, A7, O12 |
-| Q4 | May news ever be a predictive model feature, or must it remain context for the one-page outlook only? | The brief says both "complement X sentiment" and "use sentiment and price only". We defaulted to context-only; a change requires a new, documented evaluation. | B6 / A4, O7 |
-| Q5 | Which X data source should be used? Please confirm the provider, licence/terms, specific Apify Actor ID or historical dataset, its input/output schema, text availability, timestamp semantics, and that it covers the most recent 180 days with ticker/cashtag/keyword searches. A 2025–2026 Bitcoin Kaggle candidate is listed in §3B but has not been accepted or row-profiled. | No accepted, licensed 180-day post-level X corpus exists; the real sentiment-vs-price result depends entirely on it. | B1 / R2, R4, R5, R9, R10, A3, O6, O13 |
-| Q6 | How should provider tokens and Actor IDs be delivered? The brief asks for them "by email"; our security rule forbids sending secrets in email/chat/Git. Please name an approved private channel and recipient for each secret, and confirm that non-secret Actor IDs/query config may be documented in the repo. | Unblocks credential provisioning without exposing secrets. | B2 / A2, O10, NFR3 |
-| Q7 | What is the hard spend ceiling (USD) and per-run item cap for any paid Apify/Tavily operation? If Exa is expected, please confirm that separately before integration. | Paid Actor launches cost money; no provider call is authorized without a cap. | B3 / R2, NFR4, O13 |
-| Q8 | What is the accepted final submission format and packet? Please confirm whether a Markdown evaluation report is sufficient or a PDF is additionally required, whether a video/screenshots are expected, and the delivery channel. Also re-confirm the recipient address in Q9. | Determines the exact artifacts to produce before submitting. | B7 / A7, A1 |
-| Q9 | Please confirm the submission email recipient is `gilad@crowdwisdomtrading.com` (recorded from the brief) and state who should receive it. | Avoids sending to an unverified address. | B5 / A7 |
-| Q10 | For a historical archive collected after the fact, may we treat post creation time as its availability time for the 180-day backtest, provided every report discloses that look-ahead bias cannot be excluded? The alternative is a forward-collected window that cannot cover the most recent 180 days. | The leakage-safe default excludes every post whose first-observation time is after the cutoff, so a retrospective archive otherwise yields zero sentiment. This decision determines whether a real 180-day experiment is possible at all. | B9 / R2, R4, R9 |
-| Q11 | If Q10 is not acceptable, should we (a) run a shorter forward-collected experiment, (b) accept a descriptive-only sentiment analysis, or (c) change the required evaluation window? | Provides an honest fallback instead of overstating a price-only result. | B9, B10 / R2, R9, A1 |
-
-## 3. Provider / credential authorization checklist
-
-### 3A. Provider role and integration evidence (checked 2026-10-29)
-
-| Provider | Assignment role | Repository integration evidence | Identifiers / live status | Assessment |
-| --- | --- | --- | --- | --- |
-| **Apify** | Named by the assessment's X-post scraping requirement and submission credential/Actor-ID request. | A configurable adapter exists at `src/xsentiment/ingestion/apify_x.py`; fixture tests cover mocked payloads. Setup guidance is in `docs/APIFY_X_SETUP.md`. | A token and a candidate Actor ID are present in local configuration. No employer approval, licence confirmation, authorized live run, accepted post corpus or live integration test exists. | The adapter path is offline-tested; actual collection remains blocked on employer source/terms approval, candidate Actor review, an explicit cost ceiling and private credential handling. Local configuration is not authorization. |
-| **Tavily** | The assessment names Tavily for recent relevant news to complement X sentiment; conservative project interpretation is context for outlook only, not a model feature. | A working bounded Tavily adapter, explicitly gated CLI (`fetch-news --confirm-live-call`), offline JSONL handoff and tests exist. Provider behavior is mocked, including bounds and sanitization. | A key is present in local configuration, but no live call or integration test has occurred. | Engineering adapter complete offline; whether a live call is required and its spend limit need employer/user authorization. |
-| **Exa** | Appears in the assessment's submission line requesting credentials; the detailed project scope names Tavily, not Exa. No other required Exa operation is evidenced by the recorded brief. | No Exa client/adapter, Exa-specific tests or usage documentation were found. A configuration placeholder/presence check is not an integration. | The local Exa setting is blank; no use or integration exists. | Do not claim Exa integration. Ask whether Exa is required before considering implementation. |
-
-Provider configuration was inspected on 2026-11-01 without displaying values:
-`.env.example` contains placeholders only; the ignored local `.env` has Apify
-token, candidate Actor ID and Tavily key entries configured, while Exa is blank.
-This local setup is not employer approval, licence confirmation, authorization
-to spend, or an approved credential-transfer route. No live API calls were made.
-
-### 3B. Candidate dataset checks (2026-10-29; page/metadata review only)
-
-| Candidate | Current public source evidence | Match to this assignment | Decision |
-| --- | --- | --- | --- |
-| [Bitcoin Tweets Dataset (2025–2026), Kaggle](https://www.kaggle.com/datasets/pokeash/bitcoin-tweets-dataset-20252026) | Kaggle metadata endpoint is accessible. Uploader claims X Bitcoin-related posts from 2025 “to present,” CSV around 2.10 GB, `text`, `date`, `user_followers`, user profile fields, hashtags and source. License field says CC0. Dataset version 1 was last updated 2026-03-04. | Best topical candidate, but a published end date / exact recent-180-day row coverage is not proven; listed schema has no likes/reposts/views; CSV not downloaded, so timestamp quality, duplicates, actual coverage and row schema remain unknown. Uploader's CC0 label does not establish rights clearance for underlying X content/profile data. | Candidate only. Do not download or train until employer approves use and a bounded local inspection is authorized. |
-| [Crypto & Stock Tweets, Hugging Face](https://huggingface.co/datasets/StephanAkkerman/crypto-stock-tweets) | Public, ungated repository and card; CC-BY-4.0 declared. Card lists 8,024,269 cleaned rows, including 4,820,915 Bitcoin tweets, merged from ten sources; dataset revision last modified 2023-12-22. | Published feature schema is `text` and `url`, with no structured timestamp, author or engagement fields, and no post-2023 coverage. Card says it follows the original sources' terms; those source rights/terms are not validated. | Does not meet recent 180-day window or required metadata; not accepted. |
-| [Tweets about the Top Companies (2015–2020), Kaggle](https://www.kaggle.com/datasets/omermetinn/tweets-about-the-top-companies-from-2015-to-2020) | Kaggle metadata accessible; uploader claims >3M posts for Amazon, Apple, Google, Microsoft and Tesla, with author, date, text, comments, likes and retweets; CC0 declared; last updated 2020-11-26. | Historical equities, not BTC/X recent 180-day coverage. Row-level schema/quality not downloaded or verified. CC0 label alone is not rights clearance. | Not a match; do not use for this BTC task. |
-
-**Conclusion:** none of the candidates has been downloaded, rights-cleared,
-row-profiled or approved; none currently proves an acceptable recent 180-day
-BTC-related X corpus with the requested coverage and available metadata. The
-Kaggle 2025–2026 Bitcoin listing is the only plausible candidate to ask the
-employer about, not an accepted dataset. Public page access and an uploader's
-license label do not prove collection rights, acceptable use, or field/coverage
-quality. Do not label the historical price-only run or synthetic demo as a
-sentiment evaluation.
-
-Availability of a credential never implies authorization to spend. The prior
-2026-10-29 inspection recorded APIFY_TOKEN, APIFY_API_TOKEN, TAVILY_API_KEY and
-EXA_API_KEY absent from the process environment and project-local `.env` files;
-`.env.example` contains placeholders only. No private transfer route is defined,
-and no paid call is authorized. This is the exact checklist to satisfy before any
-live call.
-
-| Provider | Purpose | Expected operation | May incur cost? | Required cap | Required approval |
-| --- | --- | --- | --- | --- | --- |
-| Apify (X corpus) | Obtain the accepted 180-day post-level X dataset | One bounded Actor run (ticker, cashtag, keyword queries), then profile and ingest | **Yes** — Actor runs are billed | Hard USD ceiling + per-run item cap (Q7) | Employer source approval (Q5) + user spend authorization + private token route (Q6) |
-| Tavily (news) | Optional recent-news outlook context | One bounded, single-request `fetch-news --confirm-live-call` search | **Yes** — API usage is billed | Per-call USD cap (Q7) | Employer confirmation it is required (Q3) + user authorization + private key route (Q6) |
-| Exa (news, optional; not integrated) | No operation in this repository; implement only if the employer requires it | None unless scope is approved and adapter is built | **Yes** if later used | Per-call USD cap (Q7) | Employer confirmation, explicit user authorization, private key route (Q6); do not imply current integration |
-| Coinbase (prices) | Reproducible public daily price snapshot | Free public `fetch-prices` re-fetch of the recorded 180-bar window | No (public endpoint) | n/a (bounded request) | Network allowlist to `api.exchange.coinbase.com`; no credential |
-| Private credential channel | Transfer any token safely | Password-manager share / encrypted attachment | No | n/a | Employer-named channel and recipient (Q6) |
-
-Engineering rule: no live Tavily/Exa/Apify/Coinbase request is made until the
-matching row is fully approved, the cap is recorded, and the user explicitly
-authorizes the call. The verification report records that as of 2026-10-29, **no live provider call had been made**;
-Apify and Tavily have mocked adapter coverage, while Exa has only a configuration
-placeholder and no adapter-level tests.
-
-## 4. Ready-to-send email draft (NOT SENT)
-
-**Recorded recipient (unconfirmed):** `gilad@crowdwisdomtrading.com` (re-verify against the original brief — Q9)
-**Subject:** X Sentiment Price Predictor — internship assignment deliverables and clarification request
-
-> Hello,
->
-> Please find the X Sentiment Price Predictor assignment deliverables below.
->
-> **Repository:** <https://github.com/rajaryan1111/x-sentiment-price-predictor>
-> **Assessment PR:** <https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14>
-> **Branch:** `feat/availability-basis-and-preflight` (local branch at the time this draft was reconciled; verify PR #14's live head before sending)
-> **Evaluation report:** [Markdown report](https://github.com/rajaryan1111/x-sentiment-price-predictor/blob/feat/availability-basis-and-preflight/reports/btc-usd-180d/evaluation-report.md) (per-horizon MAE/RMSE and methodology, plus Sharpe, Sortino and max drawdown where valid; verify the live branch head before sending).
-> **Documentation:** the submission summary, requirements audit, verification
-> report, demo walkthrough and outlook/chart artifacts are also in the repository.
->
-> **What is delivered.** A reproducible Python research pipeline for BTC-USD
-> daily closes at horizons `n+0`..`n+5`: validated price ingestion, point-in-time
-> X-post alignment, VADER sentiment and price features, naive / price-only /
-> sentiment-plus-price ridge models on identical purged walk-forward folds, and an
-> evaluation report with Sharpe ratio, Sortino ratio and maximum drawdown. It has
-> a full offline test suite and CI, a gated Tavily news step, a database join, a
-> sentiment-change chart and a one-page outlook. Installation and reproduction
- > commands are in the README and the demo walkthrough.
->
-> **Verification evidence.** On the final verified local commit (2026-11-01), 209
-> tests pass, together with `ruff`, byte-compilation and both
-> documentation/registry validators. The earlier 2026-10-29 checkpoint passed 187
-> tests and its GitHub Actions runs were green. The documented setup was repeated from a clean checkout on
-> Python 3.11 and re-run on Python 3.12 with the same result. The committed
-> real-price metrics were independently re-derived from the recorded snapshot with
-> zero differences, so the report is reproducible rather than merely asserted.
->
-> **Reproduction:** from the repository root, install with `python -m pip install -e '.[dev,storage]'`; run `pytest`, `ruff check src tests scripts`, `python scripts/validate_docs.py`, and `python scripts/validate_dataset_registry.py`. For a fully offline software demonstration, run `python scripts/make_offline_demo.py --out reports/generated/offline-demo-inputs/prices.json --posts-out reports/generated/offline-demo-inputs/posts.jsonl --generated-at 2026-10-27T00:00:00+00:00`, then follow the README's `python -m xsentiment run` command using those generated files and label outputs synthetic. The historical real-price report is also reproducible: re-running `python -m xsentiment run --prices data/btc-usd-daily-2026-04-29_2026-10-25.json --out <dir> --now 2026-10-26T00:00:00+00:00` reproduces its `metrics.json` with zero differences, provided that public snapshot is re-fetched with `fetch-prices` first (it is not committed).
->
-> **Provider identifiers and credentials:** an Apify token, candidate Actor ID and Tavily key are configured locally, but no employer approval, licence confirmation, spend cap, private transfer channel or live provider call exists. No accepted X corpus has been collected. Exa is not integrated. No secret values are included here; please confirm an approved source and private credential method. I will not send tokens in plaintext email.
->
-> **Verified results (honest).** On the committed historical real-price run (180
-> public Coinbase daily bars, zero X posts), mean MAE was naive $1,828.36 vs
-> price-only ridge $2,264.62; sentiment-plus-price is identical because there was
-> no sentiment data, and the report flags it as not identifiable. **No claim is
-> made that sentiment improves forecasts**, because no accepted, licensed 180-day
-> X corpus was available. The current offline demo uses clearly labelled synthetic
-> data and is a software demonstration only, not market evidence.
->
-> **What is blocked and what I need from you.** To finish the real-data sentiment
-> evaluation and the submission packet, I need your answers to the clarification
-> questions below (full detail is in the repository's
-> `docs/EMPLOYER_CLARIFICATIONS.md`):
->
-> 1. Exact calendar submission deadline and timezone (Q1).
-> 2. Confirmation of the `n+0` target convention (Q2).
-> 3. Whether a live Tavily news call is required, and whether news may be a
->    model feature (Q3, Q4).
-> 4. The approved X data source / Actor or historical dataset, its licence, and
->    confirmation of 180-day coverage (Q5).
-> 5. The approved private channel for delivering any provider tokens/Actor IDs,
->    since I will not put secrets in email, chat or the repository (Q6).
-> 6. A hard item-count **and** USD spend cap for any paid collection (Q7).
-> 7. The accepted final submission format (Markdown vs PDF, video/screenshots),
->    delivery channel, and re-confirmation of this recipient address (Q8, Q9).
-> 8. For any historical archive collected after the fact, whether post creation
->    time may be treated as its availability time for the 180-day backtest, with
->    the mandatory disclosure in every report that look-ahead bias cannot be
->    excluded — or whether a forward-collected window is preferred (Q10, Q11;
->    the code supports both, disclosed and opt-in only).
->
-> Once the data source, credential route, spend cap and target convention are
-> confirmed, I can run the sentiment-enhanced evaluation, record the actual
-> metrics, and assemble the final packet in the required format.
->
-> Thank you,
-> [Your name]
-
-This is a **draft only**. It has not been sent. Before sending, the user must:
-(a) explicitly authorize sending; (b) use an authorized/connected email tool
-(none exists in this session); (c) re-verify the recipient from the original PDF;
-(d) add their name; and (e) never include tokens in the email body — use the
-approved private channel from Q6 instead. Any token/Actor identifiers requested
-by the brief must be delivered separately and securely, not committed to Git.
-
-## 5. Submission-format artifacts to prepare if required (unconfirmed)
-
-The original submission instructions are not in this checkout, so whether these
-are required is **unconfirmed** (Q8). If confirmed, produce them from the real
-application, never from mockups:
-
-- **Markdown evaluation report:** already present at
-  `reports/btc-usd-180d/evaluation-report.md`; a PDF can be produced from it.
-- **Screenshots:** capture the generated `sentiment-vs-price.svg`/`outlook.md`
-  and the CLI run output from a real offline run (see
-  [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md)); label them as synthetic.
-- **Video (5–7 min):** record the timed script in
-  [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md), which uses verified commands only.
-- **GitHub links:** repository URL and PR #14 URL above; the verified code was
-  promoted to the existing PR #14 feature branch by non-forced fast-forward.
-  At the last recorded inspection the PR was still OPEN and DRAFT, and was not
-  merged. Check GitHub for the live head and CI before sending.
+The unsent email is in [EMPLOYER_EMAIL_DRAFT.md](../submission/EMPLOYER_EMAIL_DRAFT.md). It uses the source-specified recipient, identifies the final branch and report, describes current evidence and limitations, states that no paid Apify run or live provider call was made, and asks for secure credential instructions only if needed. No email has been sent.

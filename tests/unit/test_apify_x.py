@@ -128,7 +128,8 @@ def test_apify_config_is_required_before_network_activity() -> None:
     transport = httpx.MockTransport(handler)
     client = httpx.AsyncClient(transport=transport)
     adapter = ApifyXAdapter(
-        settings=Settings(http_timeout_seconds=2),
+        # Keep this absence-of-credentials test independent of an ignored local .env.
+        settings=Settings(_env_file=None, http_timeout_seconds=2),
         client=client,
     )
     assert not adapter.is_configured()

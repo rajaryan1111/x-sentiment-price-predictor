@@ -144,6 +144,10 @@ def test_chart_renders_both_panels_and_marks_an_empty_sentiment_panel(tmp_path) 
     assert empty.count("<polyline") == 1
     assert EMPTY_SENTIMENT_MESSAGE in empty
     assert SENTIMENT_CHANGE_EMPTY_MESSAGE in empty
+    assert empty.count("<tspan") >= 3
+    assert 'x="954"' in rich and 'text-anchor="end"' in rich
+    # The panel heading starts below the subtitle baseline.
+    assert 'y="76"' in empty
 
 
 def test_chart_rendering_is_deterministic(tmp_path) -> None:

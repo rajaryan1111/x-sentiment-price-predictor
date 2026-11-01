@@ -2,7 +2,6 @@
 
 import json
 import math
-import subprocess
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -240,8 +239,8 @@ def test_pipeline_writes_every_documented_artefact(tmp_path: Path) -> None:
     assert metrics["strategies"]["price_only"]["assumptions"]["fee_rate"] == 0.001
 
 
-def test_run_manifest_records_the_actual_checkout_revision(tmp_path: Path) -> None:
-    """NFR1: the revision comes from the real repository, never an inference."""
+def test_run_manifest_records_available_revision_or_reason(tmp_path: Path) -> None:
+    """NFR1: source archives report unavailable rather than inventing a revision."""
     prices = write_prices(tmp_path / "prices.json", 90)
 
     artifacts = run_forecast_pipeline(
@@ -250,17 +249,16 @@ def test_run_manifest_records_the_actual_checkout_revision(tmp_path: Path) -> No
         now=START + timedelta(days=91),
     )
     manifest = json.loads(artifacts.manifest_path.read_text())
-    expected = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        capture_output=True,
-        text=True,
-        cwd=repo_root(),
-        check=True,
-    ).stdout.strip()
-
-    assert manifest["provenance"]["code_revision"] == expected
-    assert set(manifest["provenance"]["code_revision"]) <= set("0123456789abcdef")
-    assert "code_revision_reason" not in manifest["provenance"]
+    expected = _code_revision(root=repo_root())
+    assert {
+        key: manifest["provenance"][key]
+        for key in expected
+    } == expected
+    if expected["code_revision"] == "unavailable":
+        assert "code_revision_reason" in manifest["provenance"]
+    else:
+        assert len(expected["code_revision"]) == 40
+        assert set(expected["code_revision"]) <= set("0123456789abcdef")
 
 
 def test_code_revision_fails_closed_outside_a_repository(tmp_path: Path) -> None:

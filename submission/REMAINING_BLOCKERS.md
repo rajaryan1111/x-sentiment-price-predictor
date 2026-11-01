@@ -1,0 +1,17 @@
+# Remaining blockers — 2026-11-01
+
+No live paid provider operation or email submission is authorized by this handoff. These are the remaining external requirements; implementation work that can be verified offline is documented separately.
+
+| Blocker | Missing | Why it cannot be closed locally | Owner and exact next action |
+| --- | --- | --- | --- |
+| Approved recent X data (R2/A3) | Employer-selected Actor or dataset; applicable license/terms; schema/field semantics; proof of ticker/cashtag/keyword search and most-recent 180-day coverage | Candidate Actor ID is not approval, and no accepted corpus or live payload exists. | Employer: approve source/terms and query/field expectations. User: authorize a bounded pilot after the price cap is known. |
+| Paid Apify run and credentials (A2/NFR4) | Explicit USD and item cap; approved token-transfer channel; approved Actor | Actor billing and permissions are account-specific. Local `.env` presence does not authorize a run. | Employer: provide cap and secure private route. User: explicitly authorize any billable operation. |
+| Real sentiment evaluation (R7/R9/R10/R11) | Accepted post text with valid timestamps and permitted retention | No accepted X posts were collected; synthetic fixtures cannot stand in for real sentiment. | After source approval and authorized data collection, profile/ingest the real corpus and rerun the complete pipeline. |
+| Live Tavily news (A4) | Confirmation that live news is required and any spend ceiling | Adapter and CLI are offline-tested; no live request was made. | Employer: confirm requirement and budget. User: authorize the call and provide/use approved credentials. |
+| Exa requirement | Confirmation whether Exa must be integrated or supplied | The assignment names Tavily in project scope and mentions Exa only in the submission line; no Exa adapter exists. | Employer: state whether Exa integration is mandatory. If so, approve scope, credentials route, and budget before implementation or calls. |
+| `n+0` definition (R8) | Issue time and target close convention | Current convention is a documented working default, not employer-confirmed. | Employer: confirm the target convention; then regenerate labels and evaluation if it changes. |
+| Deadline and possible extra deliverables (A1/A7) | Absolute due date/timezone; confirmation of any video or extra packet format | Source gives “within 1 week” and “5–7 days” without an absolute date; no video requirement is stated. | Employer: provide deadline and specify any additional format. |
+| Credentials in submission (A2/A7) | Employer-approved secure private transfer mechanism, if credentials are still needed | The source asks for provider credentials; this project's security rule prohibits plaintext email, chat, Git, and ZIP delivery. | Employer: provide secure channel and recipient. No secret values are in the draft/package. |
+| Historical metric reproduction | Raw historical price snapshot and prediction rows | The repository has aggregate metrics and manifest only. This audit did not reconstruct/retrain from market data. | User: if independent raw-data reproduction is required, restore the exact snapshot/prediction artifacts or authorize a new data retrieval and evaluation. |
+
+The source-specified email recipient is `gilad@crowdwisdomtrading.com`. It is used in the draft; mailbox ownership was not independently checked and no email was sent.

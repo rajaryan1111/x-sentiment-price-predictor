@@ -1,43 +1,39 @@
-# Reproducibility
+# Reproducibility guide
 
-Python 3.11+. Requires no API key for anything offline; every network-capable
-command is explicit and gated.
+The repository supports a fully offline reproduction using clearly labelled synthetic inputs. Provider access is optional and gated. Never treat synthetic demo metrics as market evidence.
 
-## Setup
+## 1. Extract or clone and install
+
+For a Git clone with exact revision provenance:
 
 ```bash
 git clone https://github.com/rajaryan1111/x-sentiment-price-predictor.git
 cd x-sentiment-price-predictor
-git checkout feat/availability-basis-and-preflight   # evaluator branch; PR #14 alternative below
+git checkout feat/availability-basis-and-preflight
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev,storage]'
 ```
 
-Copy `.env.example` to `.env` if you want local configuration; its provider
-entries are blank placeholders. **Never put real tokens in tracked files or
-Git.** Configuring a token or candidate Actor ID does not establish employer
-approval, licensing, permission to spend, or an approved private transfer route.
-Do not make live calls until those decisions are confirmed.
+For the submission ZIP, extract it and enter the single `x-sentiment-price-predictor/` directory. Install the same project extras from that directory. The ZIP intentionally has no `.git`; run manifests will therefore record `code_revision: unavailable` with a reason rather than inventing a SHA. The test suite supports this source-archive state.
 
-## Verify the project first (about 1 minute)
+No API key is needed for offline tests or the demo. `.env.example` contains placeholders; do not copy secrets into a tracked or packaged file.
 
-Run the complete offline test suite from a Git clone of the repository. One
-provenance test invokes `git rev-parse HEAD`; an extracted source-only ZIP has
-no `.git` metadata and therefore cannot pass that test until used from a clone.
+## 2. Offline verification
+
+Run from the repository root (Git clone or clean ZIP extraction):
 
 ```bash
-python -m pytest -q                      # 209 offline tests at the 2026-11-01 verification; TEST_PLAN.md is authoritative
+python -m pytest -q -ra
 python -m ruff check src tests scripts
 python -m compileall -q src tests scripts
-python scripts/validate_docs.py          # links + 28-row traceability matrix
+python scripts/validate_docs.py
 python scripts/validate_dataset_registry.py
-git status --ignore-submodules -s        # should be clean (untracked local data only)
 ```
 
-## Reproduce the labelled synthetic demo end to end
+The provenance tests verify the exact Git SHA in a clone and an explicit unavailable state in a ZIP extraction. Current counts are in `FINAL_SUBMISSION_CHECKLIST.md` after the final run.
 
-This proves the whole pipeline runs on your machine with no credentials:
+## 3. Reproduce the labelled synthetic demo
 
 ```bash
 python scripts/make_offline_demo.py \
@@ -53,93 +49,23 @@ python -m xsentiment run \
   --input-note "synthetic offline demo from scripts/make_offline_demo.py"
 ```
 
-Six artefacts appear in `reports/generated/offline-demo/`:
-`manifest.json` (code revision, input hashes, library versions, input
-lineage), `metrics.json`, `predictions.jsonl`, `evaluation-report.md`,
-`outlook.md` and `sentiment-vs-price.svg`. Run it twice; both runs must match
-byte for byte.
+The output includes a manifest, metrics, per-row predictions, evaluation report, outlook and SVG chart. Run the pipeline twice into separate output directories and compare those six files byte-for-byte. The generated values are synthetic and must not be presented as historical market or sentiment results.
 
-## Reproduce the historical real-price run
-
-The committed manifest in `reports/btc-usd-180d/` pins the run. The raw price
-snapshot is intentionally not committed; refetch it:
-
-```bash
-python -m xsentiment fetch-prices \
-  --start 2026-04-29 --end 2026-10-26 \
-  --out data/btc-usd-180d-snapshot.json
-
-python -m xsentiment run \
-  --prices data/btc-usd-180d-snapshot.json \
-  --out reports/regenerated-btc-usd-180d \
-  --now 2026-10-26T00:00:00+00:00 \
-  --input-note "refetch of the committed BTC-USD 180d snapshot"
-```
-
-`fetch-prices` needs outbound HTTPS to Coinbase. The committed manifest records
-`provenance.price_snapshot_sha256` =
-`09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75` for the
-original 2026-10-26 snapshot. Your refetched file will NOT be byte-identical to
-that hash: every snapshot embeds the UTC moment of its own fetch in
-`fetched_at`, by design. Compare at the data level instead — the
-2026-11-01 clean-environment verifier confirmed a fresh refetch is byte-equal to
-a second refetch on `candles` (180/180 rows) and reproduced every committed
-forecast metric exactly with `--now 2026-10-26T00:00:00+00:00`.Output writes to `reports/regenerated-btc-usd-180d/`; the original committed
-report is never overwritten.
-
-## Persisted-database path (R15)
-
-```bash
-python -m xsentiment persist \
-  --prices <prices.json> --posts <posts.jsonl> \
-  --database-url sqlite+aiosqlite:///./data/xsentiment.db
-python -m xsentiment run --database-url sqlite+aiosqlite:///./data/xsentiment.db \
-  --out reports/generated/persisted-run --now 2026-07-30T00:00:00+00:00
-```
-
-Writes are idempotent upserts; the manifest records
-`input_source = persisted_storage`.
-
-## News (optional, context only)
-
-`fetch-news` is the only live-capable news command and performs exactly one
-bounded call, gated behind `--confirm-live-call`; without an API key or the
-flag it does nothing. Output JSONL feeds `run --news-file` offline; news never
-enters model features.
-
-```bash
-TAVILY_API_KEY=<your-key> python -m xsentiment fetch-news \
-  --query "Bitcoin" --out data/news.jsonl --confirm-live-call
-python -m xsentiment run --prices <prices.json> --posts <posts.jsonl> \
-  --news-file data/news.jsonl --out reports/generated/news-run
-```
-
-## Optional Apify X collection (blocked — never run without authorization)
-
-Judge the wiring without spending anything:
+## 4. Safe Apify preflight (no request and no spend)
 
 ```bash
 python scripts/smoke_test_apify_x.py \
-  --input-json config/apify_actor_input.example.json --validate-only    # no network call
+  --input-json config/apify_actor_input.example.json --validate-only
 ```
 
-Bounded ingestion — a real Actor run is prohibited until the employer selects
-the Actor, reviews terms and prices, sets a hard item/USD cap and hands over
-the token privately (B1/B3/B10; see
-[docs/APIFY_X_SETUP.md](../docs/APIFY_X_SETUP.md) and
-[docs/ACTOR_REVIEW.md](../docs/ACTOR_REVIEW.md)):
+Expected: `valid: true`, query modes `ticker`, `cashtag`, `keyword`, `network_call_made: false`, and `paid_run_launched: false`. This validates local shape only; it does not prove the candidate Actor accepts those inputs or terms.
 
-```bash
-python scripts/ingest_apify_x.py \
-  --actor "$APIFY_ACTOR_ID" \
-  --q '$BTC OR BTC OR bitcoin' \
-  --query-mode mixed --start 2026-05-05 --end 2026-11-01 \
-  --max-items 10000 --max-spend-usd 50 --confirm-paid-run \
-  --out data/x-posts-180d.jsonl --manifest data/x-posts-180d.manifest.json
-```
+A paid Actor run is blocked until an Actor and license are approved, actual billing is reviewed, item/USD caps are agreed, a secure credential channel is supplied, and the user explicitly authorizes the operation. See [APIFY_X_SETUP.md](../docs/APIFY_X_SETUP.md) and [REMAINING_BLOCKERS.md](REMAINING_BLOCKERS.md).
 
-The pipeline then continues automatically: normalize →
-`python scripts/profile_local_x_dataset.py <jsonl>` → `xsentiment persist` →
-`xsentiment run --database-url`. Once accepted posts are ingested this way,
-the historical evaluation regenerates the four key artefacts honestly and the
-sentiment comparison becomes measurable.
+## 5. Historical real-price artifacts
+
+The historical run under `reports/btc-usd-180d/` records 180 Coinbase BTC-USD daily bars and aggregate metrics from 2026-10-26. The raw price snapshot and `predictions.jsonl` are not in the repository or ZIP. The recorded MAE and strategy metrics can be inspected in the committed `metrics.json`; this is not enough to independently retrain or recompute those results from raw rows. A new price retrieval and evaluation would be a new run, not a reproduction of the committed raw snapshot.
+
+## 6. Optional provider calls
+
+`fetch-news` is the only Tavily live-capable path and requires an explicit confirmation flag. It was not called in this verification. Exa is not integrated. Apify live ingestion is also not performed. Do not configure a real key or run a paid command without employer approval, an agreed cost ceiling, and explicit user authorization.

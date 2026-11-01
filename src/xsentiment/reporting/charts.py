@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from html import escape
 from pathlib import Path
+from textwrap import wrap
 
 from xsentiment.features.dataset import SupervisedRow
 from xsentiment.ingestion.prices import PriceCandle
@@ -31,7 +32,7 @@ PANEL_HEIGHT = 170
 PANEL_GAP = 46
 PADDING_LEFT = 84
 PADDING_RIGHT = 26
-PADDING_TOP = 64
+PADDING_TOP = 86
 PADDING_BOTTOM = 48
 Y_TICKS = 4
 X_TICKS = 6
@@ -222,10 +223,18 @@ def _axis_lines(
         f'stroke="#cccccc" stroke-width="1"/>'
     )
     if not panel.points:
+        lines = wrap(panel.empty_message, width=70, break_long_words=False)
+        line_height = 18
+        first_baseline = top + PANEL_HEIGHT // 2 - (len(lines) - 1) * line_height / 2
+        spans = "".join(
+            f'<tspan x="{PADDING_LEFT + 12}" y="{first_baseline + line_index * line_height:.2f}">'
+            f"{escape(line)}</tspan>"
+            for line_index, line in enumerate(lines)
+        )
         elements.append(
-            f'<text x="{PADDING_LEFT + 12}" y="{top + PANEL_HEIGHT // 2}" '
-            f'font-family="sans-serif" font-size="13" fill="#666666">'
-            f"{escape(panel.empty_message)}</text>"
+            f'<text x="{PADDING_LEFT + 12}" y="{first_baseline:.2f}" '
+            f'font-family="sans-serif" font-size="13" fill="#666666" '
+            f'aria-label="{escape(panel.empty_message, quote=True)}">{spans}</text>'
         )
         return elements
 
@@ -258,7 +267,7 @@ def _axis_lines(
             f"{escape(_format_value(value, reference))}</text>"
         )
     elements.append(
-        f'<text x="{PADDING_LEFT - 8}" y="{top - 2}" text-anchor="end" '
+        f'<text x="{plot_right}" y="{top - 2}" text-anchor="end" '
         f'font-family="sans-serif" font-size="11" fill="#777777">'
         f"{escape(panel.y_label)}</text>"
     )

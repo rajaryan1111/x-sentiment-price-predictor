@@ -10,7 +10,9 @@ from urllib.parse import quote
 import httpx
 import pytest
 
+from xsentiment.config.settings import Settings
 from xsentiment.errors import PayloadTooLargeError
+from xsentiment.ingestion import tavily_news
 from xsentiment.ingestion.tavily_news import (
     NewsCredentialsMissingError,
     NewsProviderError,
@@ -462,7 +464,10 @@ def test_response_ceiling_stops_streaming_before_the_whole_body_is_buffered() ->
     assert body.chunks_yielded < 5
 
 
-def test_missing_credentials_is_an_explicit_condition() -> None:
+def test_missing_credentials_is_an_explicit_condition(monkeypatch) -> None:
+    # Do not let an ignored developer .env turn this missing-key test into a live-key case.
+    monkeypatch.setattr(tavily_news, "get_settings", lambda: Settings(_env_file=None))
+
     async def execute() -> None:
         adapter = TavilyNewsAdapter(api_key=None, client=transporting(success_handler))
         try:

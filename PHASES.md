@@ -29,9 +29,8 @@ Status: complete as a documented baseline, with external data/provider and deadl
 - Give every requirement an acceptance criterion, a verification method, an evidence pointer, a status, a gap and a blocker.
 Evidence: docs/PHASE_1_REQUIREMENTS.md, PRD.md and the authoritative matrix in
 docs/REQUIREMENTS_TRACEABILITY.md, checked by `scripts/validate_docs.py`. Both assessment
-PDFs are recorded as read in full on 2026-10-26 and reconciled against the requirements;
-they are absent from this checkout, so that primary-source review could not be repeated
-in the current pass. The linked Google Doc was re-fetched as full text on 2026-10-29 and
+PDFs were re-opened and read in full on 2026-11-01 from user-provided copies outside
+the repository; they are not committed or included in the submission ZIP. The linked Google Doc was re-fetched as full text on 2026-10-29 and
 is a dataset-link compilation, not a tweet corpus.
 **Open items that engineering cannot close:** the employer's calendar deadline is unknown
 (A1, D-014); provider access, credentials and the private transfer channel remain external
@@ -43,9 +42,8 @@ does not mean X data has been collected or any sentiment result measured.
 
 ## Phase 2 — Canonical documentation
 Status: complete for the recorded working baseline. The canonical documents were reconciled
-with the assignment transcription on 2026-10-26 and with later implementation changes;
-the original PDF is absent from this checkout, so its wording could not be independently
-reverified during the current pass.
+with the assignment source on 2026-11-01 and with later implementation changes; external
+data and employer decisions remain open gates.
 - Maintain all nine root-level files: PRD, ARCHITECTURE, DESIGN, DATA_POLICY,
   MODEL_PLAN, TEST_PLAN, RULES, PHASES, DECISIONS.
 - Keep docs/REQUIREMENTS_TRACEABILITY.md and docs/PHASE_1_REQUIREMENTS.md aligned.

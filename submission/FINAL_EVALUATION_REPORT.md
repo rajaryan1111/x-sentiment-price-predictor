@@ -1,174 +1,53 @@
-# Independent final evaluation report — 2026-11-01
+# Final evaluation report — 2026-11-01
 
-This report is the independent final-gate audit of the repository branch
-`feat/availability-basis-and-preflight`. It re-verified the implementation,
-documentation, tests, CLI workflows and every artifact of this package from a
-clean environment, fixed the defects it found, and states a final verdict.
-All numbers below were re-measured on 2026-11-01 unless marked historical.
+## Scope and evidence limits
 
-## 1. Assignment requirement coverage
+This report records the artifacts and verification available on the final submission branch. The original assignment and companion dataset-reference PDF were reviewed in full from user-provided copies; the source file names, page counts, and SHA-256 values are in [the requirement traceability matrix](../docs/REQUIREMENTS_TRACEABILITY.md). They are not in Git or the ZIP.
 
-The authoritative matrix is
-[docs/REQUIREMENTS_TRACEABILITY.md](../docs/REQUIREMENTS_TRACEABILITY.md)
-(28 IDs, machine-validated). Reconciled status:
+The committed BTC-USD evaluation artifacts are historical outputs from 2026-10-26. They contain a manifest, aggregate `metrics.json`, rendered report, outlook, and SVG, but the raw 180-day price snapshot and `predictions.jsonl` are absent from this checkout. This audit cross-checked reported numbers against the committed metrics artifact and verified arithmetic summaries where possible; it did **not** refetch market data, retrain the models, or recompute MAE and strategy returns from raw rows. The values below must therefore be read as results recorded in those committed artifacts, not a fresh independent evaluation.
 
-| Verdict | Count | IDs |
+No accepted X posts or scored sentiment observations are present. The sentiment-plus-price model is not identifiable in that historical run. No sentiment improvement is claimed.
+
+## Requirement-by-requirement status
+
+Detailed acceptance criteria, evidence, and blockers for all 28 IDs are in [REQUIREMENTS_TRACEABILITY.md](../docs/REQUIREMENTS_TRACEABILITY.md). This table maps the source brief's major deliverables to those IDs.
+
+| Original assignment requirement | Status | Evidence and remaining gap |
 | --- | --- | --- |
-| PASS (verified complete) | 11 | R1, R3, R6, R12, R15, NFR1, NFR2, NFR3, NFR5, NFR6, A5 |
-| PARTIAL (offline-complete, externally unverified) | 14 | R4, R5, R7, R8, R9, R10, R11, R13, R14, NFR4, A3, A4, A6, A7 |
-| BLOCKED BY EXTERNAL INPUT | 2 | R2 (accepted 180-day X corpus), A2 (tokens/Actor ID via a private channel) |
-| FAIL | 0 | — |
-| NEEDS CLARIFICATION | 1 | A1 (calendar deadline; the brief states both "one week" and "5–7 days") |
+| Python ML/RL pipeline | COMPLETE (supervised ML interpretation) | Implemented CLI pipeline, baseline comparisons and tests; the brief permits ML or RL and does not define an RL environment. |
+| X scraping with ticker, cashtag and keyword searches over the latest 180 days | BLOCKED | Offline Apify adapter, local input preflight and bounded ingest exist; preflight confirms all three query modes without network or spend. No approved Actor, licensed corpus, live run, or coverage profile exists. |
+| Same-period historical prices | COMPLETE (historical record) | The committed manifest/metrics record 180/180 Coinbase BTC-USD daily candles for 2026-04-29 through 2026-10-25 UTC. The raw snapshot is not in the repository, so this audit did not independently revalidate the rows. |
+| Post text, timestamps/UTC offsets, engagement and follower counts | PARTIAL | Normalization contracts and fixture tests exist; no real provider payload has been checked for actual field availability or semantics. |
+| Join price and X data in a database | COMPLETE (offline implementation) | Versioned storage, idempotent writes and leakage-safe joins are implemented and fixture-tested; populating with accepted real X records remains blocked by source/data approval. |
+| Recent relevant news with Tavily | PARTIAL | Bounded, explicitly gated adapter and offline JSONL path are mocked-tested. No live Tavily request or news snapshot was made. |
+| Sentiment and price-only features | PARTIAL | VADER, aggregates, price features and explicit missing-sentiment behavior are implemented and fixture-tested. No accepted post text was scored. |
+| Forecast `n+0` through `n+5` | PARTIAL | Six horizon models/targets exist and are tested. Meaning of `n+0` remains a working convention pending employer clarification. |
+| Walk-forward out-of-sample validation | PARTIAL | Five expanding folds with a five-row purge and baseline comparisons are implemented. Historical aggregate metrics exist, but no fresh retraining from raw rows was possible and sentiment is absent. |
+| Visual matrix of sentiment change against price | PARTIAL | Dependency-free SVG has price, sentiment-level and sentiment-change panels; empty panels state that sentiment is unavailable. The historical artifact has no real sentiment curve. |
+| One-page sentiment outlook | PARTIAL | Generator and page contract are tested; historical outlook clearly reports zero scored posts and no news context. A real sentiment outlook cannot be produced without data. |
+| Evaluation report with Sharpe, Sortino and max drawdown | COMPLETE as an artifact; current recalculation PARTIAL | Markdown report and metrics artifact state the strategy assumptions and values, with undefined ratios explained. Raw prices/predictions are absent, so the metrics are not freshly recomputed here. |
+| Repository, evaluation report and reproducibility materials | PARTIAL (prepared, not delivered) | Final branch, package, report, demo and reproduction instructions are prepared; email delivery and any employer-required additional materials remain outstanding. |
+| Provider credentials and Actor IDs | BLOCKED | The brief asks for credentials used. Local Apify/Tavily entries are configured but are not employer-approved; Exa is blank and not integrated. A secure private channel and employer approval are missing. |
+| Submission timing and any extra video/format | BLOCKED | Brief says both “within 1 week” and “5–7 days” but gives no calendar date; it does not specify a video. Employer must clarify deadline and any extra deliverables. |
 
-No requirement is only superficially implemented: each partial row is partial
-because real X data or a live provider call is gated by authorization
-(B1–B10), not because code or tests are missing. The ML/RL slash (A5) is
-resolved as supervised ML with a naive persistence baseline and unit tests.
+The exhaustive matrix statuses currently aggregate to 11 verified complete, 14 partial, 2 blocked by external dependency, and 1 requiring clarification. “Complete” for software does not mean the real-data experiment is complete.
 
-## 2. Architecture and implementation summary
+## Historical recorded BTC-USD metrics
 
-The pipeline is one CLI (`python -m xsentiment`) over: bounded adapters
-(Coinbase prices, optional Apify X, gated Tavily news) → normalized
-provenance-safe records (event time vs first-observed time, UTC only, payload
-hashes) → optional idempotent SQLAlchemy storage → point-in-time alignment
-(strict candle completion, post eligibility by `created_at` **and**
-`retrieved_at`, unfinished-day drop) → deterministic VADER scoring and
-predeclared features → naive / price-only-ridge / sentiment-plus-price-ridge
-models, one per horizon `n+0…n+5` → purged expanding walk-forward evaluation →
-long/flat strategy with Sharpe/Sortino/max drawdown → SVG chart matrix,
-one-page outlook, Markdown report and a lineage-complete manifest. Full text:
-[SUBMISSION_README.md](SUBMISSION_README.md) and [ARCHITECTURE.md](../ARCHITECTURE.md).
+The committed `reports/btc-usd-180d/metrics.json` records 180 BTC-USD daily candles from 2026-04-29 through 2026-10-25 UTC; 0 posts and 0 scored posts; 5 expanding walk-forward folds; 100 evaluation samples per model and horizon; and 1,800 model/horizon prediction evaluations (3 × 6 × 100). The raw candles and per-row predictions are not committed.
 
-## 3. Data sources and provenance
+| Model | Mean MAE across six horizons (USD) | Relative to naive |
+| --- | ---: | ---: |
+| Naive persistence | 1,828.36 | baseline |
+| Price-only ridge | 2,264.62 | 23.86% higher MAE |
+| Sentiment-plus-price ridge | 2,264.62 | identical to price-only; no sentiment observations |
 
-| Source | Status on this branch |
-| --- | --- |
-| Coinbase public `BTC-USD` daily candles | **Verified.** 180/180 bars, 2026-04-29→2026-10-25 UTC, no gaps/duplicates; committed manifest pins the snapshot SHA-256 `09ce225a…` and every run records `fetched_at` |
-| X/Twitter posts | **Zero accepted.** A candidate Actor ID and credentials are configured locally, but employer approval, licensing, spend cap and private credential route are absent (B1–B3, B10). No live Actor run or paid scrape occurred. |
-| Tavily news | Adapter + gated single-call CLI, mocked-verified; never called live; context-only, never a feature |
-| Registry candidates | 12 machine-validated records; none approved, downloaded or row-profiled |
+The historical metrics artifact records the price-only strategy at +10.91% cumulative net return, Sharpe 1.807, Sortino 3.979, maximum drawdown 4.08%, and 32/100 long days. It records the unconditional long benchmark at +6.11%, Sharpe 0.752, Sortino 1.377, and 10.33% maximum drawdown. These are sample-specific backtest statistics, not expected or guaranteed future returns. The naive strategy made no trades, so its risk ratios are undefined.
 
-## 4. Experimental methodology
+## Verification status
 
-Documented in [EXPERIMENT_METHODOLOGY.md](EXPERIMENT_METHODOLOGY.md). The
-defaults are working defaults, not confirmed client instructions: `n+0`
-forecasts the not-yet-completed close of day `n` issued at that day's 00:00
-UTC start (open gate B4). Imputation/standardization fit on training folds
-only; test folds are evaluation-only; no random splits anywhere.
+The final exact-working-tree test, lint, compile, documentation, registry, preflight, clean-extraction, ZIP, and CI results are recorded in [FINAL_HANDOFF.md](FINAL_HANDOFF.md) and [FINAL_SUBMISSION_CHECKLIST.md](FINAL_SUBMISSION_CHECKLIST.md). Historical Actions runs are not used as proof for a newer commit.
 
-## 5 and 6. Actual verified results and model comparison
+## Final verdict
 
-From the committed historical run
-([reports/btc-usd-180d/metrics.json](../reports/btc-usd-180d/metrics.json) and
-[RESULTS.md](RESULTS.md), re-measured independently on 2026-11-01):
-
-- **Naive persistence wins every horizon**: mean MAE **$1,828.36** vs
-  price-only **$2,264.62** (23.86% worse). No claim that any fitted model
-  beats the baseline is made.
-- **Sentiment-plus-price is digit-for-digit identical to price-only** because
-  zero scored posts existed; the committed metrics carry the explicit
-  not-identifiable warning, and sentiment features stay null (never
-  zero-filled).
-- Strategy metrics (out-of-sample, net of 10 bps fees): price-only long/flat
-  +10.91% cumulative return, Sharpe 1.807, Sortino 3.979, max drawdown 4.08%,
-  exposure 32/100 days; the never-trading naive strategy's ratios are
-  `null` with a recorded reason; short-sample and single-regime caveats are
-  stated.
-- 5 purged folds, 100 out-of-sample days per (model, horizon), 1,800 stored
-  predictions.
-- The dataset profile records 175 cutoffs with a full six-horizon target;
-  evaluation has 174 eligible rows because one full-horizon cutoff has no
-  reference close. The populations differ by that eligibility condition.
-
-## 7. Data leakage and availability limitations
-
-- Default availability basis is `observed` (`retrieved_at <= cutoff`), fail-closed
-  with tests. `archive_created_at` is opt-in, requires a non-empty disclosure
-  note, stamps look-ahead caveats into every report/outlook, and was **not**
-  used in any recorded run. It is never presented as a leakage-safe backtest.
-- Prices: strictly completed candles before each cutoff; the unfinished day is
-  dropped when `--now` is supplied; targets are structurally barred from
-  features.
-- The central limitation: no accepted X corpus, so the
-  sentiment-versus-price question remains **unmeasured**; GitHub CI and test
-  counts prove offline behavior only, never data access or model quality.
-
-## 8. Testing and CI evidence (all re-run 2026-11-01)
-
-| Gate | Result |
-| --- | --- |
-| `pytest -q` in a clean checkout of the pushed tip | **209 passed on 2026-11-01** (historical verification; authoritative count: [TEST_PLAN.md](../TEST_PLAN.md)) |
-| `ruff check src tests scripts` | clean |
-| `compileall -q src tests scripts` | clean |
-| `scripts/validate_docs.py` | OK — all links, 28 matrix rows valid |
-| `scripts/validate_dataset_registry.py` | OK — 12 records |
-| `git diff --check` | clean |
-| GitHub Actions CI | success: [run `41267305862`](https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/41267305862) checked out exact branch tip `33c24dcb7d9d6664bd456f00ae9f477278cdb8cf` (confirmed in checkout logs); lint, dataset-registry validation, documentation validation and pytest all succeeded; **209 passed on 2026-11-01**. This CI run predates the current local HEAD. |
-
-Clean-environment reproduction (fresh venv, install from committed
-`pyproject.toml` only, all offline):
-
-- `scripts/make_offline_demo.py` + `xsentiment run` — six artefacts
-  (`manifest.json`, `metrics.json`, `predictions.jsonl`,
-  `evaluation-report.md`, `outlook.md`, `sentiment-vs-price.svg`); **two
-  consecutive runs are byte-identical on all six files**.
-- Public price refetch (`fetch-prices --start 2026-04-29 --end 2026-10-26`):
-  180 candles; candle payload byte-equal across two immediate refetches and
-  the run with `--now 2026-10-26T00:00:00+00:00` reproduced the committed
-  forecast metrics exactly.
-- Persisted-database path: upserted 180 bars (idempotent), then
-  `run --database-url …` produced `input_source = persisted_storage` and
-  identical forecast metrics.
-- Apify preflight (`--input-json config/apify_actor_input.example.json
-  --validate-only`): exit 0; `network_call_made: false`,
-  `paid_run_launched: false`, credential presence reported as booleans, and
-  it fails fast before any spend.
-
-Defects found and fixed by this audit (all documentation defects, verified by
-re-running the documented commands):
-
-1. `submission/REPRODUCIBILITY.md` and `submission/DEMO_SCRIPT.md` showed the
-   unsupported `--now` flag on `fetch-prices` (rejected by the CLI) —
-   corrected.
-2. `submission/REPRODUCIBILITY.md` claimed a refetched snapshot's file
-   SHA-256 would match the committed hash. It cannot: `fetched_at` is
-   embedded by design; the data-level comparison (candle equality + exact
-   metrics) is what holds — corrected and re-verified.
-3. The same two files showed the preflight without its required
-   `--input-json` argument (exit 2 otherwise) — corrected and re-verified.
-4. "Pushed tip" current-state sentences were made date-qualified so they stay
-   true when future commits advance the branch.
-
-## 9. Reproduction instructions
-
-See [REPRODUCIBILITY.md](REPRODUCIBILITY.md). In one pass: create a Python
-3.11 venv, `pip install -e '.[dev,storage]'`, run the six verification gates,
-then either the synthetic demo (fully offline) or the real-price path
-(refetch + `xsentiment run`). Optional paid paths require employer
-authorization and are gated by design.
-
-## 10. Remaining external blockers
-
-| Blocker | Exact missing input | Owner |
-| --- | --- | --- |
-| B1/B3/B10 | Approved X source + hard item/USD spend cap | employer |
-| B2 | Apify/Tavily tokens via an approved private channel (never chat/Git/email) | employer |
-| B4–B7 | n+0 convention, calendar deadline, news role, submission format/channel | employer |
-| B9 | Availability-basis approval for any retrospective-archive experiment | employer |
-| A1 | Calendar deadline (brief says both "one week" and "5–7 days") | employer |
-
-The unsent email draft is in
-[docs/EMPLOYER_CLARIFICATIONS.md](../docs/EMPLOYER_CLARIFICATIONS.md).
-
-## 11. Submission recommendation and verdict
-
-**Verdict: The technical submission package is prepared with disclosed limitations; external submission remains pending.**
-
-Every deliverable that does not require external authorization is complete,
-tested (209 offline tests passed on 2026-11-01 per
-[TEST_PLAN.md](../TEST_PLAN.md)), lint-clean and validator-clean, with a
-reproducible clean-environment workflow. Outstanding items include an approved
-X source and corpus, licensing confirmation, explicit spend caps, private
-credential transfer, employer decisions on conventions and submission format,
-recipient confirmation, and any required live Tavily call. The unsent email
-draft is not evidence of delivery or employer approval.
+**READY WITH DISCLOSED EXTERNAL BLOCKERS.** Locally achievable software, offline verification, documentation, and packaging are prepared. Real X collection and sentiment evaluation, approved credentials/source terms, any paid run, and the employer's remaining decisions cannot be completed without external authorization and data.
