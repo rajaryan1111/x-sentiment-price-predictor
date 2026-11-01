@@ -1,0 +1,127 @@
+# Apify X ingestion setup
+
+**Current account gate (2026-11-01):** the configured candidate resolves to
+`apidojo/tweet-scraper`. Its current Free plan is demo-only and prohibits Actor API
+use. Do not run the API commands below on the current plan. No paid plan or Actor
+run has been authorized. Use this guide only after the employer approves a permitted
+source/plan and a maximum spend, or supplies a licensed export.
+
+## Before any run
+
+1. Choose an Actor in your Apify account and verify its current terms, pricing model, input schema, data retention rules and ability to collect the target BTC-related posts over the requested 180-day window using **ticker, cashtag and keyword searches**.
+2. Check the Actor's output dataset in the Apify console using a tiny test first. Confirm stable post IDs, original creation timestamps (with UTC/EST offset information), actual text, likes, reposts, views, author follower counts and nested author fields. Field aliases supported by this adapter are common conventions, not a guarantee of a particular Actor's schema.
+3. Agree on a maximum spend. The adapter sends Apify run options for `maxItems`, `maxTotalChargeUsd` and `timeout`. Apify documents these as run options; actual billing behavior depends on the Actor's pricing model/account. Do not rely on these controls instead of checking the Actor's pricing.
+4. Never put an API token in the URL, code, JSON input file or Git. Configure `APIFY_API_TOKEN` in your private local environment or secret manager and `APIFY_ACTOR_ID` with the reviewed actor ID.
+
+## Input configuration and query modes
+
+Actor input schemas vary, so there is deliberately no universal default query payload. Create a **local, untracked** JSON file using the input schema shown by the reviewed Actor. Keep query dates explicitly bounded to the desired 180-day window and include the three search modes required by the brief: the asset ticker (for example `BTC`), the cashtag (for example `$BTC`) and relevant keywords (for example `Bitcoin`). Verify with the Actor's own documentation that the selected input fields actually implement all three modes; do not assume that one search field covers them. Do not include credentials in the payload.
+
+Example shell configuration:
+
+```bash
+read -rsp "Apify token: " APIFY_API_TOKEN; echo; export APIFY_API_TOKEN
+export APIFY_ACTOR_ID='owner~reviewed-actor-name'
+```
+
+Do not paste the token into chat or commit it. Prefer setting it through your own shell/secret manager rather than storing it in a tracked file.
+
+## Offline preflight (no network, no charge)
+
+Before a paid run, validate the local input file and credential presence:
+
+```bash
+python scripts/smoke_test_apify_x.py \
+  --input-json config/apify_actor_input.example.json \
+  --validate-only
+```
+
+The preflight checks that `searchTerms` covers the ticker, cashtag and keyword
+modes, that every term has one ordered `since:`/`until:` window of at most 180
+days, that `maxItems` is bounded, and that no credential-shaped key is present.
+It reports only boolean credential presence, never a value, and prints
+`network_call_made: false`. It does not prove the Actor's current schema, recall
+or price. Replace the example dates and confirm the reviewed Actor's exact input
+schema first. The operator sequence after external approval is: review
+`ACTOR_REVIEW.md` -> `--validate-only` -> a bounded, approved pilot -> the full
+bounded run. The Free plan makes no API Actor run possible at present.
+
+## Bounded ingestion command
+
+After the pilot is approved, run one query per invocation so provenance records the
+mode exactly:
+
+```bash
+python scripts/ingest_apify_x.py \
+  --input-json config/apify_actor_input.example.json \
+  --query-mode ticker \
+  --query "BTC" \
+  --posts-out data/apify-x-ticker.jsonl \
+  --manifest-out reports/generated/apify-x-ticker/manifest.json \
+  --max-items 500 \
+  --max-total-charge-usd 0.50 \
+  --timeout-seconds 600 \
+  --confirm-paid-run
+```
+
+Without `--confirm-paid-run` the command refuses and constructs no adapter. It
+requires configured `APIFY_API_TOKEN`/`APIFY_ACTOR_ID`, writes normalized JSONL to
+the local ignored path and writes a sanitized manifest containing counts, daily
+coverage, caps and a hashed query label, never post text. Repeat for `cashtag` and
+`keyword`; then feed the JSONL to `xsentiment persist --posts` or
+`xsentiment run --posts`.
+
+### Merge query outputs before a multi-query run
+
+Each invocation records one query mode. Combine its JSONL and sanitized manifest
+with the other approved query batches before running the feature pipeline:
+
+```bash
+python scripts/merge_apify_x_posts.py \
+  --posts data/apify-x-ticker.jsonl \
+  --posts data/apify-x-cashtag.jsonl \
+  --posts data/apify-x-keyword.jsonl \
+  --run-manifest reports/generated/apify-x-ticker/manifest.json \
+  --run-manifest reports/generated/apify-x-cashtag/manifest.json \
+  --run-manifest reports/generated/apify-x-keyword/manifest.json \
+  --out data/apify-x-merged.jsonl \
+  --manifest-out reports/generated/apify-x-merged/manifest.json
+
+python -m xsentiment run --prices prices.json \
+  --posts data/apify-x-merged.jsonl \
+  --posts-provenance reports/generated/apify-x-merged/manifest.json \
+  --out reports/generated/x-sentiment-run
+```
+
+The merge rejects the same post ID with conflicting event time, text, or platform.
+Compatible duplicates retain the earliest recorded retrieval time; the sidecar
+lists each query mode and hashed query origin per post without copying post text.
+The run manifest records the sidecar hash. Post collection remains disabled on the
+current Apify Free plan; these commands are instructions only and were not run.
+
+## Adapter behavior
+
+`ApifyXAdapter.run_and_fetch(...)` is explicit and never runs merely by importing the module. The caller must supply the Actor input plus an item cap, dollar cap and timeout. The initial POST is not automatically retried because a network timeout may leave a paid run's result ambiguous. In that case, inspect the Apify console before another attempt.
+
+The adapter:
+- passes the token as a Bearer header, never as a query parameter;
+- applies explicit run item, cost and timeout options;
+- caps response-body size and result item count;
+- unwraps the documented `data` envelope for run responses while reading dataset items as the documented JSON array;
+- pages the dataset-items endpoint with `offset` and `limit`, and stops at the caller's item cap;
+- normalizes common tweet ID/text/date/engagement field names;
+- requires real ID, text and timezone-aware event timestamp;
+- preserves the raw provider timestamp, supplied UTC offset, payload hash, author reference and ticker/cashtag/keyword query provenance;
+- preserves engagement fields as null when the Actor did not return them;
+- records retrieval time separately from event time;
+- leaves sentiment unscored (null) until a separately specified sentiment model is configured;
+- does not persist raw posts automatically.
+
+Apify's official API documentation describes the run response as a `data` object
+(https://docs.apify.com/api/v2/actors-runs-post) and the dataset endpoint as supporting
+`offset`/`limit` with a JSON-array response (https://docs.apify.com/api/v2/dataset-items-get).
+The documented `maxItems` run option caps charges for pay-per-result Actors; it does **not**
+by itself guarantee how many rows the Actor returns. The adapter therefore enforces its
+own returned-row cap and never trusts the provider to honour it.
+
+No live Apify run is included in CI. Tests use mocked HTTP responses and incur no provider costs. A green test suite does not certify the Actor's current availability, legal terms, historical reach, or actual output schema.

@@ -1,0 +1,74 @@
+# Data Policy
+This is an engineering policy, not legal advice or proof of license approval.
+
+## Principles
+Use only sources accessible through documented, permitted routes. A URL, dataset card or registry entry is not proof of current rights. Review current terms before collection, hydration, processing, retention, training or redistribution. If access or rights are unclear, mark the source blocked. Preserve platform identity: StockTwits is not X. Never bypass access controls or hydrate IDs unless permitted.
+
+## Price source
+Current evaluation uses Binance Vision Spot BTCUSDT daily archives, quote currency USDT, with official archive checksums and 2026-05-05..2026-10-31 UTC coverage. Binance Vision terms (updated 2026-08-26) place data and derivatives under CC BY-NC-SA 4.0, require attribution and identical licensing for redistributed derivatives, and exclude commercial use. The source archives, snapshot, report, predictions and chart in `reports/btcusdt-180d/` carry this license and must remain non-commercial. This is not exact BTC-USD; employer acceptance or a different rights-cleared USD source remains required.
+
+Coinbase Market Data Terms at https://www.coinbase.com/legal/market_data prohibit using Coinbase Market Data to train, validate, benchmark, or improve AI/ML models and prohibit distributing derived works without prior express written consent. No Coinbase data was fetched for the current evaluation. Older Coinbase-derived result files were removed from the current tree; their historical Git objects remain because repository history was not rewritten. Do not reuse those old results without written permission.
+
+## X source
+Required target is asset-related X posts over the most recent 180 days using an approved Apify/provider route, with ticker, cashtag and keyword searches. Before collection verify Actor identity, input/output schema, platform, terms, query support for all three modes, available fields (text, timestamps, likes, reposts, views, author followers), charges, plan limits, max results and actual 180-day reach. Candidate `apidojo/tweet-scraper` was identified but is not approved; current Free plan forbids Actor API use, and no real X corpus is accepted. Do not assume free credits make an Actor free; no paid run without explicit budget approval.
+
+## Historical datasets
+The assessment-linked Google Doc was re-fetched as full text on 2026-10-29; it is a 12-entry dataset-link compilation, not a tweet corpus. Three candidate public listing/card metadata were partially checked and are described in `docs/data-sources.md`; no candidate rows were downloaded or profiled and no rights, license, schema or current 180-day coverage were approved. Registry entries are candidates only. ID-only files contain no text; older corpora cannot by themselves meet a recent 180-day window. Raw uploaded files mentioned in prior repository notes are absent from this checkout, so those historical inventories are not treated as current local evidence.
+
+## News
+Tavily is the named source for the most recent and relevant news. Default use is context for the outlook, not predictive features, because the brief says the model uses sentiment and price only. The 2026-11-01 bounded Tavily smoke request returned one result with a malformed publication timestamp, which was withheld; the Exa smoke request returned one result with a publication timestamp and source metadata. These one-result checks do not establish coverage or provider quality. Both providers are context-only. Live calls require `--confirm-live-call` and are never automatically retried. See [provider verification](docs/PROVIDER_VERIFICATION_2026-11-01.md).
+
+## Synthetic demonstration data
+`scripts/make_offline_demo.py` writes deterministic price and post fixtures that are labelled `synthetic` in the files, in each post record, in the run `--input-note`, in the manifest's `input_lineage` and in report/outlook limitations. These fixtures exist only to exercise the software without credentials or accepted X data. They are not observed market data, not X posts and not evidence of forecasting performance. Generated inputs and artefacts belong under ignored paths (`reports/generated/` or `data/`), never in Git.
+
+## Provenance manifest
+Record source/platform/provider and URL; dataset version or non-secret run ID; query and UTC range; retrieval timestamp; code revision; license review status/date/restrictions; SHA-256 hash when a snapshot is retained; schema version; sanitized counts/missingness/duplicates/time range; transformations/exclusions; and whether historical availability is known. Never include secrets.
+
+### Combining X query batches
+The approved ingestion workflow emits one normalized JSONL and sanitized manifest
+per query. Combine those files with `scripts/merge_apify_x_posts.py` before a
+multi-query `run --posts`. The merger deduplicates by stable post ID, rejects
+conflicting creation timestamps, text, or platform, retains the earliest actual
+retrieval timestamp for compatible duplicates, and records every query mode and
+query hash in a sanitized sidecar keyed by post ID. Pass that sidecar with
+`--posts-provenance`; the run manifest records its content hash. Keep the post JSONL
+and sidecar in an ignored/private local path. Neither contains API credentials, and
+the sidecar does not copy post text.
+
+## Point-in-time and engagement
+created_at is event time; retrieved_at is when first observed. Never backdate retrieval. Old posts downloaded today are not automatically valid historical features. Only records with defensible availability evidence may enter a historical cutoff. Current likes/reposts/views/follower counts are not historical predictors unless time-stamped snapshots prove their values at cutoff.
+
+The merge uses the earliest recorded retrieval time across compatible copies of a
+post, so duplicate discovery cannot make a post appear available earlier than the
+first recorded observation. A backfilled batch collected after a historical cutoff
+therefore remains unavailable under the default `observed` policy.
+
+### Availability basis
+The pipeline has two explicit bases. `observed` is the default and the only
+leakage-safe historical rule: a post must be published and first retrieved by the
+cutoff. `archive_created_at` is an opt-in retrospective basis for a historical
+archive whose true first-observation times are unknowable; it treats event time as
+availability, refuses to run without a caller-supplied disclosure note, records the
+basis and note in the manifest, and prints the look-ahead limitation in the report
+and outlook. Results produced under `archive_created_at` must be described as
+retrospective and conditional; they are not a fully leakage-safe historical
+backtest. Do not use the archive basis to imply that collection happened in the
+past.
+
+## Security, retention and cost
+Keep raw datasets, private exports, hydrated text, cookies and secrets out of Git. Use ignored local paths or approved private storage; honor retention/deletion terms. Share credentials only through a verified employer-approved private channel. Bound items, timeout and spend; use a small schema test first; no automatic retries of non-idempotent paid launches.
+
+## What is committed to the repository
+Committed: sanitized reports, charts, outlook pages, metrics, manifests and non-secret configuration. The Binance-derived BTCUSDT package is a narrow exception to the usual raw-data exclusion because Binance's terms permit non-commercial redistribution under CC BY-NC-SA 4.0; attribution, source checksums and same-license notice are included. Every real run records input hashes, counts and library versions. Post text is never written into a committed artefact, and news remains context-only.
+
+## Source acceptance checklist
+- Platform/source identity and access route verified.
+- Current terms reviewed for collection, training, storage, retention and reporting.
+- Actual schema and text availability inspected.
+- Required 180-day event-time coverage measured, with ticker, cashtag and keyword query modes documented.
+- Missing IDs/text/timestamps, duplicates, invalid timestamps and engagement availability profiled.
+- Provenance and hash/run ID recorded.
+- Point-in-time availability assessed and limitations stated.
+- Cost is zero or within explicit approval.
+- No raw content or secret committed.
+Until evidenced, a source remains a candidate, not an accepted training dataset.

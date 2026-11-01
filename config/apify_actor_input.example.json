@@ -1,0 +1,11 @@
+{
+  "_note": "Example only. Replace the since/until dates with the approved 180-day window and confirm the reviewed Actor's exact input schema before use. Do not add credentials to this file.",
+  "searchTerms": [
+    "BTC since:2026-05-05 until:2026-11-01 lang:en -filter:retweets",
+    "$BTC since:2026-05-05 until:2026-11-01 lang:en -filter:retweets",
+    "Bitcoin since:2026-05-05 until:2026-11-01 lang:en -filter:retweets"
+  ],
+  "tweetLanguage": "en",
+  "sort": "Latest",
+  "maxItems": 500
+}

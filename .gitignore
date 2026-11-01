@@ -44,6 +44,8 @@ htmlcov/
 *.ckpt
 /models/artifacts/
 /reports/generated/
+/reports/**/predictions.jsonl
+!/reports/btcusdt-180d/predictions.jsonl
 
 # Logs
 *.log

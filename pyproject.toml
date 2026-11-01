@@ -14,7 +14,11 @@ dependencies = [
   "pydantic>=2.7,<3",
   "pydantic-settings>=2.2,<3",
   "python-dotenv>=1.0,<2",
+  "vaderSentiment>=3.3,<4",
 ]
+
+[project.scripts]
+xsentiment = "xsentiment.main:main"
 
 [project.optional-dependencies]
 analysis = [
