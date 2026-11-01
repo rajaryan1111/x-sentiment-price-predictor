@@ -209,6 +209,7 @@ def test_outlook_page_meets_the_documented_one_page_contract() -> None:
     rendered = render_outlook_markdown(outlook)
 
     assert check_outlook_page(rendered) == []
+    assert all(line == line.rstrip() for line in rendered.splitlines())
 
 
 def test_outlook_page_checker_flags_a_degenerate_report() -> None:

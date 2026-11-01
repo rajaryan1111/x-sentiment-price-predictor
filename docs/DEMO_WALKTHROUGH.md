@@ -159,8 +159,8 @@ PY
 head -n 12 reports/generated/offline-demo/predictions.jsonl
 ```
 
-**Expected:** six non-empty artefacts; six horizons `n+0`..`n+5`; three model
-names; 18 finite per-horizon metric rows; a positive prediction count; synthetic
+**Expected:** seven non-empty artefacts (including `dashboard.html`); six horizons
+`n+0`..`n+5`; three model names; 18 finite per-horizon metric rows; a positive prediction count; synthetic
 price lineage and non-empty sentiment coverage.
 
 **Say:** “Predictions and metrics are produced by the application, not hand
@@ -169,7 +169,7 @@ and synthetic flags without storing raw query terms or secrets.”
 
 ---
 
-## 5:30–6:15 — Visualization, outlook and risk reporting
+## 5:30–6:15 — Dashboard, visualization, outlook and risk reporting
 
 ```bash
 grep -n '^##' reports/generated/offline-demo/evaluation-report.md

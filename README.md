@@ -173,9 +173,9 @@ This is verified offline on fixtures (`tests/unit/test_phase3_ingestion_e2e.py`)
 database populated with real X rows is still blocked until R2 supplies an accepted,
 permitted source.
 
-Each run writes `evaluation-report.md`, `outlook.md`, `sentiment-vs-price.svg`,
-`metrics.json`, `predictions.jsonl` and `manifest.json` (code revision, config,
-hashes, input lineage, counts and warnings).
+Each run writes `dashboard.html`, `evaluation-report.md`, `outlook.md`,
+`sentiment-vs-price.svg`, `metrics.json`, `predictions.jsonl` and `manifest.json`
+(code revision, config, hashes, input lineage, counts and warnings).
 
 ### Fully offline demonstration (synthetic inputs)
 
@@ -198,8 +198,9 @@ python -m xsentiment run \
   --input-note "synthetic offline demo from scripts/make_offline_demo.py"
 ```
 
-Inspect `reports/generated/offline-demo/evaluation-report.md`, `outlook.md`,
-`sentiment-vs-price.svg`, `metrics.json`, `predictions.jsonl` and `manifest.json`.
+Inspect `reports/generated/offline-demo/dashboard.html`,
+`evaluation-report.md`, `outlook.md`, `sentiment-vs-price.svg`, `metrics.json`,
+`predictions.jsonl` and `manifest.json`.
 The generated paths are ignored by Git. `tests/integration/test_offline_demo.py`
 executes the same CLI and validates every artefact and deterministic repeatability.
 

@@ -207,10 +207,10 @@ def render_outlook_markdown(outlook: OutlookReport) -> str:
     lines: list[str] = [
         f"# {outlook.asset} — current sentiment outlook",
         "",
-        f"**As of:** {outlook.as_of.isoformat()}  ",
-        f"**Forecast cutoff:** {_iso(outlook.cutoff)}  ",
+        f"**As of:** {outlook.as_of.isoformat()}<br>",
+        f"**Forecast cutoff:** {_iso(outlook.cutoff)}<br>",
         f"**Last completed daily close ({currency}):** "
-        f"{_money(outlook.latest_completed_close)}  ",
+        f"{_money(outlook.latest_completed_close)}<br>",
         f"**Sentiment scorer:** {outlook.scorer.get('scorer', 'unknown')} "
         f"`{outlook.scorer.get('version', 'unknown')}`",
         "",

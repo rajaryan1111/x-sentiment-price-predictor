@@ -34,7 +34,7 @@ plan policy prohibits API use. No Coinbase data was fetched in this execution.
 ## Verification
 
 The current count is recorded in [TEST_PLAN.md](../TEST_PLAN.md); Ruff passed;
-compilation passed; documentation validation checked 100 links and all 28
+compilation passed; documentation validation checked 102 links and all 28
 requirements; dataset registry validated 12 records; Apify preflight reported
 `valid: true`, `network_call_made: false`, `paid_run_launched: false`. The clean
 package extraction, secret scan and exact pushed-commit CI result are release checks
@@ -42,7 +42,7 @@ recorded in the final response and package checksum sidecar.
 
 ## Package and employer materials
 
-- ZIP: `/Users/rajaryan/Projects/x-sentiment-price-predictor-final/x-sentiment-price-predictor-submission.zip`
+- ZIP: `outputs/x-sentiment-price-predictor-submission.zip`
 - SHA-256 sidecar: the adjacent `.sha256` file; exact digest and entry count are in
   the release handoff.
 - Attribution and package details: [PACKAGE_MANIFEST.md](PACKAGE_MANIFEST.md) and

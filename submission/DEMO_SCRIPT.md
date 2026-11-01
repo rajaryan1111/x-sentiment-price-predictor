@@ -39,7 +39,7 @@ Open `reports/btcusdt-180d/evaluation-report.md`, `metrics.json`, `predictions.j
 
 ## 5:00–6:00 — Show the visualization and one-page outlook
 
-Open the generated `dashboard.html`, `sentiment-vs-price.svg`, and `outlook.md`. The dashboard is standalone and offline. Sentiment panels explicitly say no scored posts are available. Do not replace these empty states with synthetic numbers.
+Open `reports/btcusdt-180d/dashboard.html`, `sentiment-vs-price.svg`, and `outlook.md` for the committed measured run. The dashboard is standalone and offline. Sentiment panels explicitly say no scored posts are available. Do not replace these empty states with synthetic numbers.
 
 ## 6:00–7:00 — State external blockers and close
 
