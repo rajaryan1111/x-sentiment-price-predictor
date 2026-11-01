@@ -22,6 +22,10 @@ Do not make live calls until those decisions are confirmed.
 
 ## Verify the project first (about 1 minute)
 
+Run the complete offline test suite from a Git clone of the repository. One
+provenance test invokes `git rev-parse HEAD`; an extracted source-only ZIP has
+no `.git` metadata and therefore cannot pass that test until used from a clone.
+
 ```bash
 python -m pytest -q                      # 209 offline tests at the 2026-11-01 verification; TEST_PLAN.md is authoritative
 python -m ruff check src tests scripts
