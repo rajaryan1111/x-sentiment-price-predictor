@@ -212,10 +212,13 @@ authorization, then pass the JSONL to `run --news-file`. Never commit credential
   `main` and is MERGEABLE.
 - CI at that head: runs `40799393484` (push) and `40799399662` (pull_request),
   both successful. Earlier checks are historical for their own SHAs.
-- Branch `feat/availability-basis-and-preflight` is pushed to origin at
-  `a75b1595cb9cb418362a332b320c5a734c86991d` (`a75b159`; code commit `4264469`),
-  five commits ahead of the PR head, with CI run `41235279232` green on that SHA.
-  Neither branch is merged; PR #14 remains draft and both merges await explicit
+- Branch `feat/availability-basis-and-preflight` was pushed to origin on
+  2026-11-01 at `a75b1595cb9cb418362a332b320c5a734c86991d` (`a75b159`; code
+  commit `4264469`), five commits ahead of the PR head, with CI run `41235279232`
+  green on that SHA. Documentation-only commits have advanced it since (including
+  the `submission/` package); read the live tip from `git rev-parse
+  origin/feat/availability-basis-and-preflight`. Neither branch is merged; PR #14
+  remains draft and both merges await explicit
   authorization.
 - PR #14 is not merged and has not been marked ready for review. The historical
   promotion procedure is in [PR14_PROMOTION.md](PR14_PROMOTION.md).
@@ -254,10 +257,11 @@ authorization and delivery items remain pending.
   (Sharpe, Sortino, max drawdown) available.
 - [x] Timed 5–7 minute demo script and submission-package documents present.
 - [x] PR #14 is retargeted to `main` (head `848de00`, 87 files) and both CI runs
-  succeeded on that exact SHA. The follow-up work is pushed on
-  `feat/availability-basis-and-preflight` (`a75b159`, CI `41235279232` green).
-  Neither branch is merged; PR #14 remains draft and both merges await explicit
-  authorization (B8 remains historical).
+  succeeded on that exact SHA. The follow-up work was pushed on
+  `feat/availability-basis-and-preflight` on 2026-11-01 at `a75b159` with CI
+  `41235279232` green; later docs-only commits (including the `submission/`
+  package) have advanced the branch. Neither branch is merged; PR #14 remains
+  draft and both merges await explicit authorization (B8 remains historical).
 - [ ] Accepted licensed 180-day X corpus / Actor / spend cap provided (B1/B3),
   and sentiment-enhanced evaluation run with real metrics (R2, R9).
 - [ ] Provider tokens / Actor IDs delivered through an approved private channel

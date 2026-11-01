@@ -12,20 +12,26 @@ the exact next safe commands, and the blockers. It is not a completion claim.
   `docs/canonical-source-of-truth` to **`main`** after the ancestry and secret
   checks. The diff against `main` is 87 files. CI runs `40799393484` (push) and
   `40799399662` (pull_request) succeeded on `848de00`. The PR is not merged.
-- Branch `feat/availability-basis-and-preflight` is **pushed to origin** at
+- Branch `feat/availability-basis-and-preflight` is a dedicated feature branch
+  pushed to origin (no force). The push verified on 2026-11-01 ended at
   `a75b1595cb9cb418362a332b320c5a734c86991d`, five commits on top of `848de00`.
   Code commit `4264469` adds the explicit availability basis, the offline Apify
-  preflight and the bounded ingestion command; the following docs-only commits end
-  at `a75b159`, the pushed tip. CI run `41235279232` succeeded on that exact SHA.
-  Push and merge authorization for this state was granted on 2026-11-01 for this
-  branch only; PR #14 remains draft and unmerged and merging still awaits explicit
-  authorization.
+  preflight and the bounded ingestion command; documentation-only commits after
+  `4264469` ended at `a75b159` at the time of the original push and have advanced
+  further since (including the `submission/` package) — read the live pushed tip
+  with `git rev-parse origin/feat/availability-basis-and-preflight`. CI run
+  `41235279232` succeeded on the `a75b159` SHA. Push authorization for this branch
+  was granted on 2026-11-01; merge authorization remains withheld.
 - A clean-copy run on 2026-11-01 at code `4264469` / branch tip `346a18c`
   (excluding the unrelated untracked `aicte-compliance-ai/` directory) passed 209
   tests, Ruff, compileall, the documentation validator, the dataset-registry
   validator and `git diff --check`.
-  The working-tree copy with the unrelated directory present shows one
-  environment-only docs-validator failure; that is not a code failure.
+  The working-tree copy with the unrelated directory present shows two
+  environment-only consequences: the documentation validator flags unqualified
+  test-count claims inside `aicte-compliance-ai` Markdown, and the regression test
+  `test_repository_has_no_unqualified_test_count_claims` fails for the same reason.
+  Both disappear in a checkout that contains only tracked files, because the
+  directory is untracked and never reaches Git, CI or a clone.
 - The code now has two named availability bases. `observed` is the default and
   keeps `retrieved_at <= cutoff`. `archive_created_at` is opt-in, requires
   `--availability-note`, and records a look-ahead limitation in the manifest,
