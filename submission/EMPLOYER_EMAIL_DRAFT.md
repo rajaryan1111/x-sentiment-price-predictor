@@ -1,46 +1,28 @@
-# Unsent email draft
+# Unsent employer email draft
 
 **To:** gilad@crowdwisdomtrading.com
-**Status:** draft only. The recipient is taken from the assessment PDF and has not
-been independently mailbox-verified. Do not send credentials in email.
+**Status:** draft only. The recipient is from the assessment PDF and has not been independently mailbox-verified. No credentials are included.
 
-**Subject:** X sentiment and BTC price forecasting assignment — repository and results
+**Subject:** X sentiment and BTC price forecasting assignment — results and required data decisions
 
 Hello Gilad,
 
-I have prepared the repository and a reproducible price-only evaluation. The current
-branch is `feat/availability-basis-and-preflight` in
-https://github.com/rajaryan1111/x-sentiment-price-predictor, with PR #14 kept open
-as a draft. The package includes source archives, checksums, the normalized snapshot,
-per-row predictions, metrics, report, standalone offline dashboard, outlook and SVG chart.
+I have completed the forecasting pipeline, point-in-time data alignment, persistence path, six-horizon model comparison, purged walk-forward evaluation, risk metrics, offline dashboard, one-page outlook, and reproducibility package. PR #14 is open as a draft at https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14 on branch `feat/availability-basis-and-preflight`.
 
-The price sample is Binance Vision BTCUSDT daily data (USDT quote), 2026-05-05 to
-2026-10-31 UTC. It is not exact BTC-USD. The naive mean MAE is 1,824.23 USDT and
-price-only mean MAE is 2,378.50 USDT. No real X posts were accepted or scored, so
-the sentiment model's contribution cannot be measured. One bounded Tavily finance
-search returned five results without publication dates; Exa is implemented but was
-not live-verified because no key is configured.
+The reproducible evaluation covers 180 Binance Spot BTCUSDT daily bars from May 5 through October 31, 2026 (USDT quote, not USD), with five expanding folds, a five-row purge/embargo, six horizons, and 1,800 saved out-of-sample predictions. Naive persistence mean MAE is 1,824.23 USDT; price-only mean MAE is 2,378.50 USDT. Price-only is 30.38% worse than naive. There were zero accepted real X posts and zero scored posts, so no sentiment contribution can be established. The accompanying price-only strategy metrics are sample-specific research statistics, not a profitability claim.
 
-Could you please clarify the following so I can close the remaining assessment
-requirements?
+Tavily received one bounded live finance search and returned five results without publication dates; those dates remain unavailable. Exa is implemented and mock-tested but was not live-verified because no key is configured. Apify preflight passed without a network call or paid run; no X collection was launched.
 
-1. Can I use the included BTCUSDT (USDT quote) market sample, or do you require an
-   exact BTC-USD source? Coinbase's current terms prohibit ML evaluation and
-   redistribution of derived analytics without written permission.
-2. Can you provide an approved, rights-cleared 180-day X export, or approve a
-   specific Apify Actor/plan, query modes, terms and maximum item/USD spend? The
-   currently configured Actor is not available over API on the account's Free plan.
-3. Is Exa mandatory in addition to Tavily? If so, please provide an approved key
-   route and credit cap.
-4. Please confirm the n+0 issue/target convention and the calendar due date; the
-   PDF gives both “within 1 week” and “5–7 days.”
-5. If provider credentials need to be shared, please provide a verified secure
-   private channel. I will not send tokens in plaintext email or include them in the
-   repository/package.
+Attached are `x-sentiment-price-predictor-submission.zip` and `x-sentiment-price-predictor-FINAL_HANDOFF.md`.
 
-The Binance Vision data and derived artifacts are licensed CC BY-NC-SA 4.0,
-attributed in the report folder, and non-commercial only. I have not sent this email
-or submitted the assignment externally.
+To close the remaining data requirements, could you please confirm:
+
+1. Whether you can provide a rights-cleared 180-day X export, or approve a named Actor/account and explicit item/spend cap with permission to use and retain the returned fields.
+2. Whether BTCUSDT is acceptable, or provide/approve a rights-cleared BTC-USD source. Coinbase Market Data was not used; its current terms restrict ML use absent express written consent.
+3. Whether live Exa verification is required and, if so, provide an authorized credential route and credit limit.
+4. The `n+0` target convention and calendar deadline (the assessment gives both “within 1 week” and “5–7 days”).
+
+The Binance Vision source data and its derived evaluation artifacts are attributed and licensed CC BY-NC-SA 4.0 for non-commercial use with share-alike obligations. I have not sent this message or submitted the assignment externally.
 
 Regards,
 

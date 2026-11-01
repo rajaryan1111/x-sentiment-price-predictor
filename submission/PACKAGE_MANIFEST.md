@@ -1,6 +1,6 @@
 # Submission package manifest
 
-The ZIP is a source-based package built from the reviewed `feat/availability-basis-and-preflight` worktree. It contains tracked repository files only, under one `x-sentiment-price-predictor/` root directory. The exact entry count and integrity result are recorded in `FINAL_SUBMISSION_CHECKLIST.md` after the ZIP is built.
+The ZIP is a source-based package built from the reviewed `feat/availability-basis-and-preflight` worktree. It contains **216 tracked files** under one `x-sentiment-price-predictor/` root directory. The final ZIP size, SHA-256, extraction, and integrity results are recorded in the external final handoff and adjacent checksum sidecar.
 
 | Top-level component | Included content | Why it is included |
 | --- | --- | --- |

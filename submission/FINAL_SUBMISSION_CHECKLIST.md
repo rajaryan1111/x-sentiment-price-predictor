@@ -32,7 +32,7 @@
 | Apify validate-only preflight | Pass; no network call and no paid run |
 | Binance archive builder | Pass: 36 published checksum matches, 180 complete bars |
 | Fresh walk-forward evaluation | Pass: 5 folds, 6 horizons, per-row predictions and risk metrics |
-| Clean extraction, secret scan and final ZIP integrity | Release checks recorded in the output package sidecar and final response |
+| Clean extraction, secret scan and final ZIP integrity | Pass: final package verification reports exact file count, size and digest in output handoff |
 | GitHub Actions for final pushed SHA | Checked after normal push; exact Actions link is in final response |
 
 ## Package
