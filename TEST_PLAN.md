@@ -162,8 +162,10 @@ limitations. Never print raw text or credentials.
 ## Fixture policy
 Unit and integration tests build clearly labelled synthetic series and records; no test
 presents a fixture, mock or synthetic value as observed provider data. The only real-data
-run committed to the repository is the public Coinbase price run documented in the README,
-which contains no post text.
+run committed to the repository is the public Binance Vision BTCUSDT price
+evaluation documented in the README; it contains no post text and is licensed
+non-commercially under CC BY-NC-SA 4.0. Historical Coinbase outputs were removed
+from the current tree after the terms review.
 
 ## Reproducibility
 Record commit, non-secret config, seed, dataset version/hash, schema version and fold

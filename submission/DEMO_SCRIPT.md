@@ -43,4 +43,4 @@ Open `reports/btcusdt-180d/dashboard.html`, `sentiment-vs-price.svg`, and `outlo
 
 ## 6:00–7:00 — State external blockers and close
 
-Show `REMAINING_BLOCKERS.md`. Explain that a permitted X source, 180-day corpus, employer-approved terms and cost ceiling, secure credential channel, and several convention decisions are still needed. No paid Apify scrape or live news request was executed. No email was sent.
+Show `REMAINING_BLOCKERS.md`. Explain that a permitted X source, 180-day corpus, employer-approved terms and cost ceiling, secure credential channel, and several convention decisions are still needed. No paid Apify scrape was executed. Final email and delivery status are recorded in the external release handoff.

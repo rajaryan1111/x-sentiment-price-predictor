@@ -6,9 +6,10 @@
 - Final branch: `feat/availability-basis-and-preflight`
 - PR #14: https://github.com/rajaryan1111/x-sentiment-price-predictor/pull/14
   (keep open as draft; no merge to `main`)
-- Final commit SHA and exact GitHub Actions run are verified after the normal push;
-  see the GitHub link in the release handoff. No force-push or history rewrite was
-  performed.
+- The implementation commits are in PR #14, and the PR source branch is advanced
+  only by normal fast-forward. The exact final commit SHA, green checks, package
+  digest and delivery status are recorded in the external release handoff generated
+  after verification. No force-push or history rewrite was performed.
 
 ## Current evidence
 
@@ -29,29 +30,33 @@ sample-specific research metrics, not performance claims.
 One bounded Tavily finance search and one bounded Exa news search were live-checked.
 Tavily returned one result with a malformed publication timestamp, withheld by the
 adapter; Exa returned one result with publication and source metadata. The Exa CLI
-dispatch was fixed and regression-tested. No Apify Actor run was launched: the
-Actor's Free-plan policy prohibits API use. No Coinbase data was fetched in this
-execution. See [provider verification](../docs/PROVIDER_VERIFICATION_2026-11-01.md).
+dispatch was fixed and regression-tested. Apify authentication and Actor metadata
+were verified, but no Actor scraping run was launched and no scraping credits were
+used. Free-plan restrictions and incomplete historical search coverage remain
+limitations. No Coinbase data was fetched in this execution. See
+[provider verification](../docs/PROVIDER_VERIFICATION_2026-11-01.md).
 
 ## Verification
 
-The current count is recorded in [TEST_PLAN.md](../TEST_PLAN.md); Ruff passed;
-compilation passed; documentation validation checked 109 links and all 28
-requirements; dataset registry validated 12 records; Apify preflight reported
+The current count is 228 tests, recorded in [TEST_PLAN.md](../TEST_PLAN.md); Ruff
+and Python compilation passed; documentation validation and dataset registry
+validation passed for 28 requirements and 12 records respectively; Apify preflight reported
 `valid: true`, `network_call_made: false`, `paid_run_launched: false`. The clean
 package extraction, secret scan and exact pushed-commit CI result are release checks
 recorded in the final response and package checksum sidecar.
 
 ## Package and employer materials
 
+- Evaluation PDF: [FINAL_EVALUATION_REPORT.pdf](FINAL_EVALUATION_REPORT.pdf)
 - ZIP: `outputs/x-sentiment-price-predictor-submission.zip`
 - SHA-256 sidecar: the adjacent `.sha256` file; exact digest and entry count are in
-  the release handoff.
+  the external release handoff. The Gmail connector cannot attach files, so the
+  curated ZIP requires a separate delivery method.
 - Attribution and package details: [PACKAGE_MANIFEST.md](PACKAGE_MANIFEST.md) and
   `reports/btcusdt-180d/ATTRIBUTION.md`.
-- Unsent draft: [EMPLOYER_EMAIL_DRAFT.md](EMPLOYER_EMAIL_DRAFT.md), addressed to
-  `gilad@crowdwisdomtrading.com` as printed in the source PDF. It contains no
-  credentials. No email or external assignment submission was made.
+- Email: the final message is sent only after the verified PR head, green CI,
+  integrity-checked PDF/ZIP, and accurate limitations pass the release gates. No
+  credentials are included.
 
 ## Remaining external work
 

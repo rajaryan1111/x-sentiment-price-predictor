@@ -16,5 +16,5 @@ credentials allow. These remaining items require an employer or account-level in
 | Recorded demo/video | No recorded video is included | Employer confirms whether a video is mandatory and required format | Existing reproducible demo script can be recorded locally if requested |
 
 The source-specified recipient is `gilad@crowdwisdomtrading.com`, not independently
-mailbox-verified. The message remains an unsent draft. No credentials have been
-emailed, and no assignment has been submitted externally.
+mailbox-verified. Delivery status is recorded in the external final handoff. No
+credentials are included in the email or repository.

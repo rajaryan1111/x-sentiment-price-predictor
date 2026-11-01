@@ -46,4 +46,5 @@ See [REMAINING_BLOCKERS.md](REMAINING_BLOCKERS.md), the
   conflicting relative deadlines; the exact calendar due date must be clarified.
 
 The recipient printed in the assessment is `gilad@crowdwisdomtrading.com` and has
-not been independently mailbox-verified. No email or assignment has been sent.
+not been independently mailbox-verified. The final message and delivery status are
+recorded in the external release handoff.

@@ -27,7 +27,7 @@
 | Full pytest suite | Current count and command: [TEST_PLAN.md](../TEST_PLAN.md). |
 | Ruff | Pass |
 | Python compilation | Pass |
-| Documentation validation | Pass: 102 relative links, 5 test-count claims, 28 requirement rows |
+| Documentation validation | Pass; current link, test-count and requirement totals are reported by `scripts/validate_docs.py` |
 | Dataset registry validation | Pass: 12 records structurally valid |
 | Apify validate-only preflight | Pass; no network call and no paid run |
 | Binance archive builder | Pass: 36 published checksum matches, 180 complete bars |
@@ -40,11 +40,12 @@
 - [x] Package includes source, tests, canonical docs, reproducibility guide, all permitted Binance source archives/checksums, evaluation artifacts, offline HTML dashboard, one-page outlook and demo script.
 - [x] Package excludes `.git`, `.env`, secrets, private databases, caches, virtual environments and unrelated files.
 - [x] Assessment PDFs are not copied into the package.
+- [x] Final evaluation PDF is included; rendered pages were visually inspected.
 - [x] Package path: `outputs/x-sentiment-price-predictor-submission.zip` in this Codex task.
 - [x] SHA-256 and archive entry count are recorded in the adjacent `.sha256` file and final handoff.
 
 ## External blockers and submission
 
 - [x] Remaining decisions and exact employer actions are listed in `REMAINING_BLOCKERS.md`.
-- [x] Email draft is prepared but unsent; no credentials are included.
+- [x] Email includes the required limitations and delivery note; external send status is recorded in the release handoff. No credentials are included.
 - [x] Final verdict: **SUBMISSION READY WITH EXTERNAL BLOCKERS**. Real X sentiment and exact BTC-USD acceptance remain external dependencies.

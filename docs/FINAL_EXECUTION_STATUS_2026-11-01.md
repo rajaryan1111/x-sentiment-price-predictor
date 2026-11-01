@@ -13,7 +13,7 @@ absence of a live Tavily request. Historical decision records remain in Git hist
 | 180-day X post coverage | No accepted real posts or permitted current-period corpus; Apify Free plan blocks API actor use | Blocked externally |
 | Apify integration and actor setup | Existing bounded adapter and preflight remain; configured actor is `apidojo/tweet-scraper`, but current account plan forbids API runs | Implemented, live collection blocked |
 | Tavily news | Live bounded dated finance search; five results saved for audit, provider supplied no publication dates; news remains context-only | Implemented and live-checked; date metadata incomplete |
-| Exa news | Official `/search` adapter, typed response envelope, date filters, timeout/body bounds, no retry, normalized provenance, CLI selector, mocked tests | Implemented; no live key |
+| Exa news | Official `/search` adapter, typed response envelope, date filters, timeout/body bounds, no retry, normalized provenance, CLI selector, mocked tests; one bounded live request returned a dated result | Implemented and live-smoke-verified; see provider report |
 | Price data | Binance Spot BTCUSDT, daily UTC, 2026-05-05 through 2026-10-31; 180 bars, no gaps or duplicates; source ZIPs and published checksums packaged | Recomputed; USDT proxy, not exact BTC-USD |
 | Timestamped sentiment and features | Pipeline and point-in-time joins are implemented; this run supplied 0 posts and scored 0 | Software verified; empirical sentiment blocked |
 | Horizons n+0 through n+5 | Six horizons, five expanding folds, 100 OOS samples per horizon/model | Recomputed on price data |
@@ -59,9 +59,8 @@ absence of a live Tavily request. Historical decision records remain in Git hist
   search. The search requested finance news, an inclusive UTC date range, publication
   metadata and five results. Tavily returned null publication dates for all five;
   these are not treated as dated observations. News never enters predictive features.
-- At this baseline audit, Exa API key was not configured. A subsequent bounded
-  request is recorded in the provider follow-up report; account credit balance was
-  not queried.
+- The baseline audit preceded a subsequent bounded Exa request recorded in the
+  provider follow-up report. The account credit balance was not queried.
 - Coinbase Market Data Terms prohibit using Coinbase Market Data to train, validate,
   benchmark or improve AI/ML models and prohibit redistributing derived analytics
   without prior written consent. No Coinbase data was fetched in this execution.
@@ -84,5 +83,5 @@ absence of a live Tavily request. Historical decision records remain in Git hist
    with an explicit credit limit.
 4. Confirm the calendar deadline and secure credential handoff channel. Keep tokens
    out of Git and plaintext email.
-5. No email has been sent; the existing employer email remains a draft for separate
-   explicit user authorization.
+5. The employer email is sent only after the verified PR, CI, report and package
+   release gates pass; no credential is included.

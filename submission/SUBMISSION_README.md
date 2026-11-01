@@ -3,7 +3,7 @@
 **Repository:** https://github.com/rajaryan1111/x-sentiment-price-predictor
 **Branch:** `feat/availability-basis-and-preflight`
 **Recipient in assignment PDF:** `gilad@crowdwisdomtrading.com` (not independently mailbox-verified)
-**Submission state:** package prepared; email not sent.
+**Submission state:** final package and email are handled after the verified PR release gates; check the external release handoff for the final send and delivery status.
 
 ## Packet contents
 
@@ -16,7 +16,7 @@
 | [PACKAGE_MANIFEST.md](PACKAGE_MANIFEST.md) | Included components and exclusions |
 | [DEMO_SCRIPT.md](DEMO_SCRIPT.md) | Honest evaluator walkthrough |
 | [REPRODUCIBILITY.md](REPRODUCIBILITY.md) | Clean clone/ZIP setup, offline checks and demo |
-| [EMPLOYER_EMAIL_DRAFT.md](EMPLOYER_EMAIL_DRAFT.md) | Unsent draft using the address printed in the assignment |
+| [EMPLOYER_EMAIL_DRAFT.md](EMPLOYER_EMAIL_DRAFT.md) | Prepared email using the address printed in the assignment |
 | [RESULTS.md](RESULTS.md) and [DATA_LIMITATIONS.md](DATA_LIMITATIONS.md) | Recorded metrics and evidence limits |
 | [EXPERIMENT_METHODOLOGY.md](EXPERIMENT_METHODOLOGY.md) | Modeling and evaluation conventions |
 
@@ -38,6 +38,6 @@ offline tests, and safe preflight tooling.
 - The fresh Binance Vision evaluation includes its source archives/checksums, exact snapshot and per-row predictions. Its quote currency is USDT, not USD.
 - Binance data and derived report files are CC BY-NC-SA 4.0, attributed and non-commercial only.
 - The original assessment PDFs were reviewed from user-provided copies outside the repository; they are neither committed nor included in the ZIP.
-- No email was sent, and no external submission was made.
+- The email send and external delivery status are recorded in the external release handoff.
 
 **Verdict:** SUBMISSION READY WITH EXTERNAL BLOCKERS. See the handoff and blocker list for exact next actions.

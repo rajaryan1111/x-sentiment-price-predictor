@@ -89,8 +89,19 @@ verified run are also included under `reports/btcusdt-180d/`.
 ## 6. Optional provider calls
 
 `fetch-news` selects Tavily or Exa and requires an explicit `--confirm-live-call`
-flag. One dated Tavily finance request was performed using existing free allowance;
-it returned five results without publication dates. Exa has no configured key and
-is only mock-verified. No Apify Actor run was performed; the current account Free
-plan forbids API use. Do not run a paid collection without employer approval and an
-explicit cap.
+flag. On 2026-11-01, one bounded Tavily finance request returned one item whose
+malformed publication timestamp was withheld. One bounded Exa request returned one
+item with publication time and source metadata. These smoke checks do not establish
+provider quality or coverage; see [provider verification](../docs/PROVIDER_VERIFICATION_2026-11-01.md).
+No Apify Actor run was performed; the current account Free plan forbids API use. Do
+not run a paid collection without employer approval and an explicit cap.
+
+## 7. Test suite and X-post integration
+
+Run `python -m pytest -q -ra` from the repository root; the authoritative current
+count is maintained in `TEST_PLAN.md`. Synthetic X-post integration tests exercise actor-shaped records
+through normalization, multi-query merge, provenance-sidecar validation, `--posts`,
+sentiment scoring, and point-in-time feature construction. They verify duplicate
+conflicts and exclusion of posts retrieved after the cutoff. These fixtures verify
+software behavior only; they are not real X data or empirical sentiment evidence.
+News loaded with `--news-file` remains separate from predictive features.

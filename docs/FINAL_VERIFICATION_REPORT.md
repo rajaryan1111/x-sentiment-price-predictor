@@ -2,14 +2,14 @@
 
 ## Local verification
 
-The full source-tree verification was run on the execution changes:
+The full source-tree verification was run on the final release changes:
 
 | Check | Result |
 | --- | --- |
 | `uv run pytest -q -ra` | See the current count in [TEST_PLAN.md](../TEST_PLAN.md); this report follows the 2026-11-01 run. |
-| `uv run ruff check src tests scripts` | Pass |
+| `uv run ruff check .` | Pass |
 | `uv run python -m compileall -q src tests scripts` | Pass |
-| `uv run python scripts/validate_docs.py` | Pass: 102 relative links, 5 test-count claims, 28 matrix rows |
+| `uv run python scripts/validate_docs.py` | Pass; exact current link and matrix counts are reported by the validator |
 | `uv run python scripts/validate_dataset_registry.py` | Pass: 12 records structurally valid |
 | Apify `--validate-only` preflight | `valid: true`; `network_call_made: false`; `paid_run_launched: false` |
 | Binance archive build | 36 published checksum matches; 180 complete, unique daily rows |
@@ -33,15 +33,17 @@ results are CC BY-NC-SA 4.0, attributed and non-commercial only.
 
 ## Release checks
 
-The final ZIP is built from the reviewed final branch. ZIP integrity, clean
+The final ZIP is built from the exact reviewed PR tree. ZIP integrity, clean
 extraction, forbidden-file/secret scans, archive entry count, checksum sidecar, and
-GitHub Actions for the exact pushed SHA are release gates. Their exact output paths,
-digest and Actions link are returned in the final handoff. Historical CI runs are
-not used as evidence for a newer SHA.
+GitHub Actions for the exact pushed SHA are release gates. The external final
+handoff records the exact commit, digest, package path and Actions links. Historical
+CI runs are not used as evidence for a newer SHA.
 
 ## External constraints
 
-Current Apify Free-plan rules prohibit Actor API use. Coinbase Market Data terms
+Apify credentials and Actor metadata were verified without launching an Actor run;
+the current Free-plan rules prohibit API runs and historical search is not complete
+coverage. Coinbase Market Data terms
 prohibit ML evaluation and derived-artifact redistribution without written consent;
 no Coinbase data was used in this execution and its former derived result files were
 removed from the current tree. The exact BTC-USD pair, real X dataset, any Exa live

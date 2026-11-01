@@ -1,6 +1,6 @@
 # Submission package manifest
 
-The ZIP is a source-based package built from the reviewed `feat/availability-basis-and-preflight` worktree. It contains **217 tracked files** under one `x-sentiment-price-predictor/` root directory, including the full 1,800-row saved prediction file. The final ZIP size, SHA-256, extraction, and integrity results are recorded in the external final handoff and adjacent checksum sidecar.
+The ZIP is a source-based package built from the exact reviewed PR tree under one `x-sentiment-price-predictor/` root directory, including the final evaluation PDF and full 1,800-row saved prediction file. The external final handoff records its exact source commit, entry count, byte size, SHA-256, extraction, and integrity results.
 
 | Top-level component | Included content | Why it is included |
 | --- | --- | --- |
@@ -12,7 +12,7 @@ The ZIP is a source-based package built from the reviewed `feat/availability-bas
 | `docs/` | Source-checked requirements, traceability, provider setup, data contract, limitations and technical audit records | Requirement evidence and context; historical records are dated and must not be read as current-state CI evidence. |
 | `data/registry/` | Curated historical dataset reference metadata | Reproducible dataset inventory; no downloaded post corpus. |
 | `reports/btcusdt-180d/` | 180-row BTCUSDT snapshot, 36 source archive ZIPs and checksum sidecars, manifest, aggregate/per-horizon metrics, 1,800 predictions, Markdown report/outlook, SVG, attribution/license | Recomputed reproducible price-only evaluation; USDT quote, Binance Vision CC BY-NC-SA 4.0, non-commercial only. |
-| `submission/` | Final checklist, handoff, package manifest, blockers, evaluation, demo, reproducibility, results, limitations and unsent email draft | Evaluator-facing packet and precise handoff. |
+| `submission/` | Final checklist, handoff, package manifest, blockers, evaluation PDF and Markdown, demo, reproducibility, results, limitations and email draft | Evaluator-facing packet and precise handoff. |
 | `dashboard/` and pipeline `dashboard.html` | Offline dashboard scope and generated dashboard | Self-contained HTML embeds the generated SVG and reports sample counts, forecast metrics, risk metrics, source freshness, licensing, and honest empty sentiment states. |
 
 ## Exclusions

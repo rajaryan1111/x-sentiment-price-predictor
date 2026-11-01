@@ -213,7 +213,8 @@ errors and caller notes are redacted, oversized responses are rejected while
 streaming, JSONL can be loaded by `run --news-file`, and adding news context
 leaves predictions and metrics byte-identical. A separate regression blocks
 network access during the offline CLI run. One bounded Tavily finance search was
-made and yielded five results without publication dates. Exa remains mock-only.
+made; its returned item's malformed publication timestamp was withheld. One
+bounded Exa search returned one dated item. See the provider verification report.
 
 **Close with:**
 
@@ -226,7 +227,7 @@ made and yielded five results without publication dates. Exa remains mock-only.
 
 **Show:** [EXTERNAL_BLOCKERS.md](EXTERNAL_BLOCKERS.md),
 [EMPLOYER_CLARIFICATIONS.md](EMPLOYER_CLARIFICATIONS.md) (consolidated questions
-and unsent email draft) and
+and prepared email) and
 [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md).
 
 ## Commands deliberately not demonstrated

@@ -1,6 +1,6 @@
 # Employer clarifications and authorization gates
 
-**Status (2026-11-01):** no employer answers or submission delivery are recorded. The original assignment PDF was re-opened and read in full from a user-provided copy in Downloads; the companion historical-dataset PDF was also reviewed. Both are outside Git and excluded from the ZIP. The source names, page counts, and verified hashes are in [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md). The PDF specifies the recipient `gilad@crowdwisdomtrading.com`; this address is copied into the unsent draft and is not independently mailbox-verified. No address reconfirmation is requested.
+**Status (2026-11-01):** no employer answers are recorded. The original assignment PDF was re-opened and read in full from a user-provided copy in Downloads; the companion historical-dataset PDF was also reviewed. Both are outside Git and excluded from the ZIP. The source names, page counts, and verified hashes are in [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md). The PDF specifies the recipient `gilad@crowdwisdomtrading.com`; this address is used in the prepared email and is not independently mailbox-verified. No address reconfirmation is requested. Final delivery status is maintained in the external handoff.
 
 ## Confirmed from the assignment source
 
@@ -35,4 +35,4 @@ Configuration was checked on 2026-11-01 without printing secret values. The igno
 
 ## Submission draft
 
-The unsent email is in [EMPLOYER_EMAIL_DRAFT.md](../submission/EMPLOYER_EMAIL_DRAFT.md). It uses the source-specified recipient, identifies the final branch and report, describes current evidence and limitations, states that no paid Apify run was made, and asks only for unresolved employer decisions. No email has been sent.
+The prepared email is in [EMPLOYER_EMAIL_DRAFT.md](../submission/EMPLOYER_EMAIL_DRAFT.md). It uses the source-specified recipient, identifies the final branch and report, describes current evidence and limitations, states that no paid Apify run was made, and asks only for unresolved employer decisions. Final send status is in the external handoff.
