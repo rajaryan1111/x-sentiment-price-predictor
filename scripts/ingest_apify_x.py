@@ -29,6 +29,7 @@ from xsentiment.ingestion.apify_preflight import (
 )
 from xsentiment.ingestion.apify_x import ApifyXAdapter
 from xsentiment.ingestion.contracts import XPostRecord
+from xsentiment.ingestion.post_dataset import serialize_x_post
 
 QUERY_MODES = ("ticker", "cashtag", "keyword")
 MAX_QUERY_CHARS = 400
@@ -93,28 +94,7 @@ def _credentials_configured() -> bool:
 
 
 def _serialize(post: XPostRecord) -> dict[str, Any]:
-    return {
-        "post_id": post.post_id,
-        "created_at": post.created_at.isoformat(),
-        "retrieved_at": post.retrieved_at.isoformat(),
-        "text": post.text,
-        "sentiment_score": post.sentiment_score,
-        "likes": post.likes,
-        "reposts": post.reposts,
-        "views": post.views,
-        "author_followers": post.author_followers,
-        "provenance_url": post.provenance_url,
-        "source_name": post.source_name,
-        "source_platform": post.source_platform,
-        "source_created_at_raw": post.source_created_at_raw,
-        "source_utc_offset": post.source_utc_offset,
-        "author_id": post.author_id,
-        "query_mode": post.query_mode,
-        "query": post.query,
-        "source_record_hash": post.source_record_hash,
-        "schema_version": post.schema_version,
-        "warnings": list(post.warnings),
-    }
+    return serialize_x_post(post)
 
 
 def build_manifest(

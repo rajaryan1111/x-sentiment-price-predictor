@@ -1,7 +1,9 @@
 # Test Plan
 A passing suite proves only the cases it actually exercises. Current collection on
-2026-11-01 is **220 offline tests** using Python 3.11.15 and the existing
-`.[dev,storage,analysis]` environment. The current verification adds 10 collected
+2026-11-01 is **228 offline tests** using Python 3.11.15 and the existing
+`.[dev,storage,analysis]` environment. This verification adds 8 collected cases
+over the 220-case checkpoint: six post-batch merge cases and two synthetic
+X-post-to-feature integration cases. The prior verification had added 10 collected
 cases over the earlier 209-case checkpoint: two Tavily date-filter cases, three
 Exa adapter cases, one Exa CLI-routing case, three Binance archive/checksum/coverage
 cases, one quote-unit case and one dashboard empty-sentiment integration case. Earlier verification had added 22 collected
@@ -50,6 +52,12 @@ results for that revision. `scripts/validate_docs.py` enforces that rule, and
   manifest records `input_source = persisted_storage`. These remain fixture/mock based: they
   do not prove a production PostgreSQL deployment, and they do not prove acceptance of any
   real X corpus.
+- X-post feature integration: synthetic Actor-shaped records pass through
+  normalization, multi-query merge, `run --posts`, VADER scoring and the
+  point-in-time feature builder. Tests verify provenance-sidecar hashing, earliest
+  retrieval selection, duplicate identity conflicts, and exclusion of posts
+  retrieved after a cutoff. These fixtures verify software behavior only; they are
+  not real X data or model evidence.
 - End-to-end: `tests/integration/test_offline_demo.py` generates deterministic,
   explicitly labelled synthetic price/post snapshots, drives the real `run` CLI,
   validates every artefact (manifest lineage, six horizons, three models, finite

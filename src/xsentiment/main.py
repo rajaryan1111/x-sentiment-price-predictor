@@ -117,6 +117,19 @@ def _parse_availability_note(value: str) -> str:
     return note
 
 
+def _validate_posts_provenance(posts_path: Path, provenance_path: Path) -> str:
+    """Verify a merge sidecar belongs to the exact posts snapshot being evaluated."""
+    try:
+        payload = json.loads(provenance_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError("posts provenance file is not valid JSON") from exc
+    if not isinstance(payload, dict) or payload.get("schema_version") != "x-posts-merge-v1":
+        raise ValueError("posts provenance file has an unsupported schema")
+    if payload.get("posts_sha256") != sha256_file(posts_path):
+        raise ValueError("posts provenance file does not match the supplied posts snapshot")
+    return sha256_file(provenance_path)
+
+
 def _configured_news_key(provider: str) -> str | None:
     """Read the only permitted credential source: environment or local .env."""
     settings = get_settings()
@@ -205,10 +218,11 @@ async def _fetch_news_result(
     adapter_type = TavilyNewsAdapter if provider == "tavily" else ExaNewsAdapter
     async with adapter_type(api_key=api_key, max_results=max_results) as adapter:
         kwargs = {
-            "topic": topic,
             "start_date": start_date.date() if start_date else None,
             "end_date": end_date.date() if end_date else None,
         }
+        if provider == "tavily":
+            kwargs["topic"] = topic
         return await adapter.search(query, **kwargs)
 
 
@@ -435,8 +449,14 @@ def _command_run(args: argparse.Namespace) -> int:
         )
         provenance: dict[str, object] = {}
         if args.database_url is not None:
-            if args.prices is not None or args.posts is not None:
-                raise ValueError("--database-url cannot be combined with --prices/--posts")
+            if (
+                args.prices is not None
+                or args.posts is not None
+                or args.posts_provenance is not None
+            ):
+                raise ValueError(
+                    "--database-url cannot be combined with --prices/--posts/--posts-provenance"
+                )
             candles, posts, snapshot_ids = asyncio.run(_load_persisted_inputs(args))
             provenance["input_source"] = "persisted_storage"
             provenance["database_url"] = args.database_url
@@ -444,6 +464,8 @@ def _command_run(args: argparse.Namespace) -> int:
         else:
             if args.prices is None:
                 raise ValueError("usage: xsentiment run --prices SNAPSHOT or --database-url URL")
+            if args.posts_provenance is not None and args.posts is None:
+                raise ValueError("--posts-provenance requires --posts")
             provenance["input_source"] = "file_snapshot"
             provenance["price_snapshot"] = str(args.prices)
             provenance["price_snapshot_sha256"] = sha256_file(args.prices)
@@ -455,6 +477,11 @@ def _command_run(args: argparse.Namespace) -> int:
             if args.posts is not None:
                 provenance["posts_snapshot"] = str(args.posts)
                 provenance["posts_snapshot_sha256"] = sha256_file(args.posts)
+                if args.posts_provenance is not None:
+                    provenance["posts_provenance_snapshot"] = str(args.posts_provenance)
+                    provenance["posts_provenance_snapshot_sha256"] = (
+                        _validate_posts_provenance(args.posts, args.posts_provenance)
+                    )
             candles = load_candles(args.prices)
             posts = load_posts_jsonl(args.posts) if args.posts is not None else []
         news = load_news_context(args.news_file) if args.news_file is not None else []
@@ -592,7 +619,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     run = subparsers.add_parser("run", help="run the offline evaluation pipeline")
     run.add_argument("--prices", type=Path, default=None, help="price snapshot from fetch-prices")
-    run.add_argument("--posts", default=None, help="optional JSONL of normalized posts")
+    run.add_argument(
+        "--posts", type=Path, default=None, help="optional JSONL of normalized posts"
+    )
+    run.add_argument(
+        "--posts-provenance",
+        type=Path,
+        default=None,
+        help="optional merge provenance sidecar matching --posts",
+    )
     run.add_argument(
         "--database-url",
         default=None,

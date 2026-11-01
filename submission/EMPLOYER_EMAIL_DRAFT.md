@@ -11,7 +11,7 @@ I have completed the forecasting pipeline, point-in-time data alignment, persist
 
 The reproducible evaluation covers 180 Binance Spot BTCUSDT daily bars from May 5 through October 31, 2026 (USDT quote, not USD), with five expanding folds, a five-row purge/embargo, six horizons, and 1,800 saved out-of-sample predictions. Naive persistence mean MAE is 1,824.23 USDT; price-only mean MAE is 2,378.50 USDT. Price-only is 30.38% worse than naive. There were zero accepted real X posts and zero scored posts, so no sentiment contribution can be established. The accompanying price-only strategy metrics are sample-specific research statistics, not a profitability claim.
 
-Tavily received one bounded live finance search and returned five results without publication dates; those dates remain unavailable. Exa is implemented and mock-tested but was not live-verified because no key is configured. Apify preflight passed without a network call or paid run; no X collection was launched.
+One bounded live finance search each was made to Tavily and Exa. Tavily's result had a malformed publication timestamp, which was withheld; Exa's result had a publication timestamp and source metadata. No Apify Actor run or X collection was launched. The provider verification report records exact commands and remaining data-access blockers.
 
 Attached are `x-sentiment-price-predictor-submission.zip` and `x-sentiment-price-predictor-FINAL_HANDOFF.md`.
 

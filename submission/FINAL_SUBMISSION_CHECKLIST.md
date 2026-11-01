@@ -12,8 +12,8 @@
 
 - [x] Real X status is explicit: 0 accepted posts, 0 scored posts, no 180-day corpus.
 - [x] Apify actor `apidojo/tweet-scraper` is identified; current Free plan prohibits API runs; no Actor run or purchase was made.
-- [x] One bounded Tavily finance search was live-checked; five results had no publication timestamps and remain undated.
-- [x] Exa adapter and CLI are implemented and mock-tested; no key/live verification.
+- [x] One bounded Tavily finance search and one bounded Exa news search were live-checked; see the provider verification report for timestamp/source results.
+- [x] Exa CLI dispatch fixed and regression-tested after a pre-network TypeError was found; no Apify run was launched.
 - [x] 180 Binance Vision BTCUSDT bars cover 2026-05-05 to 2026-10-31 UTC; 36 published archive checksums matched, with no missing or duplicate dates.
 - [x] Six horizons, five folds, 100 OOS samples per model/horizon, 1,800 prediction rows, and the defined price-only strategy were freshly recomputed.
 - [x] Price-only is worse than naive on mean MAE; no sentiment or profitability claim is made.

@@ -270,9 +270,10 @@ def test_fetch_news_routes_exa_provider_and_date_bounds(
         async def __aexit__(self, exc_type, exc, tb):
             return None
 
-        async def search(self, query: str, **kwargs):
+        async def search(self, query: str, *, start_date=None, end_date=None):
             captured["query"] = query
-            captured.update(kwargs)
+            captured["start_date"] = start_date
+            captured["end_date"] = end_date
             now = datetime.now(UTC)
             return NewsResult(query=query, retrieved_at=now, items=(), excluded=())
 

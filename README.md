@@ -10,8 +10,10 @@ close forecasts at horizons `n+0` through `n+5`.
 > posts were available, so no sentiment conclusion is possible. Price-only mean
 > MAE is worse than naive. Binance-derived data and reports are CC BY-NC-SA 4.0,
 > attribution/share-alike, non-commercial only. No live Apify run occurred; one
-> bounded Tavily search was live-checked; Exa is implemented but mock-only because
-> no key is configured. No Coinbase data was fetched in this execution. The original assignment and companion
+> bounded Tavily and Exa news searches were live-checked; a single Exa CLI dispatch
+> bug found during verification was fixed and regression-tested. No Apify run or
+> Coinbase data fetch occurred. See [provider verification](docs/PROVIDER_VERIFICATION_2026-11-01.md).
+> The original assignment and companion
 > dataset-reference PDFs were re-opened on 2026-11-01 from user-provided copies
 > outside Git; they are not included in the repository or ZIP. CI and offline
 > tests prove software behavior, not data access, licensing, model quality, or
@@ -93,6 +95,30 @@ archive is explicitly approved, run with `--availability-basis archive_created_a
 --availability-note "<disclosure>"`; the manifest, report and outlook then carry a
 look-ahead limitation. The archive basis is never the default.
 
+For multiple approved query batches, first merge their normalized JSONL files and
+per-query manifests. Duplicates are collapsed by post ID only when their stable
+event time, text and platform agree; the earliest retrieval time is kept and every
+query origin is recorded in the sidecar. The optional `--posts-provenance` flag
+binds that sidecar hash into the run manifest. This does not make a post collected
+later available at an earlier cutoff. See [Apify X setup](docs/APIFY_X_SETUP.md).
+
+```bash
+python scripts/merge_apify_x_posts.py \
+  --posts data/apify-x-ticker.jsonl \
+  --posts data/apify-x-cashtag.jsonl \
+  --posts data/apify-x-keyword.jsonl \
+  --run-manifest reports/generated/apify-x-ticker/manifest.json \
+  --run-manifest reports/generated/apify-x-cashtag/manifest.json \
+  --run-manifest reports/generated/apify-x-keyword/manifest.json \
+  --out data/apify-x-merged.jsonl \
+  --manifest-out reports/generated/apify-x-merged/manifest.json
+
+python -m xsentiment run --prices prices.json \
+  --posts data/apify-x-merged.jsonl \
+  --posts-provenance reports/generated/apify-x-merged/manifest.json \
+  --out reports/generated/x-sentiment-run
+```
+
 News is a deliberately separate, two-step workflow: `fetch-news` makes one
 explicitly confirmed provider request, and `run --news-file` is entirely offline.
 The `fetch-prices` path is a legacy Coinbase adapter; do not use Coinbase data for
@@ -125,9 +151,12 @@ python -m xsentiment run \
 Each JSONL line carries `title`, `url`, `published_at` (or an explicit note when the
 provider omits it), `retrieved_at`, `source`, `provider`, `payload_sha256`, `query`
 and a rendered `context_line`. Credentials are never written to the file, logged or
-passed on the command line. One Tavily finance request was live-checked and returned
-five results without publication dates. Exa remains mock-only because no key is
-configured. News remains context-only.
+passed on the command line. One bounded Tavily finance request returned one result
+whose malformed publication timestamp was withheld; one bounded Exa request
+returned one result with a publication timestamp and source metadata. These were
+single live smoke checks, not a quality or coverage assessment. News remains
+context-only. See the [provider verification report](docs/PROVIDER_VERIFICATION_2026-11-01.md)
+for the exact commands and limitations.
 
 Profile a local candidate corpus without printing post text or uploading it:
 

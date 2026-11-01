@@ -19,7 +19,7 @@ approved rights-cleared USD source is still needed.
 | 180-day X post data | BLOCKED | 0 accepted posts and 0 scored posts. Apify Free plan prohibits Actor API runs. Employer must provide permitted data or approve a paid plan/Actor and spend cap. |
 | Apify integration | IMPLEMENTED, NOT LIVE | Bounded adapter and preflight exist; current configured Actor is `apidojo/tweet-scraper`; no Actor run was launched. |
 | Tavily | IMPLEMENTED, LIVE-CHECKED | One bounded dated finance search returned five results but no publication dates. Dates remain null. |
-| Exa | IMPLEMENTED, MOCK-VERIFIED | Official `/search` adapter, typed response, date filters, bounded HTTP handling and CLI selector. No key configured, no live call. Employer must confirm whether required. |
+| Exa | IMPLEMENTED, LIVE-SMOKE-VERIFIED | Official `/search` adapter, typed response, date filters, bounded HTTP handling and CLI selector. One bounded call returned one dated item; employer should clarify ongoing use and credit limit. |
 | Price data | RECOMPUTED, SOURCE VARIANCE | 180 Binance Vision BTCUSDT bars, 2026-05-05 through 2026-10-31 UTC, 0 gaps/duplicates, 36 archive checksum matches. USDT is not USD. |
 | Timestamped sentiment and features | SOFTWARE IMPLEMENTED, NO EMPIRICAL POSTS | Pipeline and point-in-time controls remain; this run has no sentiment observations. |
 | Forecast horizons | RECOMPUTED | n+0 through n+5; five expanding folds, 100 OOS samples per model/horizon, five-row purge/embargo. |

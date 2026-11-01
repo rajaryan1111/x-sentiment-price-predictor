@@ -71,6 +71,34 @@ coverage, caps and a hashed query label, never post text. Repeat for `cashtag` a
 `keyword`; then feed the JSONL to `xsentiment persist --posts` or
 `xsentiment run --posts`.
 
+### Merge query outputs before a multi-query run
+
+Each invocation records one query mode. Combine its JSONL and sanitized manifest
+with the other approved query batches before running the feature pipeline:
+
+```bash
+python scripts/merge_apify_x_posts.py \
+  --posts data/apify-x-ticker.jsonl \
+  --posts data/apify-x-cashtag.jsonl \
+  --posts data/apify-x-keyword.jsonl \
+  --run-manifest reports/generated/apify-x-ticker/manifest.json \
+  --run-manifest reports/generated/apify-x-cashtag/manifest.json \
+  --run-manifest reports/generated/apify-x-keyword/manifest.json \
+  --out data/apify-x-merged.jsonl \
+  --manifest-out reports/generated/apify-x-merged/manifest.json
+
+python -m xsentiment run --prices prices.json \
+  --posts data/apify-x-merged.jsonl \
+  --posts-provenance reports/generated/apify-x-merged/manifest.json \
+  --out reports/generated/x-sentiment-run
+```
+
+The merge rejects the same post ID with conflicting event time, text, or platform.
+Compatible duplicates retain the earliest recorded retrieval time; the sidecar
+lists each query mode and hashed query origin per post without copying post text.
+The run manifest records the sidecar hash. Post collection remains disabled on the
+current Apify Free plan; these commands are instructions only and were not run.
+
 ## Adapter behavior
 
 `ApifyXAdapter.run_and_fetch(...)` is explicit and never runs merely by importing the module. The caller must supply the Actor input plus an item cap, dollar cap and timeout. The initial POST is not automatically retried because a network timeout may leave a paid run's result ambiguous. In that case, inspect the Apify console before another attempt.

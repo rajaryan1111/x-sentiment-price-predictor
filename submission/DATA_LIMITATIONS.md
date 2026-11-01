@@ -29,12 +29,11 @@ See [REMAINING_BLOCKERS.md](REMAINING_BLOCKERS.md), the
 
 ## News providers
 
-- Tavily is bounded, dated, live-checked once and context-only. The five live
-  results lacked publication timestamps, so dates remain unknown. Usage was 0/1,000
-  plan units before the call.
-- Exa adapter and CLI are implemented and mock-tested. No key is configured and
-  no live verification is claimed. Employer confirmation is needed if Exa is
-  mandatory.
+- Tavily is bounded, dated, live-checked once and context-only. Its one-result smoke
+  response had a malformed publication timestamp, which the adapter withheld.
+- Exa adapter and CLI are implemented and tested; one bounded live request returned
+  one dated result with source metadata. See the provider verification report for
+  costs and the ongoing-use limitation.
 
 ## Model and display limits
 

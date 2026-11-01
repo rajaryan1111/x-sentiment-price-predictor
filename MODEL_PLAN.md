@@ -37,6 +37,23 @@ is `mean_sentiment_24h(T) - mean_sentiment_24h(T-1 UTC day)`, emitted only for
 consecutive scored cutoffs; an unscored day leaves the change unavailable rather than
 zero. See `src/xsentiment/reporting/charts.py`.
 
+## X-post input path and provenance
+The feature implementation already accepts normalized `XPostRecord` values:
+`scripts/ingest_apify_x.py` writes one normalized JSONL batch per approved query;
+`xsentiment run --posts` loads those records, scores text with VADER, builds the
+sentiment columns above, and evaluates the sentiment-plus-price model. The missing
+multi-query seam is deterministic assembly when the same post appears in multiple
+batches. The merge command records every source query in a sanitized provenance
+sidecar, keeps one canonical post row, and the run manifest hashes both the posts
+snapshot and sidecar. Existing single-file `--posts` runs remain supported.
+
+Duplicate IDs must agree on stable post identity (`created_at`, text and platform)
+or the merge fails closed. For compatible duplicates, the earliest observed
+`retrieved_at` is retained and all source query modes/hashes are preserved in the
+sidecar. A retrospective scrape has its actual retrieval time: it is excluded from
+earlier cutoffs under `observed` and is not evidence for leakage-safe historical
+sentiment. The opt-in archive basis remains explicitly retrospective.
+
 
 ## Sentiment scorer (implemented)
 VADER (`vaderSentiment` 3.3.x, MIT) through `xsentiment.features.sentiment`. It is

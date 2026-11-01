@@ -17,9 +17,9 @@ The full source-tree verification was run on the execution changes:
 
 The local test count matches the authoritative count in `TEST_PLAN.md`. Adapter
 tests use mocked HTTP and do not reach provider endpoints. The one explicitly
-authorized live Tavily request is documented separately in the final execution
-status; it yielded five results without publication timestamps. Exa is not live
-verified and no Apify Actor was run.
+authorized Tavily and Exa smoke requests are documented in the provider
+verification report; Tavily's result timestamp was withheld and Exa returned a
+dated item. No Apify Actor was run.
 
 ## Data and model result
 

@@ -20,17 +20,17 @@
 | Which X source/Actor and terms should be used? | No approved Actor, license, matching 180-day corpus, or live payload profile exists. `61RPP7dywgiy0JPD0` is only a candidate configured locally. | Employer: approve a provider/Actor or dataset, terms, fields, query modes, and 180-day coverage. |
 | What is the hard item and USD spend cap? | The adapter has local caps, but they do not verify Actor pricing or authorize a paid run. | Employer: specify per-run item and spend ceilings; user must authorize any paid run. |
 | How should required provider credentials be transferred? | Local presence is not approval. Secrets must not be sent by plaintext email or included in the ZIP. | Employer: name an approved private channel and recipient. |
-| Is Exa required? | The brief names Tavily in project scope and mentions Exa only on the submission page. An Exa adapter now exists but has no configured key or live verification. | Employer: confirm whether live Exa access is required and provide an authorized key/credit limit if so. |
+| Is Exa required for ongoing use? | The brief names Tavily in project scope and mentions Exa only on the submission page. A bounded Exa request has now been smoke-tested once. | Employer: clarify ongoing provider requirements and any allowed credit/spend limit. |
 | Is a video or any format beyond the requested repository and Markdown/PDF report required? | The source does not specify a demo/video attachment. A demo script exists; no video is claimed. | Employer: specify any additional deliverables and delivery channel. |
 | May retrospective archive creation time be used as availability time? | This can introduce look-ahead bias. The implemented default is leakage-safe observed availability; archive mode is opt-in and disclosed. | Employer: explicitly approve or reject the disclosed retrospective assumption. |
 
 ## Provider status verified locally
 
-Configuration was checked on 2026-11-01 without printing secret values. The ignored local `.env` has an Apify token entry, candidate Actor ID, and Tavily key entry configured; Exa is blank. `.env.example` contains placeholders only. This does not establish employer approval, licensing, permission to spend, or a secure credential-transfer route.
+Configuration was checked on 2026-11-01 without printing secret values. The ignored local `.env` has the Apify token, candidate Actor ID, Tavily key, and Exa key configured. `.env.example` contains placeholders only. This does not establish employer approval, licensing, permission to spend, or a secure credential-transfer route.
 
 - **Apify:** configured ID resolves to `apidojo/tweet-scraper`; adapter and preflight tests exist. Current account Free-plan rules block API Actor runs. No live run, paid scrape, accepted X post, or 180-day X profile exists.
-- **Tavily:** bounded adapter, date/topic controls, explicit CLI gate and offline JSONL handoff are mocked-tested. One live dated finance request returned five results without publication dates.
-- **Exa:** official `/search` adapter, typed response envelope, date filters, bounds, and mock tests exist. No key is configured and no live request was made.
+- **Tavily:** bounded adapter, date/topic controls, explicit CLI gate and offline JSONL handoff are mocked-tested. One live dated finance request returned one result with a malformed publication timestamp withheld.
+- **Exa:** official `/search` adapter, typed response envelope, date filters, bounds, and mock tests exist. One live request returned one result with publication and source metadata; the shared CLI dispatch was corrected and regression-tested.
 - **Prices:** a fresh 180-row Binance Vision BTCUSDT snapshot and evaluation, with source archives/checksums and per-row predictions, are included. Values are USDT, not USD, and derivatives are non-commercial CC BY-NC-SA 4.0.
 
 ## Submission draft

@@ -8,8 +8,8 @@ restriction. Full notice: [`reports/btcusdt-180d/ATTRIBUTION.md`](../reports/btc
 | --- | --- | --- |
 | Binance Vision Spot BTCUSDT daily kline archives | Price features, targets, forecast labels and strategy replay | 36 ZIP archives with published checksum sidecars; May 5–Oct 31, 2026 UTC; 180 rows, no gaps/duplicates; reproducible using `scripts/build_binance_snapshot.py` |
 | Real X posts | Sentiment features and time alignment | None accepted; no X posts were collected or scored |
-| Tavily news | Outlook context only | One bounded live finance query returned five results without publication dates; not a model input |
-| Exa news | Optional outlook context | Adapter/CLI mocked-tested; no Exa key and no live call |
+| Tavily news | Outlook context only | One bounded live finance query returned one result with a malformed publication timestamp withheld; not a model input |
+| Exa news | Optional outlook context | One bounded live search returned one result with publication/source metadata; not a model input |
 
 Forecasts are issued at 00:00 UTC. The implementation predicts n+0 through n+5
 daily closes and only uses completed prior bars and posts whose availability passes

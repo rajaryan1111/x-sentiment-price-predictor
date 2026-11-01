@@ -141,9 +141,10 @@ Status: implemented; the sentiment panel is empty until an accepted X source exi
   normalized JSONL snapshot from one bounded Tavily request using `TAVILY_API_KEY`;
   the offline `run --news-file` step then consumes it. The adapter, CLI gate, bounds,
   redaction, single-request behaviour and prediction/metric invariance are covered by
-  mock transport tests plus one bounded live Tavily finance search. Tavily returned
-  five results without publication dates. Exa remains mock-only because no key is
-  configured; news remains outside predictive features.
+  mock transport tests plus one bounded live search each for Tavily and Exa. The
+  Tavily result's malformed publication timestamp was withheld; Exa returned a
+  dated item with source metadata. See `docs/PROVIDER_VERIFICATION_2026-11-01.md`;
+  news remains outside predictive features.
 - The R10 sentiment-change series is implemented as a third chart panel:
   `sentiment_change_points` draws the day-over-day change
   `mean_sentiment_24h(T) - mean_sentiment_24h(T-1 UTC day)` for consecutive scored

@@ -1,5 +1,7 @@
 # Final execution status — 2026-11-01
 
+> Provider follow-up: see [the 2026-11-01 provider verification report](PROVIDER_VERIFICATION_2026-11-01.md) for the subsequent one-result Exa smoke check, the Tavily recheck and the CLI dispatch fix. The baseline observations below predate that follow-up.
+
 This is the current evidence record for the execution audit. It supersedes older
 handoff statements about Coinbase-derived results, missing price rows, and the
 absence of a live Tavily request. Historical decision records remain in Git history.
@@ -57,8 +59,9 @@ absence of a live Tavily request. Historical decision records remain in Git hist
   search. The search requested finance news, an inclusive UTC date range, publication
   metadata and five results. Tavily returned null publication dates for all five;
   these are not treated as dated observations. News never enters predictive features.
-- Exa API key is not configured. Its adapter and mock contract are complete, but live
-  behavior and account credit limits remain unverified.
+- At this baseline audit, Exa API key was not configured. A subsequent bounded
+  request is recorded in the provider follow-up report; account credit balance was
+  not queried.
 - Coinbase Market Data Terms prohibit using Coinbase Market Data to train, validate,
   benchmark or improve AI/ML models and prohibit redistributing derived analytics
   without prior written consent. No Coinbase data was fetched in this execution.

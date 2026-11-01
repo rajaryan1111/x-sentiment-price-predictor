@@ -16,7 +16,7 @@ Required target is asset-related X posts over the most recent 180 days using an 
 The assessment-linked Google Doc was re-fetched as full text on 2026-10-29; it is a 12-entry dataset-link compilation, not a tweet corpus. Three candidate public listing/card metadata were partially checked and are described in `docs/data-sources.md`; no candidate rows were downloaded or profiled and no rights, license, schema or current 180-day coverage were approved. Registry entries are candidates only. ID-only files contain no text; older corpora cannot by themselves meet a recent 180-day window. Raw uploaded files mentioned in prior repository notes are absent from this checkout, so those historical inventories are not treated as current local evidence.
 
 ## News
-Tavily is the named source for the most recent and relevant news. Default use is context for the outlook, not predictive features, because the brief says the model uses sentiment and price only. Tavily's bounded adapter supports a topic, date range and published-date request; a live dated finance query returned five items with no publication dates, which remain null. Exa has a separate official `/search` adapter, typed response models, date filters, timeout/body bounds and CLI selection; tests use mocks and no Exa key is configured. Both providers are context-only. Live calls require `--confirm-live-call` and are never automatically retried.
+Tavily is the named source for the most recent and relevant news. Default use is context for the outlook, not predictive features, because the brief says the model uses sentiment and price only. The 2026-11-01 bounded Tavily smoke request returned one result with a malformed publication timestamp, which was withheld; the Exa smoke request returned one result with a publication timestamp and source metadata. These one-result checks do not establish coverage or provider quality. Both providers are context-only. Live calls require `--confirm-live-call` and are never automatically retried. See [provider verification](docs/PROVIDER_VERIFICATION_2026-11-01.md).
 
 ## Synthetic demonstration data
 `scripts/make_offline_demo.py` writes deterministic price and post fixtures that are labelled `synthetic` in the files, in each post record, in the run `--input-note`, in the manifest's `input_lineage` and in report/outlook limitations. These fixtures exist only to exercise the software without credentials or accepted X data. They are not observed market data, not X posts and not evidence of forecasting performance. Generated inputs and artefacts belong under ignored paths (`reports/generated/` or `data/`), never in Git.
@@ -24,8 +24,24 @@ Tavily is the named source for the most recent and relevant news. Default use is
 ## Provenance manifest
 Record source/platform/provider and URL; dataset version or non-secret run ID; query and UTC range; retrieval timestamp; code revision; license review status/date/restrictions; SHA-256 hash when a snapshot is retained; schema version; sanitized counts/missingness/duplicates/time range; transformations/exclusions; and whether historical availability is known. Never include secrets.
 
+### Combining X query batches
+The approved ingestion workflow emits one normalized JSONL and sanitized manifest
+per query. Combine those files with `scripts/merge_apify_x_posts.py` before a
+multi-query `run --posts`. The merger deduplicates by stable post ID, rejects
+conflicting creation timestamps, text, or platform, retains the earliest actual
+retrieval timestamp for compatible duplicates, and records every query mode and
+query hash in a sanitized sidecar keyed by post ID. Pass that sidecar with
+`--posts-provenance`; the run manifest records its content hash. Keep the post JSONL
+and sidecar in an ignored/private local path. Neither contains API credentials, and
+the sidecar does not copy post text.
+
 ## Point-in-time and engagement
 created_at is event time; retrieved_at is when first observed. Never backdate retrieval. Old posts downloaded today are not automatically valid historical features. Only records with defensible availability evidence may enter a historical cutoff. Current likes/reposts/views/follower counts are not historical predictors unless time-stamped snapshots prove their values at cutoff.
+
+The merge uses the earliest recorded retrieval time across compatible copies of a
+post, so duplicate discovery cannot make a post appear available earlier than the
+first recorded observation. A backfilled batch collected after a historical cutoff
+therefore remains unavailable under the default `observed` policy.
 
 ### Availability basis
 The pipeline has two explicit bases. `observed` is the default and the only

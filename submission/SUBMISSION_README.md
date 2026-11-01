@@ -34,7 +34,7 @@ offline tests, and safe preflight tooling.
 ## What the evidence does not show
 
 - No accepted or licensed 180-day X corpus or scored real sentiment is present.
-- No Apify run or Coinbase request was made. One bounded Tavily request was made; Exa remains mock-only because no key is configured.
+- No Apify run or Coinbase request was made. One bounded request each to Tavily and Exa was made; see the [provider verification report](../docs/PROVIDER_VERIFICATION_2026-11-01.md).
 - The fresh Binance Vision evaluation includes its source archives/checksums, exact snapshot and per-row predictions. Its quote currency is USDT, not USD.
 - Binance data and derived report files are CC BY-NC-SA 4.0, attributed and non-commercial only.
 - The original assessment PDFs were reviewed from user-provided copies outside the repository; they are neither committed nor included in the ZIP.

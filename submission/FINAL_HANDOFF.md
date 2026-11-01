@@ -26,15 +26,17 @@ scored posts; sentiment contribution is not identifiable. The price-only strateg
 reports Sharpe 1.124, Sortino 2.431 and maximum drawdown 5.885%; these are
 sample-specific research metrics, not performance claims.
 
-One bounded Tavily finance search was live-checked. It returned five results without
-publication dates; timestamps remain null. Exa integration is implemented and
-mock-tested, but no Exa key exists. No Apify Actor run was launched: current Free
-plan policy prohibits API use. No Coinbase data was fetched in this execution.
+One bounded Tavily finance search and one bounded Exa news search were live-checked.
+Tavily returned one result with a malformed publication timestamp, withheld by the
+adapter; Exa returned one result with publication and source metadata. The Exa CLI
+dispatch was fixed and regression-tested. No Apify Actor run was launched: the
+Actor's Free-plan policy prohibits API use. No Coinbase data was fetched in this
+execution. See [provider verification](../docs/PROVIDER_VERIFICATION_2026-11-01.md).
 
 ## Verification
 
 The current count is recorded in [TEST_PLAN.md](../TEST_PLAN.md); Ruff passed;
-compilation passed; documentation validation checked 102 links and all 28
+compilation passed; documentation validation checked 109 links and all 28
 requirements; dataset registry validated 12 records; Apify preflight reported
 `valid: true`, `network_call_made: false`, `paid_run_launched: false`. The clean
 package extraction, secret scan and exact pushed-commit CI result are release checks

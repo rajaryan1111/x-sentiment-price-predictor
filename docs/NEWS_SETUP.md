@@ -31,7 +31,10 @@ Set `EXA_API_KEY` and choose `--provider exa`. The adapter uses the official
 `POST https://api.exa.ai/search` contract with category `news`, typed response
 validation, optional published-date bounds, timeout and response-size limits, and
 the `x-api-key` header. It uses no answer synthesis or result-page extraction.
-No Exa key was available for live verification in the current audit.
+Exa was also live-checked once on 2026-11-01; the one-item result contained a
+publication timestamp, retrieval timestamp, source label and URL. See
+[provider verification](PROVIDER_VERIFICATION_2026-11-01.md). This smoke check does
+not establish coverage or provider quality.
 
 ## Offline handoff
 
