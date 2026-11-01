@@ -1,0 +1,259 @@
+{
+  "asset": "BTCUSDT",
+  "availability": {
+    "basis": "observed",
+    "note": null
+  },
+  "dataset": {
+    "first_cutoff": "2026-05-05T00:00:00+00:00",
+    "last_cutoff": "2026-10-31T00:00:00+00:00",
+    "posts": 0,
+    "rows": 180,
+    "rows_with_full_horizon": 175,
+    "rows_with_sentiment": 0,
+    "scored_posts": 0,
+    "unfinished_day_dropped": false
+  },
+  "evaluation": {
+    "assumptions": {
+      "eligible_rows": 174,
+      "eligible_rows_with_sentiment": 0,
+      "embargo_samples": 5,
+      "feature_groups": {
+        "price_only": [
+          "return_1d",
+          "return_3d",
+          "return_7d",
+          "volatility_7d",
+          "range_1d",
+          "close_vs_sma_7d"
+        ],
+        "sentiment_price": [
+          "return_1d",
+          "return_3d",
+          "return_7d",
+          "volatility_7d",
+          "range_1d",
+          "close_vs_sma_7d",
+          "post_count_24h",
+          "scored_post_count_24h",
+          "mean_sentiment_24h",
+          "positive_share_24h",
+          "negative_share_24h"
+        ]
+      },
+      "folds": 5,
+      "horizons": [
+        "n+0",
+        "n+1",
+        "n+2",
+        "n+3",
+        "n+4",
+        "n+5"
+      ],
+      "max_folds": null,
+      "min_train_samples": 60,
+      "ridge_lambda": 1.0,
+      "rows": 180,
+      "strategy": {
+        "fee_rate": 0.001,
+        "min_returns_for_risk_metrics": 30,
+        "minimum_acceptable_return": 0.0,
+        "periods_per_year": 365,
+        "risk_free_rate": 0.0
+      },
+      "test_samples": 20
+    },
+    "folds": [
+      {
+        "embargo_rows": 5,
+        "index": 0,
+        "test_rows": 20,
+        "train_rows": 60
+      },
+      {
+        "embargo_rows": 5,
+        "index": 1,
+        "test_rows": 20,
+        "train_rows": 80
+      },
+      {
+        "embargo_rows": 5,
+        "index": 2,
+        "test_rows": 20,
+        "train_rows": 100
+      },
+      {
+        "embargo_rows": 5,
+        "index": 3,
+        "test_rows": 20,
+        "train_rows": 120
+      },
+      {
+        "embargo_rows": 5,
+        "index": 4,
+        "test_rows": 20,
+        "train_rows": 140
+      }
+    ],
+    "predictions": 1800,
+    "untestable": {},
+    "warnings": [
+      "No eligible row has a scored-post sentiment mean, so the sentiment-plus-price candidate is not identifiable in this run and its coefficients cannot be interpreted."
+    ]
+  },
+  "generated_at": "2026-11-01T08:08:24+00:00",
+  "input_lineage": {
+    "input_source": "file_snapshot",
+    "posts": {
+      "count": 0,
+      "event_time_first": null,
+      "event_time_last": null,
+      "retrieved_at_first": null,
+      "retrieved_at_last": null,
+      "schema_versions": [],
+      "source_names": [],
+      "source_platforms": []
+    },
+    "price": {
+      "bars": 180,
+      "first_bar": "2026-05-05T00:00:00+00:00",
+      "last_bar": "2026-10-31T00:00:00+00:00",
+      "product_ids": [
+        "BTCUSDT"
+      ],
+      "retrieved_at": "2026-11-01T08:06:32.369608+00:00",
+      "retrieved_at_reason": null,
+      "schema": "PriceCandle (Decimal OHLCV, UTC; see DESIGN.md)",
+      "snapshot_metadata": {
+        "fetch_mode": "binance_vision_public_archive",
+        "fetched_at": "2026-11-01T08:06:32.369608+00:00",
+        "granularity_seconds": 86400,
+        "quote_currency": "USDT",
+        "requested_end": "2026-11-01T00:00:00+00:00",
+        "requested_start": "2026-05-05T00:00:00+00:00",
+        "source_archive_count": 36,
+        "source_archive_sha256": {
+          "BTCUSDT-1d-2026-05.zip": "978936e8f1f80b570248f8d4478d6fe08d94b98bc1c7d372feb27573ff466cde",
+          "BTCUSDT-1d-2026-06.zip": "7020d4d850a875b93f0b0fa6df4a4c36ab615273e2ab03f9e896852330dad77e",
+          "BTCUSDT-1d-2026-07.zip": "74ddc3e39aae9445b9f9dae00d53fe2ce6ff503ee469417e207a8f5970bad11a",
+          "BTCUSDT-1d-2026-08.zip": "fd8374a811ac7d3f4144d9c857c4f10796402c178316a25ed0c2f0ca6e16a8c1",
+          "BTCUSDT-1d-2026-09.zip": "4944279ced64d3b1822c7c535043f2bbf41bc97d9000b8d857753352c1949769",
+          "BTCUSDT-1d-2026-10-01.zip": "544d2565f54cb6347dde9c65301ecd6a5bc9128a95deacad1b86d0d36ca6c1cc",
+          "BTCUSDT-1d-2026-10-02.zip": "97f00f9530c1ee2f091bb0fd157c2097e676cb4882c568490b2fed9d17d048da",
+          "BTCUSDT-1d-2026-10-03.zip": "4fad26c8ad8e581d66200b523a7b0fc723571cfe6c760f30f16497eb920a5d1b",
+          "BTCUSDT-1d-2026-10-04.zip": "7fbfe9a84ad5d0c2936b7cb489ea09f620e0813033a7d40043dd989f614175e1",
+          "BTCUSDT-1d-2026-10-05.zip": "af132ef68300bdb34acbdab1aec6d44d8b0f54d9e6f64f5f11f6b252f67a7ec7",
+          "BTCUSDT-1d-2026-10-06.zip": "a9bfe3f7405ad80ca56d0719faf533dd66a405f7cea562b5afeb4ab220ae6982",
+          "BTCUSDT-1d-2026-10-07.zip": "0ddcb0b01671d17e7ee9956fdb19f594f408e6b6b60c632fc29ac4c9dddf05b8",
+          "BTCUSDT-1d-2026-10-08.zip": "0478666aeb380f07ada5c94b667188b6d622c3e7c376b42960c0504484965ad9",
+          "BTCUSDT-1d-2026-10-09.zip": "abc8f686e5559268bd4fd8cdac4b478f9c0810fe26944fa582282becb33ee2f4",
+          "BTCUSDT-1d-2026-10-10.zip": "7980c0fc7d3e7ef67fc5b9abb0b6dce5668b8cbf76c4828616aa1c315498a5fa",
+          "BTCUSDT-1d-2026-10-11.zip": "6d01694528255af58912b5d72b48bcd0ad70e44afa625960af0bd407efe7ac84",
+          "BTCUSDT-1d-2026-10-12.zip": "6f116c20200f77a156f93710d4c96c007594634c6771e71741a9dbd9f4fc995b",
+          "BTCUSDT-1d-2026-10-13.zip": "bee3a7d79cb4be4049a9b5dd5ef85c518ebb5e7b711d8fe13216d8ea550b2525",
+          "BTCUSDT-1d-2026-10-14.zip": "f6b81a85f0cb71e819e848459be1204d1a68857608f8a4789b0f53a4b4af1bc1",
+          "BTCUSDT-1d-2026-10-15.zip": "0861fcb0775f75f1af7b5b875e272098cf7650d3a8689d6f368c2382cd4a33be",
+          "BTCUSDT-1d-2026-10-16.zip": "a45767513118a5736df58561dd3e4ff01e44144f18e78ee8731b215cfa59b385",
+          "BTCUSDT-1d-2026-10-17.zip": "431913f651322f4e8054f75fd23abfad9defb7cb0214c2a531a76f984802dbad",
+          "BTCUSDT-1d-2026-10-18.zip": "29e500f7e5cfa3fc4a97f88ab56d16be5db9a79e170b678c356262721f6bfd36",
+          "BTCUSDT-1d-2026-10-19.zip": "50742ef26e59bf3fc771e7de72d8e91001bb4b399abdfb6ed8dca1f6a7c7a903",
+          "BTCUSDT-1d-2026-10-20.zip": "f1177f718234b1a8837bf0272b23e641e4927434949859d362d3ce5996b2aac5",
+          "BTCUSDT-1d-2026-10-21.zip": "75d684ac9217f446257c28fa64adde496663e0d2f4ef1fc792d1c98bd352d8fe",
+          "BTCUSDT-1d-2026-10-22.zip": "1019822046990d74301d261b91ff6803f9fe9f17b656d2f301da9b283669c6eb",
+          "BTCUSDT-1d-2026-10-23.zip": "7fe5726e570ede3db78f73cfb89ad9bbded88c433fd582d1a854e25a527c7d8d",
+          "BTCUSDT-1d-2026-10-24.zip": "b7108895d708c42135d5e285cc9192293c06f2c546658f86dc0c56e3fdb9007a",
+          "BTCUSDT-1d-2026-10-25.zip": "6e04c8c8b7c36710edc0417e0a2385903a4fab3dbde7071aad3ddac58e70adba",
+          "BTCUSDT-1d-2026-10-26.zip": "2048aede533388813b08dd5e88e7092db406112da2055a5ab93d5184db469c68",
+          "BTCUSDT-1d-2026-10-27.zip": "72c4db0f5228822273217c47c900b2a889dfa53fd8429547343eaf362a441bc6",
+          "BTCUSDT-1d-2026-10-28.zip": "fbe07acc308d9af87ca696c034932157d473d7e228d840429e52f8738578df67",
+          "BTCUSDT-1d-2026-10-29.zip": "4b252a9ff74183d87c30c3bebffd2f1d75fe75fa351a1faed2238a4ac5fa4e78",
+          "BTCUSDT-1d-2026-10-30.zip": "5495ac3369173deab2ab22f4d76d92fc5ab0bd1b2452b4f06ed4bc7d9e86a880",
+          "BTCUSDT-1d-2026-10-31.zip": "4d96c50c23891145fa974645d41376e06d1ba135e01a921fd9ffd421edf0e80c"
+        },
+        "source_license": "CC BY-NC-SA 4.0",
+        "source_license_url": "https://github.com/binance/binance-public-data/blob/master/TERMS_AND_CONDITIONS.md",
+        "timestamp_unit": "microseconds",
+        "venue": "Binance Spot"
+      },
+      "synthetic": false
+    },
+    "queries": {
+      "modes": [],
+      "policy": "raw query terms are not stored in the manifest; they may contain secrets",
+      "term_count": 0,
+      "terms_sha256": null
+    }
+  },
+  "provenance": {
+    "asset": "BTCUSDT",
+    "availability_basis": "observed",
+    "code_revision": "422ff53d6e378fb3dcbafb0ddaf1040409dd0174",
+    "input_source": "file_snapshot",
+    "pipeline_versions": {
+      "platform": "macOS-26.1-arm64-arm-64bit",
+      "pydantic": "2.14.2",
+      "python": "3.11.15",
+      "vaderSentiment": "3.3.2",
+      "x-sentiment-price-predictor": "0.1.0"
+    },
+    "posts_supplied": 0,
+    "price_candles_supplied": 180,
+    "price_snapshot": "reports/btcusdt-180d/btcusdt-180d-snapshot.json",
+    "price_snapshot_metadata": {
+      "fetch_mode": "binance_vision_public_archive",
+      "fetched_at": "2026-11-01T08:06:32.369608+00:00",
+      "granularity_seconds": 86400,
+      "quote_currency": "USDT",
+      "requested_end": "2026-11-01T00:00:00+00:00",
+      "requested_start": "2026-05-05T00:00:00+00:00",
+      "source_archive_count": 36,
+      "source_archive_sha256": {
+        "BTCUSDT-1d-2026-05.zip": "978936e8f1f80b570248f8d4478d6fe08d94b98bc1c7d372feb27573ff466cde",
+        "BTCUSDT-1d-2026-06.zip": "7020d4d850a875b93f0b0fa6df4a4c36ab615273e2ab03f9e896852330dad77e",
+        "BTCUSDT-1d-2026-07.zip": "74ddc3e39aae9445b9f9dae00d53fe2ce6ff503ee469417e207a8f5970bad11a",
+        "BTCUSDT-1d-2026-08.zip": "fd8374a811ac7d3f4144d9c857c4f10796402c178316a25ed0c2f0ca6e16a8c1",
+        "BTCUSDT-1d-2026-09.zip": "4944279ced64d3b1822c7c535043f2bbf41bc97d9000b8d857753352c1949769",
+        "BTCUSDT-1d-2026-10-01.zip": "544d2565f54cb6347dde9c65301ecd6a5bc9128a95deacad1b86d0d36ca6c1cc",
+        "BTCUSDT-1d-2026-10-02.zip": "97f00f9530c1ee2f091bb0fd157c2097e676cb4882c568490b2fed9d17d048da",
+        "BTCUSDT-1d-2026-10-03.zip": "4fad26c8ad8e581d66200b523a7b0fc723571cfe6c760f30f16497eb920a5d1b",
+        "BTCUSDT-1d-2026-10-04.zip": "7fbfe9a84ad5d0c2936b7cb489ea09f620e0813033a7d40043dd989f614175e1",
+        "BTCUSDT-1d-2026-10-05.zip": "af132ef68300bdb34acbdab1aec6d44d8b0f54d9e6f64f5f11f6b252f67a7ec7",
+        "BTCUSDT-1d-2026-10-06.zip": "a9bfe3f7405ad80ca56d0719faf533dd66a405f7cea562b5afeb4ab220ae6982",
+        "BTCUSDT-1d-2026-10-07.zip": "0ddcb0b01671d17e7ee9956fdb19f594f408e6b6b60c632fc29ac4c9dddf05b8",
+        "BTCUSDT-1d-2026-10-08.zip": "0478666aeb380f07ada5c94b667188b6d622c3e7c376b42960c0504484965ad9",
+        "BTCUSDT-1d-2026-10-09.zip": "abc8f686e5559268bd4fd8cdac4b478f9c0810fe26944fa582282becb33ee2f4",
+        "BTCUSDT-1d-2026-10-10.zip": "7980c0fc7d3e7ef67fc5b9abb0b6dce5668b8cbf76c4828616aa1c315498a5fa",
+        "BTCUSDT-1d-2026-10-11.zip": "6d01694528255af58912b5d72b48bcd0ad70e44afa625960af0bd407efe7ac84",
+        "BTCUSDT-1d-2026-10-12.zip": "6f116c20200f77a156f93710d4c96c007594634c6771e71741a9dbd9f4fc995b",
+        "BTCUSDT-1d-2026-10-13.zip": "bee3a7d79cb4be4049a9b5dd5ef85c518ebb5e7b711d8fe13216d8ea550b2525",
+        "BTCUSDT-1d-2026-10-14.zip": "f6b81a85f0cb71e819e848459be1204d1a68857608f8a4789b0f53a4b4af1bc1",
+        "BTCUSDT-1d-2026-10-15.zip": "0861fcb0775f75f1af7b5b875e272098cf7650d3a8689d6f368c2382cd4a33be",
+        "BTCUSDT-1d-2026-10-16.zip": "a45767513118a5736df58561dd3e4ff01e44144f18e78ee8731b215cfa59b385",
+        "BTCUSDT-1d-2026-10-17.zip": "431913f651322f4e8054f75fd23abfad9defb7cb0214c2a531a76f984802dbad",
+        "BTCUSDT-1d-2026-10-18.zip": "29e500f7e5cfa3fc4a97f88ab56d16be5db9a79e170b678c356262721f6bfd36",
+        "BTCUSDT-1d-2026-10-19.zip": "50742ef26e59bf3fc771e7de72d8e91001bb4b399abdfb6ed8dca1f6a7c7a903",
+        "BTCUSDT-1d-2026-10-20.zip": "f1177f718234b1a8837bf0272b23e641e4927434949859d362d3ce5996b2aac5",
+        "BTCUSDT-1d-2026-10-21.zip": "75d684ac9217f446257c28fa64adde496663e0d2f4ef1fc792d1c98bd352d8fe",
+        "BTCUSDT-1d-2026-10-22.zip": "1019822046990d74301d261b91ff6803f9fe9f17b656d2f301da9b283669c6eb",
+        "BTCUSDT-1d-2026-10-23.zip": "7fe5726e570ede3db78f73cfb89ad9bbded88c433fd582d1a854e25a527c7d8d",
+        "BTCUSDT-1d-2026-10-24.zip": "b7108895d708c42135d5e285cc9192293c06f2c546658f86dc0c56e3fdb9007a",
+        "BTCUSDT-1d-2026-10-25.zip": "6e04c8c8b7c36710edc0417e0a2385903a4fab3dbde7071aad3ddac58e70adba",
+        "BTCUSDT-1d-2026-10-26.zip": "2048aede533388813b08dd5e88e7092db406112da2055a5ab93d5184db469c68",
+        "BTCUSDT-1d-2026-10-27.zip": "72c4db0f5228822273217c47c900b2a889dfa53fd8429547343eaf362a441bc6",
+        "BTCUSDT-1d-2026-10-28.zip": "fbe07acc308d9af87ca696c034932157d473d7e228d840429e52f8738578df67",
+        "BTCUSDT-1d-2026-10-29.zip": "4b252a9ff74183d87c30c3bebffd2f1d75fe75fa351a1faed2238a4ac5fa4e78",
+        "BTCUSDT-1d-2026-10-30.zip": "5495ac3369173deab2ab22f4d76d92fc5ab0bd1b2452b4f06ed4bc7d9e86a880",
+        "BTCUSDT-1d-2026-10-31.zip": "4d96c50c23891145fa974645d41376e06d1ba135e01a921fd9ffd421edf0e80c"
+      },
+      "source_license": "CC BY-NC-SA 4.0",
+      "source_license_url": "https://github.com/binance/binance-public-data/blob/master/TERMS_AND_CONDITIONS.md",
+      "timestamp_unit": "microseconds",
+      "venue": "Binance Spot"
+    },
+    "price_snapshot_retrieved_at": "2026-11-01T08:06:32.369608+00:00",
+    "price_snapshot_sha256": "b8e247382e9de64c95dddb63e1af20eddd78df11f3ff28961797be30d55a295f",
+    "sentiment_scorer": "vader 3.3.2"
+  },
+  "run_id": "run-20261101T080824Z"
+}
