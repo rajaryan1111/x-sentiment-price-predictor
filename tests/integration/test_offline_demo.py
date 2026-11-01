@@ -29,6 +29,7 @@ ARTEFACTS = (
     "evaluation-report.md",
     "outlook.md",
     "sentiment-vs-price.svg",
+    "dashboard.html",
     "manifest.json",
     "metrics.json",
     "predictions.jsonl",
@@ -102,6 +103,12 @@ def test_price_snapshot_metadata_loader_uses_an_allow_list(tmp_path: Path) -> No
                 "fetched_at": "2026-10-27T01:02:03+00:00",
                 "requested_start": "2026-01-01T00:00:00+00:00",
                 "synthetic": True,
+                "quote_currency": "USDT",
+                "source_license": "CC BY-NC-SA 4.0",
+                "source_archive_sha256": {
+                    "archive.zip": "a" * 64,
+                    "../secret": "b" * 64,
+                },
                 "api_key": "must-never-be-copied-into-a-manifest",
                 "candles": [{"close": "1"}],
             }
@@ -113,6 +120,9 @@ def test_price_snapshot_metadata_loader_uses_an_allow_list(tmp_path: Path) -> No
 
     assert metadata["fetched_at"] == "2026-10-27T01:02:03+00:00"
     assert metadata["synthetic"] is True
+    assert metadata["quote_currency"] == "USDT"
+    assert metadata["source_license"] == "CC BY-NC-SA 4.0"
+    assert metadata["source_archive_sha256"] == {"archive.zip": "a" * 64}
     assert "api_key" not in metadata
     assert "candles" not in metadata
     assert "must-never" not in json.dumps(metadata)
@@ -256,6 +266,7 @@ def test_offline_demo_end_to_end_writes_real_application_artifacts(tmp_path: Pat
     report = (output / "evaluation-report.md").read_text(encoding="utf-8")
     outlook = (output / "outlook.md").read_text(encoding="utf-8")
     chart = (output / "sentiment-vs-price.svg").read_text(encoding="utf-8")
+    dashboard = (output / "dashboard.html").read_text(encoding="utf-8")
     assert "Out-of-sample forecast metrics" in report
     assert "Trading strategy and risk metrics" in report
     assert "Sharpe" in report and "Sortino" in report and "Max drawdown" in report
@@ -268,6 +279,9 @@ def test_offline_demo_end_to_end_writes_real_application_artifacts(tmp_path: Pat
     assert "<svg" in chart
     assert "Day-over-day change" in chart
     assert "No scored posts are available" not in chart
+    assert "209 posts scored across" in dashboard
+    assert "Walk-forward mean forecast error" in dashboard
+    assert "<svg" in dashboard and "script" not in dashboard.lower()
 
     repeated = tmp_path / "run-repeat"
     repeat_command = list(command)
@@ -277,6 +291,30 @@ def test_offline_demo_end_to_end_writes_real_application_artifacts(tmp_path: Pat
         repeated / "predictions.jsonl"
     ).read_bytes()
     assert (output / "metrics.json").read_bytes() == (repeated / "metrics.json").read_bytes()
+    assert (output / "dashboard.html").read_bytes() == (repeated / "dashboard.html").read_bytes()
+
+
+def test_pipeline_dashboard_shows_empty_sentiment_without_fabricating_neutral(
+    tmp_path: Path,
+) -> None:
+    prices, _posts, snapshot = generate(tmp_path)
+    output = tmp_path / "run-empty-sentiment"
+    assert cli.main(
+        [
+            "run",
+            "--prices",
+            str(prices),
+            "--out",
+            str(output),
+            "--now",
+            snapshot["recommended_now"],
+            "--input-note",
+            "synthetic offline price fixture with intentionally empty posts input",
+        ]
+    ) == 0
+    dashboard = (output / "dashboard.html").read_text(encoding="utf-8")
+    assert "No posts were scored. Sentiment is unavailable, not neutral." in dashboard
+    assert "Posts supplied / scored<strong>0 / 0</strong>" in dashboard
 
 
 def test_offline_demo_run_makes_no_network_connection(

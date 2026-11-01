@@ -35,11 +35,11 @@ Use the `xsentiment run` command from the reproducibility guide. Show the genera
 
 ## 4:00–5:00 — Show the historical result with its limits
 
-Open `reports/btc-usd-180d/evaluation-report.md` and `metrics.json`. Explain that these committed artifacts record 180 BTC-USD candles, zero X posts, and zero scored posts. The stored aggregate metrics show naive mean MAE $1,828.36 and price-only mean MAE $2,264.62; sentiment-plus-price is identical because no sentiment was available. The raw snapshot and per-prediction rows are not in the package, so this audit did not recalculate those historical results from raw inputs.
+Open `reports/btcusdt-180d/evaluation-report.md`, `metrics.json`, `predictions.jsonl`, and `outlook.md`. Explain that these files record 180 Binance Vision BTCUSDT bars (USDT quote), zero X posts, five walk-forward folds, and 100 OOS samples per horizon. Naive mean MAE is 1,824.23 USDT; price-only is 2,378.50 USDT (30.38% worse); sentiment-plus-price is identical because no sentiment was scored. The raw source archives, published checksums and exact snapshot are included. These data-derived files are CC BY-NC-SA 4.0 and non-commercial only.
 
 ## 5:00–6:00 — Show the visualization and one-page outlook
 
-Open the committed SVG and `outlook.md`. The price panel has historical values; sentiment panels explicitly say no scored posts are available. Do not replace these empty states with synthetic numbers. The deliverable is generated report/chart output, not an interactive web dashboard.
+Open the generated `dashboard.html`, `sentiment-vs-price.svg`, and `outlook.md`. The dashboard is standalone and offline. Sentiment panels explicitly say no scored posts are available. Do not replace these empty states with synthetic numbers.
 
 ## 6:00–7:00 — State external blockers and close
 

@@ -86,9 +86,11 @@ deterministic, so a reviewer can reproduce the exact inputs. `fetch-news --help`
 makes no network request; a real Tavily call would require an approved key and the
 explicit confirmation flag, which we do not run.”
 
-Also mention the historical real-price path: `reports/btc-usd-180d/manifest.json`
-records 180 public Coinbase daily bars and the input SHA-256 from 2026-10-26. That
-snapshot is not committed and cannot be refetched from this sandbox.
+Also mention the recomputed price path: `reports/btcusdt-180d/manifest.json`
+records 180 Binance Vision BTCUSDT daily bars, USDT quote, with the exact snapshot,
+36 source archives/checksums and predictions packaged. These data-derived files are
+CC BY-NC-SA 4.0 and non-commercial only. The price-only model does not beat naive,
+and no X posts were scored.
 
 ---
 
@@ -188,13 +190,14 @@ fabricated.”
 Then show the historical real-price report:
 
 ```bash
-sed -n '1,30p' reports/btc-usd-180d/evaluation-report.md
+sed -n '1,30p' reports/btcusdt-180d/evaluation-report.md
 ```
 
-**Say:** “This is the committed 2026-10-26 real-price run. Naive MAE $1,828.36
-beat price-only Ridge $2,264.62. Sentiment-plus-price is identical because there
-were zero posts, and the report says it is not identifiable. That negative result
-is reported rather than hidden.”
+**Say:** “This is the 2026-11-01 recomputed Binance Vision BTCUSDT run, quoted in
+USDT. Naive mean MAE is 1,824.23; price-only ridge is 2,378.50, or 30.38% worse.
+There are zero X posts, so sentiment-plus-price is identical and is not an
+identifiable sentiment evaluation. Binance-derived artifacts are CC BY-NC-SA 4.0
+and non-commercial only.”
 
 ---
 
@@ -204,12 +207,13 @@ is reported rather than hidden.”
 python -m pytest tests/unit/test_fetch_news_cli.py tests/integration/test_offline_demo.py -q
 ```
 
-**Say:** “The news CLI tests use mocked HTTP. They prove that a live call is
+**Say:** “The news adapter tests use mocked HTTP. They prove that a live call is
 blocked without `--confirm-live-call`, credentials come from the environment,
 errors and caller notes are redacted, oversized responses are rejected while
 streaming, JSONL can be loaded by `run --news-file`, and adding news context
 leaves predictions and metrics byte-identical. A separate regression blocks
-network access during the offline CLI run. No live Tavily or Exa call was made.”
+network access during the offline CLI run. One bounded Tavily finance search was
+made and yielded five results without publication dates. Exa remains mock-only.
 
 **Close with:**
 

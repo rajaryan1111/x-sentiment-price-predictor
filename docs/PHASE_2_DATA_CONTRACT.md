@@ -4,7 +4,7 @@
 
 ## Scope
 
-The first implementation target is BTC-USD with UTC daily bars. This contract defines normalized records and cutoff rules; it does not assert that any X provider is approved or available.
+The initial implementation target was BTC-USD with UTC daily bars. The current evaluated input is Binance Vision BTCUSDT, USDT quote, under D-031 and its CC BY-NC-SA 4.0 non-commercial/share-alike terms. This contract defines normalized records and cutoff rules; it does not assert that any X provider is approved or available.
 
 ## Normalized X post
 
@@ -33,7 +33,7 @@ The JSONL loader round-trips these fields and rejects malformed timestamps or an
 
 ## Price bars
 
-- Product ID remains explicit (BTC-USD for this project).
+- Product ID and quote currency remain explicit (`BTCUSDT`/`USDT` in the current evaluation; exact BTC-USD remains an employer decision).
 - Timestamp is the start of a UTC daily candle.
 - OHLC values are positive decimals, low <= open/close <= high; volume is non-negative.
 - Requested ranges use a half-open interval [start, end) where end is exclusive.

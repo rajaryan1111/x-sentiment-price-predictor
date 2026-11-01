@@ -1,30 +1,50 @@
 # Data limitations and external blockers
 
-The full owner-assigned list is in [REMAINING_BLOCKERS.md](REMAINING_BLOCKERS.md); the 28-ID matrix is in [docs/REQUIREMENTS_TRACEABILITY.md](../docs/REQUIREMENTS_TRACEABILITY.md).
+See [REMAINING_BLOCKERS.md](REMAINING_BLOCKERS.md), the
+[28-ID requirement matrix](../docs/REQUIREMENTS_TRACEABILITY.md), and the
+[current execution status](../docs/FINAL_EXECUTION_STATUS_2026-11-01.md).
 
 ## X and sentiment
 
-- No employer-approved Actor, accepted/license-cleared 180-day post corpus, or live X collection exists. Local configuration contains an Apify token entry and candidate Actor ID, but these do not confer approval, rights, a spend cap, or authorization. No paid Apify run occurred.
-- The offline preflight validates only local input shape and lists ticker/cashtag/keyword modes. It does not confirm a real Actor's schema, terms, or historical coverage.
-- No posts were supplied or scored in the committed historical price run. Sentiment features remain missing, the sentiment-plus-price model is unidentifiable, and the chart/outlook state this explicitly.
-- The historical dataset-reference PDF and linked Google Doc list candidate sources, not an accepted post corpus. No candidate rows were downloaded, rights-cleared, or profiled as an approved dataset.
+- No accepted recent X corpus exists in this checkout: 0 posts accepted and 0
+  scored. Synthetic fixtures remain test-only and are never represented as posts.
+- Apify actor `61RPP7dywgiy0JPD0` resolves to `apidojo/tweet-scraper`, but current
+  Free-plan policy prohibits its API use. No Actor run was launched. A permitted
+  export or explicit paid-plan/source approval and spend cap is required.
+- The linked dataset document is a list of candidate links, not a tweet corpus.
+  Available public candidates do not establish current 180-day coverage or terms.
+
+## Price source and license
+
+- Current report uses 180 Binance Vision BTCUSDT Spot daily bars (USDT quote) from
+  2026-05-05 through 2026-10-31 UTC. All 36 source ZIP checksums match; there are
+  no missing dates or duplicates. Source archives, snapshot, predictions and
+  derived report artifacts are in `reports/btcusdt-180d/`.
+- Binance Vision data and derivatives are CC BY-NC-SA 4.0, with attribution and
+  same-license obligations and non-commercial use only. This is not exact BTC-USD.
+- Coinbase Market Data terms restrict model training/validation/benchmarking and
+  redistribution of derived works without written consent. No Coinbase data was
+  fetched in this execution; earlier derived artifacts are removed from the current
+  tree but remain in prior Git history.
 
 ## News providers
 
-- Tavily adapter/CLI are mocked-verified, gated, bounded, and context-only. A local key entry is configured but no live Tavily request was made.
-- Exa is blank locally and is not integrated. No Exa request was made.
+- Tavily is bounded, dated, live-checked once and context-only. The five live
+  results lacked publication timestamps, so dates remain unknown. Usage was 0/1,000
+  plan units before the call.
+- Exa adapter and CLI are implemented and mock-tested. No key is configured and
+  no live verification is claimed. Employer confirmation is needed if Exa is
+  mandatory.
 
-## Historical price metrics
+## Model and display limits
 
-The committed report/manifest/metrics describe a 180-candle BTC-USD run from 2026-04-29 through 2026-10-25 UTC. The raw snapshot and per-prediction rows are absent from this checkout. Current documents therefore label those results historical and cross-check their reported values against the aggregate metrics artifact; they do not claim fresh retraining or raw-row recalculation.
+- With no posts, sentiment features are missing and the sentiment candidate is
+  unidentifiable. The price-only candidate's mean MAE is worse than naive; no
+  accuracy or profitability claim is made.
+- The generated HTML dashboard is offline and non-interactive; empty sentiment panels are
+  labelled. The deterministic synthetic demo is for software behavior only.
+- The `n+0` convention remains an employer-unconfirmed default. The PDF also gives
+  conflicting relative deadlines; the exact calendar due date must be clarified.
 
-## Point-in-time and model limits
-
-- Default availability uses first-observed time; retrospective archive event-time mode is explicit, opt-in, and disclosure-noted. No submitted run uses retrospective mode.
-- `n+0` remains a documented engineering convention until the employer confirms the issue-time/target definition.
-- The strategy metrics describe one short sample, one asset, and one period. They do not establish profitability or future performance.
-- The deliverable chart is a generated SVG with empty sentiment panels labelled; there is no interactive web dashboard. The assignment asks for visual charts, which the SVG output supplies.
-
-## Source and submission
-
-The original assignment PDF and companion dataset-reference PDF were reviewed on 2026-11-01 from user-provided copies outside Git; hashes and page counts are recorded in the traceability matrix. They are not committed or included in the ZIP. The assignment specifies `gilad@crowdwisdomtrading.com`; the draft uses it and does not ask for reconfirmation. Mailbox ownership was not independently verified. No email was sent.
+The recipient printed in the assessment is `gilad@crowdwisdomtrading.com` and has
+not been independently mailbox-verified. No email or assignment has been sent.

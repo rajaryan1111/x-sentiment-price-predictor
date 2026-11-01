@@ -11,16 +11,16 @@ The ZIP is a source-based package built from the reviewed `feat/availability-bas
 | `tests/` | Unit and offline integration tests | Evidence for local behavior, safety gates, data contracts, evaluation and artifact reproducibility. No live paid integration test is included. |
 | `docs/` | Source-checked requirements, traceability, provider setup, data contract, limitations and technical audit records | Requirement evidence and context; historical records are dated and must not be read as current-state CI evidence. |
 | `data/registry/` | Curated historical dataset reference metadata | Reproducible dataset inventory; no downloaded post corpus. |
-| `reports/btc-usd-180d/` | Historical manifest, aggregate metrics, Markdown evaluation/outlook, SVG | Honest historical price-only result record. Raw price snapshot and `predictions.jsonl` are absent and this is disclosed. |
+| `reports/btcusdt-180d/` | 180-row BTCUSDT snapshot, 36 source archive ZIPs and checksum sidecars, manifest, aggregate/per-horizon metrics, 1,800 predictions, Markdown report/outlook, SVG, attribution/license | Recomputed reproducible price-only evaluation; USDT quote, Binance Vision CC BY-NC-SA 4.0, non-commercial only. |
 | `submission/` | Final checklist, handoff, package manifest, blockers, evaluation, demo, reproducibility, results, limitations and unsent email draft | Evaluator-facing packet and precise handoff. |
-| `dashboard/` | Scope note for interactive dashboard | Makes explicit that the delivered visualization is generated SVG/Markdown output, not a web dashboard. The assignment asks for charts, which the SVG supplies. |
+| `dashboard/` and pipeline `dashboard.html` | Offline dashboard scope and generated dashboard | Self-contained HTML embeds the generated SVG and reports sample counts, forecast metrics, risk metrics, source freshness, licensing, and honest empty sentiment states. |
 
 ## Exclusions
 
 - `.git` and all Git history
 - `.env`, tokens, keys, passwords, and other secret values
 - local databases, model binaries, virtual environments, Python/cache/build artifacts
-- raw market or X datasets and temporary logs
+- unlicensed/raw X datasets and temporary logs; the Binance Vision archive is included only under its non-commercial CC BY-NC-SA 4.0 terms and attribution
 - original assessment PDFs (reviewed from user-provided copies; not copied into Git or ZIP)
 - unrelated files and prior ad-hoc output-directory artifacts
 

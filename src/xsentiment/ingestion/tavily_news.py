@@ -27,7 +27,7 @@ import hashlib
 import json
 import re
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
@@ -338,6 +338,9 @@ class TavilyNewsAdapter:
         query: str,
         *,
         retrieved_at: datetime | None = None,
+        topic: str = "news",
+        start_date: date | None = None,
+        end_date: date | None = None,
     ) -> NewsResult:
         """One bounded search; read-only, so it is never silently retried."""
         if not self._api_key:
@@ -349,12 +352,16 @@ class TavilyNewsAdapter:
             raise NewsProviderError("a non-empty search query is required")
         if len(query) > MAX_QUERY_CHARS:
             raise NewsProviderError(f"search query must not exceed {MAX_QUERY_CHARS} characters")
+        if topic not in {"general", "news", "finance"}:
+            raise NewsProviderError("topic must be general, news, or finance")
+        if start_date is not None and end_date is not None and start_date > end_date:
+            raise NewsProviderError("start_date must be on or before end_date")
         moment = retrieved_at or datetime.now(UTC)
         if moment.tzinfo is None or moment.utcoffset() is None:
             raise NewsProviderError("retrieval timestamp must be timezone-aware")
         moment = moment.astimezone(UTC)
 
-        body = await self._post(query)
+        body = await self._post(query, topic=topic, start_date=start_date, end_date=end_date)
         raw_items = body.get("results") if isinstance(body, dict) else None
         if not isinstance(raw_items, list):
             raise NewsProviderError("tavily response body has no results list")
@@ -404,7 +411,27 @@ class TavilyNewsAdapter:
             excluded=tuple(excluded),
         )
 
-    async def _post(self, query: str) -> dict[str, Any]:
+    async def _post(
+        self,
+        query: str,
+        *,
+        topic: str,
+        start_date: date | None,
+        end_date: date | None,
+    ) -> dict[str, Any]:
+        payload: dict[str, object] = {
+            "query": query,
+            "max_results": self._max_results,
+            "search_depth": "basic",
+            "topic": topic,
+            "include_published_date": True,
+        }
+        if start_date is not None:
+            payload["start_date"] = start_date.isoformat()
+        if end_date is not None:
+            payload["end_date"] = end_date.isoformat()
+        if start_date is not None or end_date is not None:
+            payload["filter_by_published_date"] = True
         try:
             # One bounded POST: news search is contextual, read-only and passed
             # to the provider as sent, so it is never automatically retried.
@@ -413,11 +440,7 @@ class TavilyNewsAdapter:
             async with self._client.stream(
                 "POST",
                 _SEARCH_URL,
-                json={
-                    "query": query,
-                    "max_results": self._max_results,
-                    "search_depth": "basic",
-                },
+                json=payload,
                 headers={"Authorization": f"Bearer {self._api_key}"},
             ) as response:
                 if response.status_code != 200:

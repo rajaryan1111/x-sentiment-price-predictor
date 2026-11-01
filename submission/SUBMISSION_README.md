@@ -24,15 +24,20 @@ The full 28-ID traceability matrix and detailed engineering evidence are in `doc
 
 ## What the software does
 
-The package includes BTC-USD price processing, configurable X/Apify integration, point-in-time sentiment and price feature generation, six-horizon supervised forecasts, naive and price-only baselines, purged walk-forward evaluation, strategy risk metrics, database persistence and joins, an SVG visualization, a one-page outlook, a Markdown report, offline tests, and safe preflight tooling.
+The package includes a checked Binance Vision BTCUSDT dataset and evaluation,
+configurable X/Apify preflight and ingestion, Tavily and Exa contextual-news
+adapters, point-in-time sentiment/price features, six-horizon supervised forecasts,
+naive and price-only baselines, purged walk-forward evaluation, strategy risk
+metrics, database persistence and joins, an offline HTML dashboard and SVG visualization, a one-page outlook,
+offline tests, and safe preflight tooling.
 
 ## What the evidence does not show
 
 - No accepted or licensed 180-day X corpus or scored real sentiment is present.
-- No live Apify, Tavily, Exa, or Coinbase call was made during this audit; no paid scrape ran.
-- Exa is not integrated.
-- The committed BTC evaluation contains aggregate metrics but not its raw price snapshot or per-row predictions, so the historical values were cross-checked against the metrics artifact, not retrained/recomputed here.
+- No Apify run or Coinbase request was made. One bounded Tavily request was made; Exa remains mock-only because no key is configured.
+- The fresh Binance Vision evaluation includes its source archives/checksums, exact snapshot and per-row predictions. Its quote currency is USDT, not USD.
+- Binance data and derived report files are CC BY-NC-SA 4.0, attributed and non-commercial only.
 - The original assessment PDFs were reviewed from user-provided copies outside the repository; they are neither committed nor included in the ZIP.
 - No email was sent, and no external submission was made.
 
-**Verdict:** READY WITH DISCLOSED EXTERNAL BLOCKERS. See the handoff and blocker list for exact next actions.
+**Verdict:** SUBMISSION READY WITH EXTERNAL BLOCKERS. See the handoff and blocker list for exact next actions.

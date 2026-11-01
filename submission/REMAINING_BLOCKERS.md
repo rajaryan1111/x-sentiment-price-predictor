@@ -1,17 +1,20 @@
 # Remaining blockers — 2026-11-01
 
-No live paid provider operation or email submission is authorized by this handoff. These are the remaining external requirements; implementation work that can be verified offline is documented separately.
+All independent engineering work is completed as far as the current sources and
+credentials allow. These remaining items require an employer or account-level input.
 
-| Blocker | Missing | Why it cannot be closed locally | Owner and exact next action |
+| Blocker | Missing requirement | Exact action needed | Lowest-cost legitimate path |
 | --- | --- | --- | --- |
-| Approved recent X data (R2/A3) | Employer-selected Actor or dataset; applicable license/terms; schema/field semantics; proof of ticker/cashtag/keyword search and most-recent 180-day coverage | Candidate Actor ID is not approval, and no accepted corpus or live payload exists. | Employer: approve source/terms and query/field expectations. User: authorize a bounded pilot after the price cap is known. |
-| Paid Apify run and credentials (A2/NFR4) | Explicit USD and item cap; approved token-transfer channel; approved Actor | Actor billing and permissions are account-specific. Local `.env` presence does not authorize a run. | Employer: provide cap and secure private route. User: explicitly authorize any billable operation. |
-| Real sentiment evaluation (R7/R9/R10/R11) | Accepted post text with valid timestamps and permitted retention | No accepted X posts were collected; synthetic fixtures cannot stand in for real sentiment. | After source approval and authorized data collection, profile/ingest the real corpus and rerun the complete pipeline. |
-| Live Tavily news (A4) | Confirmation that live news is required and any spend ceiling | Adapter and CLI are offline-tested; no live request was made. | Employer: confirm requirement and budget. User: authorize the call and provide/use approved credentials. |
-| Exa requirement | Confirmation whether Exa must be integrated or supplied | The assignment names Tavily in project scope and mentions Exa only in the submission line; no Exa adapter exists. | Employer: state whether Exa integration is mandatory. If so, approve scope, credentials route, and budget before implementation or calls. |
-| `n+0` definition (R8) | Issue time and target close convention | Current convention is a documented working default, not employer-confirmed. | Employer: confirm the target convention; then regenerate labels and evaluation if it changes. |
-| Deadline and possible extra deliverables (A1/A7) | Absolute due date/timezone; confirmation of any video or extra packet format | Source gives “within 1 week” and “5–7 days” without an absolute date; no video requirement is stated. | Employer: provide deadline and specify any additional format. |
-| Credentials in submission (A2/A7) | Employer-approved secure private transfer mechanism, if credentials are still needed | The source asks for provider credentials; this project's security rule prohibits plaintext email, chat, Git, and ZIP delivery. | Employer: provide secure channel and recipient. No secret values are in the draft/package. |
-| Historical metric reproduction | Raw historical price snapshot and prediction rows | The repository has aggregate metrics and manifest only. This audit did not reconstruct/retrain from market data. | User: if independent raw-data reproduction is required, restore the exact snapshot/prediction artifacts or authorize a new data retrieval and evaluation. |
+| Real 180-day X corpus (R2/A3) | Rights-cleared post text, timestamps and engagement metadata for the required window | Employer supplies an approved export or approves a named source/Actor and its terms/query/field coverage | Employer-provided permitted export is likely lowest cost |
+| Apify access/cost (A2/NFR4) | Current Free plan is demo-only; Actor API use is unavailable | Employer approves a paid plan/Actor and explicit maximum items/USD, or supplies data | No purchase until explicit employer/user approval; no run was launched |
+| Sentiment-backed comparison (R7/R9/R10/R11) | Accepted real X observations | After source approval, profile, deduplicate, validate availability, score and rerun pipeline | Dependent on the X corpus above |
+| Exact BTC-USD prices | Current reproducible evaluation is BTCUSDT (USDT), not USD | Employer accepts the disclosed proxy or provides written rights for a BTC-USD source suitable for ML and distribution | BTCUSDT archive is already included, checksum-verified, non-commercial only |
+| Exa live verification | No local Exa key and unclear requirement | Employer confirms Exa is required and supplies an authorized key/account with explicit credit limit | Skip live Exa if Tavily alone satisfies the brief |
+| Target convention (R8) | Employer has not confirmed whether n+0 is a future close at issue time | Confirm 00:00 UTC issue and n+0 target definition, or specify the alternative | Current default is documented and leakage-safe |
+| Calendar deadline (A1) | PDF says both “within 1 week” and “5–7 days,” with no due date | Employer supplies absolute deadline and timezone | Do not infer from repository timestamps |
+| Credential transfer (A2/A7) | No approved secret-sharing channel | Employer supplies a verified private channel if any credentials are actually required | Never place secrets in Git, package, chat or plaintext email |
+| Recorded demo/video | No recorded video is included | Employer confirms whether a video is mandatory and required format | Existing reproducible demo script can be recorded locally if requested |
 
-The source-specified email recipient is `gilad@crowdwisdomtrading.com`. It is used in the draft; mailbox ownership was not independently checked and no email was sent.
+The source-specified recipient is `gilad@crowdwisdomtrading.com`, not independently
+mailbox-verified. The message remains an unsent draft. No credentials have been
+emailed, and no assignment has been submitted externally.

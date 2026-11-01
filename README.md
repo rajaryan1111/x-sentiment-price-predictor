@@ -1,18 +1,17 @@
 # X Sentiment Price Predictor
 
 Research pipeline that tests whether timestamped X (Twitter) sentiment adds
-out-of-sample predictive value beyond price-only baselines for **BTC-USD** daily
+out-of-sample predictive value beyond price-only baselines for Bitcoin daily
 close forecasts at horizons `n+0` through `n+5`.
 
-> **Current evidence:** the offline pipeline, model comparison, evaluation,
-> reporting, persistence, and provider safety gates are implemented and tested.
-> The committed 2026-10-26 BTC evaluation artifacts record 180 price bars and
-> zero accepted X posts or scored sentiment observations. The raw price snapshot
-> and per-row predictions are not in this checkout, so those historic metrics are
-> not freshly recomputed from raw inputs here. No sentiment advantage is claimed.
-> No live Apify, Tavily, Exa, or Coinbase call was made during the final audit;
-> no paid Actor ran. Tavily is a mocked-verified, explicitly gated context-only
-> integration; Exa is not implemented. The original assignment and companion
+> **Current evidence:** the current report is freshly recomputed from 180
+> checksum-verified Binance Vision BTCUSDT daily bars (USDT quote), with source
+> archives, snapshot, per-row predictions and metrics included. No accepted X
+> posts were available, so no sentiment conclusion is possible. Price-only mean
+> MAE is worse than naive. Binance-derived data and reports are CC BY-NC-SA 4.0,
+> attribution/share-alike, non-commercial only. No live Apify run occurred; one
+> bounded Tavily search was live-checked; Exa is implemented but mock-only because
+> no key is configured. No Coinbase data was fetched in this execution. The original assignment and companion
 > dataset-reference PDFs were re-opened on 2026-11-01 from user-provided copies
 > outside Git; they are not included in the repository or ZIP. CI and offline
 > tests prove software behavior, not data access, licensing, model quality, or
@@ -69,18 +68,21 @@ python scripts/validate_dataset_registry.py
 python scripts/validate_docs.py
 ```
 
-Run the real pipeline on public BTC-USD daily candles (no credentials, no cost):
+Reproduce the current BTCUSDT evaluation from its licensed source archives:
 
 ```bash
-# 1. download a bounded, no-cost price snapshot (half-open [start, end) UTC range)
-python -m xsentiment fetch-prices --start 2026-04-29 --end 2026-10-26 \
-  --out data/btc-usd-daily-2026-04-29_2026-10-25.json
+# Data and all derivatives are CC BY-NC-SA 4.0, non-commercial only.
+python scripts/build_binance_snapshot.py \
+  --archives-dir reports/btcusdt-180d/source \
+  --start 2026-05-05 --end 2026-11-01 \
+  --out /tmp/btcusdt-180d-snapshot.json
 
 # 2. run the full evaluation and write every artefact
 python -m xsentiment run \
-  --prices data/btc-usd-daily-2026-04-29_2026-10-25.json \
-  --out reports/btc-usd-180d \
-  --now 2026-10-26T00:00:00+00:00
+  --prices /tmp/btcusdt-180d-snapshot.json \
+  --asset BTCUSDT \
+  --out /tmp/btcusdt-180d-run \
+  --min-train 60 --test-size 20 --embargo 5
 ```
 
 Add `--posts posts.jsonl` (normalized post records) to include sentiment. Post
@@ -91,19 +93,23 @@ archive is explicitly approved, run with `--availability-basis archive_created_a
 --availability-note "<disclosure>"`; the manifest, report and outlook then carry a
 look-ahead limitation. The archive basis is never the default.
 
-News is a deliberately separate, two-step workflow: the only live-capable command is
-`fetch-news`, and `run --news-file` is entirely offline.
+News is a deliberately separate, two-step workflow: `fetch-news` makes one
+explicitly confirmed provider request, and `run --news-file` is entirely offline.
+The `fetch-prices` path is a legacy Coinbase adapter; do not use Coinbase data for
+ML evaluation or distribute its derivatives without prior written permission.
 
 ```bash
 # Inspect the gated command; --help makes no provider request.
 python -m xsentiment fetch-news --help
 
-# Only after authorizing one provider call and setting TAVILY_API_KEY in the
+# Only after authorizing one provider call and setting TAVILY_API_KEY or EXA_API_KEY in the
 # environment or a local, ignored .env file. The flag is mandatory; there is no
 # --api-key argument and the adapter performs one bounded streaming request
 # with an enforced response ceiling and no retry.
 python -m xsentiment fetch-news \
-  --query "BTC-USD Bitcoin market news" \
+  --provider tavily --topic finance \
+  --start-date 2026-10-26 --end-date 2026-11-01 \
+  --query "Bitcoin BTC market news" \
   --max-results 5 \
   --out data/news-context.jsonl \
   --confirm-live-call
@@ -112,16 +118,16 @@ python -m xsentiment fetch-news \
 python -m xsentiment run \
   --prices data/btc-usd-daily-2026-04-29_2026-10-25.json \
   --news-file data/news-context.jsonl \
-  --out reports/btc-usd-180d-with-news \
+  --out reports/btcusdt-180d-with-news \
   --now 2026-10-26T00:00:00+00:00
 ```
 
 Each JSONL line carries `title`, `url`, `published_at` (or an explicit note when the
 provider omits it), `retrieved_at`, `source`, `provider`, `payload_sha256`, `query`
 and a rendered `context_line`. Credentials are never written to the file, logged or
-passed on the command line. The CLI is verified with mocked HTTP transports; **no live
-Tavily or Exa call was made in this repository's verification**, and the command
-must not be run without an approved key and spend authorization.
+passed on the command line. One Tavily finance request was live-checked and returned
+five results without publication dates. Exa remains mock-only because no key is
+configured. News remains context-only.
 
 Profile a local candidate corpus without printing post text or uploading it:
 
@@ -152,7 +158,7 @@ python -m xsentiment persist \
 # "input_source": "persisted_storage" and the source snapshot IDs
 python -m xsentiment run \
   --database-url sqlite+aiosqlite:///./data/xsentiment.db \
-  --out reports/btc-usd-180d-persisted \
+  --out reports/btcusdt-180d-persisted \
   --now 2026-10-26T00:00:00+00:00
 
 # optionally inspect the leakage-safe cutoff join as a JSON report
@@ -199,9 +205,10 @@ executes the same CLI and validates every artefact and deterministic repeatabili
 
 ## What the pipeline does
 
-1. **Ingest** — validated Coinbase Exchange daily candles (Decimal OHLCV, UTC,
-   half-open ranges, duplicate/malformed rejection) and normalized X post records
-   that keep event time and first-observed time distinct.
+1. **Ingest** — validated UTC OHLCV candles and normalized X post records that keep
+   event time and first-observed time distinct. The current reproducible price path
+   uses the checksum-verified Binance Vision BTCUSDT archives; the Coinbase adapter
+   is legacy and subject to the restriction above.
 2. **Align** — deduplicate by stable ID, aggregate posts over the trailing
    `(cutoff - 24h, cutoff]` window using only posts published *and* observed by the
    cutoff, and drop the unfinished current UTC day so partial bars cannot leak.
@@ -217,21 +224,31 @@ executes the same CLI and validates every artefact and deterministic repeatabili
    longest horizon; per-horizon MAE/RMSE/sample counts plus a predeclared long/flat
    strategy whose out-of-sample returns yield Sharpe, Sortino and maximum drawdown
    under disclosed fees, annualisation and missing-data rules.
-7. **Report** — chart, one-page outlook and evaluation report that label observed
+7. **Report** — standalone offline HTML dashboard, chart, one-page outlook and evaluation report that label observed
    facts, method, measured results and unavailable items separately.
 
-## Historical recorded evidence (2026-10-26)
+## Recomputed price-only evidence (2026-11-01)
 
-The committed `reports/btc-usd-180d/` artifacts record 180 public Coinbase
-BTC-USD daily candles from 2026-04-29 through 2026-10-25 UTC and zero X posts.
-They report five purged expanding folds and 100 out-of-sample samples per model
-and horizon. Aggregate mean MAE is $1,828.36 for naive persistence and $2,264.62
-for price-only ridge; sentiment-plus-price is identical because no posts were
-scored. The report records price-only strategy results of +10.91% cumulative net
-return, Sharpe 1.807, Sortino 3.979 and maximum drawdown 4.08% over 32 long days.
-These are historical aggregate artifacts, not a fresh raw-data recalculation:
-the raw price snapshot and per-prediction rows are absent from this checkout.
-They are not claims of future accuracy or profitability.
+The current `reports/btcusdt-180d/` package contains 180 checksum-verified Binance
+Vision BTCUSDT daily candles for 2026-05-05 through 2026-10-31 UTC, the exact
+normalized snapshot, source archives, per-row predictions, metrics, report,
+outlook and SVG. Quote values are USDT, not USD. The archive builder is
+`scripts/build_binance_snapshot.py`; the documented walk-forward command is in
+`submission/REPRODUCIBILITY.md`.
+
+Across five chronological folds and 100 out-of-sample samples per horizon, mean
+MAE is 1,824.23 USDT for naive persistence and 2,378.50 USDT for price-only ridge.
+Zero X posts were supplied, so sentiment-plus-price is not identifiable and does
+not evidence a sentiment effect. The price-only strategy's Sharpe is 1.124,
+Sortino 2.431 and maximum drawdown 5.885% under the documented strategy rules.
+These are sample-specific research figures, not claims of future accuracy or
+profitability. Binance Vision source data and derived artefacts are licensed under
+CC BY-NC-SA 4.0, require attribution/share-alike, and are non-commercial only; see
+`reports/btcusdt-180d/ATTRIBUTION.md`.
+
+Older Coinbase-derived evaluation artifacts were removed from the current tree
+after the source terms review. They remain in earlier Git history; no history was
+rewritten. Do not reuse those artifacts without prior written consent.
 
 **Source audit:** the assignment PDF and companion dataset-reference PDF were
 re-opened and read in full on 2026-11-01; hashes and page counts are in the
@@ -245,21 +262,21 @@ X dataset has been approved, licensed, downloaded or profiled as an accepted
 
 - `src/xsentiment/config/` — validated environment-backed settings.
 - `src/xsentiment/ingestion/` — provider-neutral contracts, bounded HTTP boundary,
-  Coinbase price adapter, configurable Apify X adapter, local CSV/JSONL profiler.
+  legacy Coinbase adapter, Apify X adapter, Tavily/Exa news adapters, and local profiler.
 - `src/xsentiment/pipeline/phase2.py` — coverage profiling, deduplication,
   point-in-time features, horizon labels.
 - `src/xsentiment/features/` — sentiment scoring, price features, supervised dataset.
 - `src/xsentiment/models/` — naive baseline, ridge forecasting, walk-forward evaluation.
 - `src/xsentiment/validation/` — purged chronological fold generation.
 - `src/xsentiment/backtesting/` — forecast/risk metrics and the long/flat strategy.
-- `src/xsentiment/reporting/` — SVG charts, one-page outlook, evaluation report.
+- `src/xsentiment/reporting/` — standalone HTML dashboard, SVG charts, one-page outlook, evaluation report.
 - `src/xsentiment/pipeline/forecast_run.py` — offline end-to-end run and artefacts.
 - `src/xsentiment/storage/` — versioned `price_bars`/`x_posts` tables, idempotent
   upserts and descriptive/cutoff joins, tested with in-memory SQLite; `xsentiment
   persist` and `xsentiment run --database-url` evaluate from persisted rows
   (manifest records `input_source = persisted_storage`); verified offline.
 - `src/xsentiment/main.py` — `fetch-prices`, `fetch-news`, `persist` and `run` CLI
-  entry points; `fetch-news` is the only live-capable, gated command.
+  entry points; `fetch-news` is gated and `run` is offline.
 - `scripts/validate_docs.py` — Phase 1 documentation validator: link resolution,
   unique requirement IDs, matrix completeness and status-summary consistency.
 - `scripts/make_offline_demo.py` — deterministic, explicitly synthetic price/post

@@ -1,36 +1,41 @@
-# Historical results recorded in committed artifacts
+# Recomputed results
 
-Source: `reports/btc-usd-180d/metrics.json`, `manifest.json`, `evaluation-report.md`, `outlook.md`, and `sentiment-vs-price.svg`. The underlying 180-day price snapshot and per-prediction rows are not present in this checkout. Values below were cross-checked against the aggregate metrics artifact and report; they were not freshly recomputed from raw data in this audit.
+The Binance-derived observations and metrics in this document are included under
+CC BY-NC-SA 4.0 with attribution to Binance Vision; non-commercial use only. See
+[`reports/btcusdt-180d/ATTRIBUTION.md`](../reports/btcusdt-180d/ATTRIBUTION.md).
 
 ## Run basis
 
-- BTC-USD daily, UTC; manifest records 180 bars from 2026-04-29 through 2026-10-25.
-- X posts supplied: 0; posts scored: 0; eligible cutoffs with scored sentiment: 0.
-- Five purged expanding walk-forward folds, 20-row test blocks and five-row purge.
-- The metrics artifact records 100 evaluation samples for each model/horizon and 1,800 model/horizon evaluations (3 × 6 × 100). Per-row `predictions.jsonl` is not included.
+- Binance Spot BTCUSDT, quote USDT; daily UTC bars from 2026-05-05 through
+  2026-10-31 (180 rows, 0 gaps, 0 duplicates).
+- Five expanding walk-forward folds; 60 minimum training rows, 20 test rows and
+  five-row purge/embargo; 100 out-of-sample samples per model and horizon.
 - Models: naive persistence, price-only ridge, sentiment-plus-price ridge.
+- X posts supplied: 0; posts scored: 0; cutoffs with scored sentiment: 0.
 
-## Forecast results (reported MAE in USD; RMSE in parentheses)
+## Aggregate forecast result
 
-| Horizon | Naive | Price-only ridge | Sentiment-plus-price ridge |
-| --- | ---: | ---: | ---: |
-| n+0 | 946.70 (1,462.93) | 1,056.82 (1,561.29) | 1,056.82 (1,561.29) |
-| n+1 | 1,434.59 (2,112.26) | 1,665.02 (2,332.84) | 1,665.02 (2,332.84) |
-| n+2 | 1,758.95 (2,653.80) | 2,108.22 (3,115.22) | 2,108.22 (3,115.22) |
-| n+3 | 2,003.41 (3,190.92) | 2,527.34 (3,831.48) | 2,527.34 (3,831.48) |
-| n+4 | 2,257.53 (3,669.37) | 2,897.59 (4,384.25) | 2,897.59 (4,384.25) |
-| n+5 | 2,568.99 (4,104.76) | 3,332.72 (4,952.22) | 3,332.72 (4,952.22) |
-| **Mean MAE** | **1,828.36** | **2,264.62** | **2,264.62** |
+| Model | Mean MAE (USDT) | Relative to naive |
+| --- | ---: | ---: |
+| Naive persistence | 1,824.23 | baseline |
+| Price-only ridge | 2,378.50 | 30.38% worse |
+| Sentiment-plus-price candidate | 2,378.50 | identical without sentiment |
 
-The aggregate metrics say naive persistence outperformed price-only ridge by 23.86% on mean MAE. The sentiment-plus-price candidate is identical because no posts were scored; no sentiment benefit is shown.
+No sentiment effect can be inferred. Per-horizon MAE/RMSE, fold predictions,
+benchmarks, assumptions and limitations are in the generated files under
+`reports/btcusdt-180d/`.
 
-## Strategy metrics recorded in the artifact
+## Strategy risk metrics
 
-| Strategy | Cumulative net return | Sharpe | Sortino | Max drawdown | Exposure |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Naive rule | 0.00% (never trades) | undefined | undefined | 0.00% | 0/100 days |
-| Price-only | +10.91% | 1.807 | 3.979 | 4.08% | 32/100 days |
-| Sentiment-plus-price | +10.91% | 1.807 | 3.979 | 4.08% | 32/100 days |
-| Unconditional long benchmark | +6.11% | 0.752 | 1.377 | 10.33% | 100/100 days |
+The defined price-only long/flat strategy has Sharpe 1.124, Sortino 2.431 and
+maximum drawdown 5.885%. The benchmark, fees, exposure and risk-metric conventions
+are in `reports/btcusdt-180d/evaluation-report.md` and `metrics.json`. These are
+out-of-sample sample statistics, not a claim of accuracy or profitability.
 
-The report records 0.1% fee per side and 365-period annualization. The values are sample-specific strategy statistics, not future-return claims. The naive ratios are undefined because its return series has no dispersion.
+## Limitations
+
+This is BTCUSDT (USDT quote), not the exact BTC-USD pair. There are no accepted X
+posts, so sentiment contribution is not measured. Binance Vision terms limit this
+data and its derivatives to non-commercial use with attribution and share-alike.
+An employer decision is required on BTCUSDT acceptability or an approved exact-USD
+source.

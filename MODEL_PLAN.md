@@ -1,12 +1,12 @@
 # Model and Evaluation Plan
 
-Status: the methodology below is implemented and verified on real public Coinbase
-BTC-USD data. No accepted X corpus exists yet, so a sentiment result is still
+Status: methodology is implemented and freshly recomputed on checksum-verified Binance Vision
+BTCUSDT (USDT quote) data. Binance-derived artifacts carry CC BY-NC-SA 4.0 terms and are non-commercial only. No accepted X corpus exists yet, so a sentiment result is still
 **not** evidenced: the candidate model is flagged as not identifiable when no scored
 posts are present. No trained model is described here as accurate or profitable.
 
 ## Question and target
-Test whether point-in-time X sentiment improves BTC-USD daily close forecasts over
+Test whether point-in-time X sentiment improves Bitcoin daily close forecasts over
 naive and price-only baselines. Issue at 00:00 UTC at start of day n. Horizons 0..5
 target closes of bars beginning at cutoff plus h days. Use completed prior bars as
 price inputs. Posts require event time and defensible availability time <= cutoff and
@@ -96,28 +96,23 @@ to out-of-sample signal predictions:
   least 30 out-of-sample days exist, and are reported as undefined when the return
   series has zero dispersion.
 
-Evidence (2026-10-27): the reproduced run's strategy metrics were re-derived
-independently of the project code by replaying the recorded `n+1` predictions against
-the raw snapshot closes with hand-written formulas: 32 long days, Sharpe 1.80682,
-Sortino 3.97922, maximum drawdown 0.040838 — matching the pipeline outputs to within
-1e-9. These are research statistics for one asset and one 100-day out-of-sample
-sample, not evidence of tradability.
+Earlier Coinbase-derived strategy metrics are excluded from this current report
+after the provider terms review; they are not repeated or relied on here. Git history
+remains unchanged.
 
-## Measured state (2026-10-26, real public data; reproduced identically 2026-10-27)
-180 public Coinbase `BTC-USD` daily bars (2026-04-29 to 2026-10-25 UTC), 5 folds,
-100 out-of-sample days per model and horizon, 1800 predictions, zero posts:
-mean MAE across horizons was $1,828.36 for naive persistence and $2,264.62 for the
-price-only ridge model, i.e. the fitted model was **23.86% worse than naive** on
-forecast error, and the candidate model was identical to price-only because no
-sentiment was available. No claim is made that any model adds predictive value.
-Strategy statistics from the same run are short-sample research numbers on one asset
-and period, not evidence of tradability.
+## Measured state (2026-11-01, Binance Vision BTCUSDT)
+The current checked run has 180 daily bars from 2026-05-05 through 2026-10-31 UTC,
+5 folds, 100 out-of-sample rows per model and horizon, 1,800 prediction rows, and
+zero posts. Mean MAE across horizons is 1,824.23 USDT for naive persistence and
+2,378.50 USDT for price-only ridge; price-only is 30.38% worse than naive. The
+sentiment-labelled candidate is identical because there are no scored posts and is
+not evidence about sentiment. Price-only strategy Sharpe is 1.124, Sortino 2.431,
+and max drawdown 5.885%; these are short-sample research measures, not evidence of
+tradability. Details and reproducibility artifacts are in `reports/btcusdt-180d/`.
 
-Re-verification evidence: on 2026-10-27 the window was re-fetched from the
-free public Coinbase endpoint and evaluated with the default CLI settings; every
-metric matched to the cent, with 180 candles, 5 folds and 1800 predictions, and the
-fresh snapshot's SHA-256 equals the committed report's input hash
-(`09ce225a405aea390ae2f21c72634da1211a321aed1b39b52febfadf64083f75`).
+Prior Coinbase-derived metrics have been removed from the current tree after the
+2026 Coinbase Market Data Terms review; they are not reproduced or redistributed
+here. Exact BTC-USD and real sentiment evaluation remain blocked.
 
 ## Robustness and go/no-go
 Possible predeclared comparisons include horizons, naive/price-only/sentiment models

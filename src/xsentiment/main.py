@@ -35,6 +35,7 @@ from xsentiment.availability import AVAILABILITY_BASES, validate_availability_ba
 from xsentiment.backtesting.strategy import StrategyAssumptions
 from xsentiment.config.settings import get_settings
 from xsentiment.errors import PayloadTooLargeError
+from xsentiment.ingestion.exa_news import ExaNewsAdapter
 from xsentiment.ingestion.prices import MAX_CANDLES_PER_REQUEST, CoinbasePriceAdapter
 from xsentiment.ingestion.tavily_news import (
     MAX_QUERY_CHARS,
@@ -116,9 +117,10 @@ def _parse_availability_note(value: str) -> str:
     return note
 
 
-def _configured_news_key() -> str | None:
+def _configured_news_key(provider: str) -> str | None:
     """Read the only permitted credential source: environment or local .env."""
-    key = get_settings().tavily_api_key
+    settings = get_settings()
+    key = settings.tavily_api_key if provider == "tavily" else settings.exa_api_key
     if key is None:
         return None
     return key.get_secret_value().strip() or None
@@ -183,29 +185,59 @@ def _news_record(result: NewsResult, item: NormalizedNewsItem) -> dict[str, obje
     }
 
 
-async def _fetch_news_result(query: str, max_results: int) -> NewsResult:
+async def _fetch_news_result(
+    query: str,
+    max_results: int,
+    *,
+    provider: str = "tavily",
+    topic: str = "news",
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+) -> NewsResult:
     """One bounded, explicitly authorized news search; never retried."""
-    api_key = _configured_news_key()
+    api_key = _configured_news_key(provider)
     if api_key is None:
         raise NewsCredentialsMissingError(
-            "no Tavily API key is configured; set TAVILY_API_KEY in the environment "
-            "or a local .env file before using --confirm-live-call"
+            f"no {provider.title()} API key is configured; set "
+            f"{'TAVILY_API_KEY' if provider == 'tavily' else 'EXA_API_KEY'} in the "
+            "environment or a local .env file before using --confirm-live-call"
         )
-    async with TavilyNewsAdapter(api_key=api_key, max_results=max_results) as adapter:
-        return await adapter.search(query)
+    adapter_type = TavilyNewsAdapter if provider == "tavily" else ExaNewsAdapter
+    async with adapter_type(api_key=api_key, max_results=max_results) as adapter:
+        kwargs = {
+            "topic": topic,
+            "start_date": start_date.date() if start_date else None,
+            "end_date": end_date.date() if end_date else None,
+        }
+        return await adapter.search(query, **kwargs)
 
 
 def _command_fetch_news(args: argparse.Namespace) -> int:
     if not args.confirm_live_call:
         print(
-            "fetch-news refused: this command may make one paid Tavily request; rerun with "
+            "fetch-news refused: this command may consume provider credits; rerun with "
             "--confirm-live-call only after that call is authorized",
             file=sys.stderr,
         )
         return 2
     try:
         _validate_news_request(args.query, args.max_results)
-        result = asyncio.run(_fetch_news_result(args.query, args.max_results))
+        if (
+            args.start_date is not None
+            and args.end_date is not None
+            and args.start_date > args.end_date
+        ):
+            raise NewsProviderError("--start-date must be on or before --end-date")
+        result = asyncio.run(
+            _fetch_news_result(
+                args.query,
+                args.max_results,
+                provider=args.provider,
+                topic=args.topic,
+                start_date=args.start_date,
+                end_date=args.end_date,
+            )
+        )
     except NewsCredentialsMissingError as exc:
         print(f"fetch-news failed: {_redact_credentials(exc)}", file=sys.stderr)
         return 1
@@ -524,6 +556,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="write one bounded, opt-in Tavily news search as contextual JSONL",
     )
     news.add_argument("--query", required=True, help="provider search query (max 400 chars)")
+    news.add_argument("--provider", choices=("tavily", "exa"), default="tavily")
+    news.add_argument("--topic", choices=("general", "news", "finance"), default="news")
+    news.add_argument("--start-date", type=_parse_day, help="inclusive publication date in UTC")
+    news.add_argument("--end-date", type=_parse_day, help="inclusive publication date in UTC")
     news.add_argument(
         "--max-results",
         type=_parse_news_limit,
@@ -534,7 +570,7 @@ def build_parser() -> argparse.ArgumentParser:
     news.add_argument(
         "--confirm-live-call",
         action="store_true",
-        help="required acknowledgement that one paid Tavily request may be made",
+        help="required acknowledgement that one provider request may use account credits",
     )
     news.set_defaults(handler=_command_fetch_news)
 

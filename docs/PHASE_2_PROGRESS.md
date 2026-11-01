@@ -2,18 +2,18 @@
 
 > Naming note: this file belongs to the repository's historical "Phase 2 data quality/alignment" workstream, which maps to canonical Phase 3 in [PHASES.md](../PHASES.md). It is not canonical documentation Phase 2.
 
-**Historical workstream log (last updated 2026-10-29):** external data-access gates remain open. Current status and evidence are in [submission/FINAL_HANDOFF.md](../submission/FINAL_HANDOFF.md) and [TEST_PLAN.md](../TEST_PLAN.md). This document distinguishes code and test evidence from provider/account verification. Live X ingestion and a verified 180-day X dataset are not yet complete, so the sentiment-versus-price comparison remains blocked. Price-only models, walk-forward evaluation and reporting are implemented on `feat/sentiment-features-and-forecasting`. The local offline suite passed on code commit `d801661` (2026-10-28) and again at the released documentation/registry commit. At the live GitHub query on 2026-10-29, PR #14 head `9b0698f86267973a220c914ac0802a5bba171374` had two successful CI runs (`40795420005`, `40795425900`) on that exact pushed SHA. See [TEST_PLAN.md](../TEST_PLAN.md) for the authoritative test count and [FINAL_VERIFICATION_REPORT.md](FINAL_VERIFICATION_REPORT.md) for scope.
+**Historical workstream log:** current evidence is in [FINAL_EXECUTION_STATUS](FINAL_EXECUTION_STATUS_2026-11-01.md), [submission/FINAL_HANDOFF.md](../submission/FINAL_HANDOFF.md) and [TEST_PLAN.md](../TEST_PLAN.md). Earlier Coinbase market-data profiles in this workstream are not current evidence and must not be reused for ML or redistribution without prior written permission. Current price evaluation uses the checksum-verified Binance Vision BTCUSDT package under its CC BY-NC-SA 4.0 non-commercial/share-alike terms. Live X ingestion and real sentiment comparison remain blocked.
 
 ## Implemented and locally verified
 
-### Coinbase daily candles
+### Price-source restriction
 
-- Public Coinbase Exchange daily-candle adapter for configured BTC-USD.
-- UTC-aware bounds, daily granularity, provider range limit, Decimal OHLCV parsing, sorting, malformed-row and duplicate checks.
-- Local smoke script checks seven completed daily bars without saving raw market data.
-- User-run live smoke test succeeded for 2026-10-19 through 2026-10-25: 7 candles, no missing bars in that seven-day window.
-- User-run 180-day live coverage profile succeeded for the half-open UTC range 2026-04-29 through 2026-10-26: 180 observed bars, no missing dates, duplicate timestamps, or out-of-range timestamps; current-day candle excluded; raw data not saved.
-- User-run test output on the pre-Apify state showed 25 tests passing. The GitHub CI after the Apify adapter addition passed lint, registry validation and pytest at that stage.
+The repository still contains a legacy Coinbase adapter and its tests. Coinbase's
+current Market Data Terms restrict ML training, validation, benchmarking and
+redistribution of derived analytics without prior written consent. No Coinbase data
+was fetched for this execution; older derived report files have been removed from
+the current tree. Do not use the legacy adapter for model evaluation without the
+required written permission.
 
 ### Data-quality and point-in-time primitives
 
@@ -56,18 +56,18 @@ The profiler now reports deterministic reference windows (`--as-of`), daily expe
 
 ## External gates still open
 
-1. **180-day Coinbase live price profile — verified by user-run check:** 180/180 daily bars for 2026-04-29 to 2026-10-26 UTC, no missing or duplicate dates and no out-of-range rows. Re-run at assessment time if newer coverage is needed; do not commit raw price data by default.
+1. **Exact BTC-USD profile:** still open. Current report uses a 180-row Binance Vision BTCUSDT proxy under non-commercial CC BY-NC-SA 4.0 terms. Do not use Coinbase-derived data for ML without written consent.
 2. Historical X dataset: retrieve the assessment's linked resource and review contents, access permissions, terms/license, schema, event-time coverage, text availability and source platform before use.
-3. Apify: inspect available Actors and account pricing/terms; verify query strategy, output fields, plan rate, 180-day coverage and strict run cost cap before any paid run. No actor selected and no paid run initiated.
+3. Apify: candidate `apidojo/tweet-scraper` was inspected. Current Free plan prohibits API use; no Actor run was launched. Employer must provide a permitted export or approve a paid plan/Actor and spend cap.
 4. Credentials: verify provider configuration privately; never add tokens, cookies or credentials to Git.
 5. Employer constraints: confirm the actual submission deadline and any target-semantics clarification.
 
 ## Next steps recorded at the data-quality stage
 
-Items 1, 2 and 5 below have since been completed on the sentiment branch and are retained as the historical plan. Items 3 and 4 remain open.
+This plan is historical and superseded by the current execution status. Do not execute its Coinbase steps without written permission.
 
 1. Run CI and local lint/tests on this branch.
-2. Execute a bounded 180-day Coinbase price profile in chunks and inspect missing UTC days and boundary behavior.
+2. Rebuild the checksum-verified Binance Vision BTCUSDT sample using `scripts/build_binance_snapshot.py`; exact BTC-USD remains an employer decision.
 3. Review historical dataset contents/terms and inspect the actual Apify actor schema before implementing a provider-specific X adapter.
 4. Select/review the permitted Actor in the user's account, then run the bounded Apify schema smoke test and inspect its sanitized output before any larger collection.
 5. Add an explicit sentiment model, train/evaluate baselines chronologically, and report only evidence-backed metrics.

@@ -20,6 +20,7 @@ from xsentiment.backtesting.strategy import StrategyAssumptions, strategy_specif
 from xsentiment.features.dataset import DatasetSummary
 from xsentiment.models.evaluation import EvaluationResult, mean_mae_by_model
 from xsentiment.reporting.outlook import OutlookReport
+from xsentiment.reporting.units import quote_currency
 
 _DISCLAIMER = (
     "Fixtures and synthetic data are labelled as such and are never presented as real "
@@ -69,6 +70,7 @@ def render_evaluation_report(
 ) -> str:
     """Render the Markdown evaluation report from measured artefacts only."""
     stamp = generated_at or datetime.now(UTC)
+    currency = quote_currency(asset, provenance)
     lines: list[str] = [
         f"# {asset} sentiment and price forecast evaluation",
         "",
@@ -123,7 +125,14 @@ def render_evaluation_report(
     if evaluation.metrics:
         lines.extend(
             _table(
-                ("Model", "Horizon", "Samples", "MAE (USD)", "RMSE (USD)", "Mean error (USD)"),
+                (
+                    "Model",
+                    "Horizon",
+                    "Samples",
+                    f"MAE ({currency})",
+                    f"RMSE ({currency})",
+                    f"Mean error ({currency})",
+                ),
                 tuple(
                     (
                         metrics.model,
@@ -148,7 +157,7 @@ def render_evaluation_report(
                 else "n/a"
             )
             rows.append((model, _number(value, 2), delta))
-        lines.extend(_table(("Model", "Mean MAE (USD)", "Difference"), tuple(rows)))
+        lines.extend(_table(("Model", f"Mean MAE ({currency})", "Difference"), tuple(rows)))
         lines.extend(
             [
                 "",
@@ -253,7 +262,7 @@ def render_evaluation_report(
                 "",
                 f"- As-of: {outlook.as_of.isoformat()}",
                 f"- Forecast cutoff: {_iso(outlook.cutoff)}",
-                f"- Last completed close (USD): "
+                f"- Last completed close ({currency}): "
                 f"{_number(outlook.latest_completed_close, 2)}",
                 f"- Cutoffs with sentiment: {outlook.days_with_sentiment}",
                 "- Full one-page outlook: `outlook.md` in this run directory.",

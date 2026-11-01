@@ -4,7 +4,7 @@ import asyncio
 import json
 import os
 import time
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from urllib.parse import quote
 
 import httpx
@@ -55,10 +55,15 @@ def success_handler(request: httpx.Request) -> httpx.Response:
 
 
 def run_search(handler, query="BTC sentiment", **kwargs) -> object:
+    search_args = {
+        key: kwargs.pop(key)
+        for key in ("topic", "start_date", "end_date")
+        if key in kwargs
+    }
     async def execute():
         adapter = TavilyNewsAdapter(api_key="tvly-test-key", client=transporting(handler), **kwargs)
         try:
-            result = await adapter.search(query, retrieved_at=RETRIEVED)
+            result = await adapter.search(query, retrieved_at=RETRIEVED, **search_args)
         except BaseException:
             await adapter.aclose()
             raise
@@ -94,6 +99,33 @@ def test_duplicate_urls_are_excluded_exactly_once() -> None:
 
     assert len(result.items) == 2
     assert "result 2: duplicate url excluded" in result.excluded
+
+
+def test_date_filter_and_publication_metadata_are_sent_to_tavily() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content)
+        assert payload["topic"] == "news"
+        assert payload["start_date"] == "2026-10-01"
+        assert payload["end_date"] == "2026-10-31"
+        assert payload["filter_by_published_date"] is True
+        assert payload["include_published_date"] is True
+        return httpx.Response(200, json={"results": []})
+
+    result = run_search(
+        handler,
+        start_date=date(2026, 10, 1),
+        end_date=date(2026, 10, 31),
+    )
+    assert result.items == ()
+
+
+def test_reversed_tavily_date_range_is_rejected_before_request() -> None:
+    with pytest.raises(NewsProviderError, match="start_date"):
+        run_search(
+            success_handler,
+            start_date=date(2026, 10, 31),
+            end_date=date(2026, 10, 1),
+        )
 
 
 def test_missing_headline_is_excluded_with_a_reason_not_fabricated() -> None:

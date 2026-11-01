@@ -1,62 +1,50 @@
 # Final submission checklist — 2026-11-01
 
-## Repository state
+## Repository and source audit
 
-- [x] Canonical repository verified: `rajaryan1111/x-sentiment-price-predictor`.
-- [x] Final branch selected: `feat/availability-basis-and-preflight`.
-- [x] Local and remote branch HEAD matched before this audit; final commit/remote state is recorded in [FINAL_HANDOFF.md](FINAL_HANDOFF.md) after push.
-- [x] Worktree was clean at the start of the audit. This audit's changes are limited to test isolation, source-archive provenance test coverage, and current documentation/package files.
-- [x] No force push, history rewrite, merge to `main`, email, or external submission.
+- [x] Repository remote is `https://github.com/rajaryan1111/x-sentiment-price-predictor.git`.
+- [x] Target branch is `feat/availability-basis-and-preflight`; final SHA and remote/PR sync are reported in the release handoff.
+- [x] Original assessment PDFs were re-read from user-provided copies; hashes/page counts are recorded in `docs/REQUIREMENTS_TRACEABILITY.md`.
+- [x] All 28 requirement IDs have current evidence, status and external dependency.
+- [x] No force-push, history rewrite, merge to `main`, email or external submission.
 
-## Assignment and engineering evidence
+## Data and evaluation
 
-- [x] Original assignment PDF and companion dataset-reference PDF re-read from user-provided copies; page counts and SHA-256 recorded in `docs/REQUIREMENTS_TRACEABILITY.md`.
-- [x] Full 28-ID traceability matrix retained and updated with source and current facts.
-- [x] Apify preflight run with `--validate-only`: valid; ticker/cashtag/keyword modes listed; `network_call_made: false`; `paid_run_launched: false`.
-- [x] Offline synthetic demo executed twice; all six artifacts were byte-identical.
-- [x] Credential-absence tests were made hermetic against an ignored local `.env`.
-- [x] Source-archive provenance test checks for the explicit unavailable revision rather than requiring `.git`.
-- [x] Historical metrics cross-checked against committed aggregate artifacts; not freshly retrained because raw snapshot and prediction rows are unavailable.
-- [x] No accepted real X posts or scored sentiment observations; no sentiment advantage is claimed.
+- [x] Real X status is explicit: 0 accepted posts, 0 scored posts, no 180-day corpus.
+- [x] Apify actor `apidojo/tweet-scraper` is identified; current Free plan prohibits API runs; no Actor run or purchase was made.
+- [x] One bounded Tavily finance search was live-checked; five results had no publication timestamps and remain undated.
+- [x] Exa adapter and CLI are implemented and mock-tested; no key/live verification.
+- [x] 180 Binance Vision BTCUSDT bars cover 2026-05-05 to 2026-10-31 UTC; 36 published archive checksums matched, with no missing or duplicate dates.
+- [x] Six horizons, five folds, 100 OOS samples per model/horizon, 1,800 prediction rows, and the defined price-only strategy were freshly recomputed.
+- [x] Price-only is worse than naive on mean MAE; no sentiment or profitability claim is made.
+- [x] Binance Vision data and derived outputs have attribution/share-alike notices and are non-commercial only. Quote is USDT, not USD.
+- [x] Old Coinbase-derived reports were removed from the current tree after terms review; Git history remains unchanged.
 
-## Final verification results
-
-Local checks passed on the reviewed worktree before release packaging; GitHub Actions for the final pushed SHA will be recorded after the push.
+## Verification on the reviewed source tree
 
 | Check | Result |
 | --- | --- |
-| `pytest -q -ra` | Pass in this 2026-11-01 audit: 209 passed, 0 failed, 0 skipped, 0 warnings |
-| `ruff check src tests scripts` | Pass |
-| `compileall -q src tests scripts` | Pass |
-| `scripts/validate_docs.py` | Pass: 103 relative links, 6 test-count claims, 28 matrix rows |
-| `scripts/validate_dataset_registry.py` | Pass: 12 records structurally valid |
-| Offline demo two-run comparison | Pass: all six outputs byte-identical using identical fixed inputs and paths |
-| Apify `--validate-only` preflight | Pass; no network call and no paid Actor run |
-| Clean ZIP extraction test suite | Pending package build |
-| Secret and forbidden-file scan | Pending final package scan |
-| `git diff --check` | Pass |
-| GitHub Actions | Pending run matching the final commit SHA |
+| Full pytest suite | Current count and command: [TEST_PLAN.md](../TEST_PLAN.md). |
+| Ruff | Pass |
+| Python compilation | Pass |
+| Documentation validation | Pass: 102 relative links, 4 test-count claims, 28 requirement rows |
+| Dataset registry validation | Pass: 12 records structurally valid |
+| Apify validate-only preflight | Pass; no network call and no paid run |
+| Binance archive builder | Pass: 36 published checksum matches, 180 complete bars |
+| Fresh walk-forward evaluation | Pass: 5 folds, 6 horizons, per-row predictions and risk metrics |
+| Clean extraction, secret scan and final ZIP integrity | Release checks recorded in the output package sidecar and final response |
+| GitHub Actions for final pushed SHA | Checked after normal push; exact Actions link is in final response |
 
-## Package verification
+## Package
 
-- [ ] ZIP rebuilt from reviewed source at `/Users/rajaryan/Projects/x-sentiment-price-predictor-final/x-sentiment-price-predictor-submission.zip`.
-- [ ] ZIP integrity test passes.
-- [ ] Exact archive entry count and SHA-256 recorded in final handoff.
-- [ ] One root folder; no duplicate or obsolete submission artifacts.
-- [ ] No `.git`, `.env`, credentials, databases, raw datasets, virtual environments, caches, logs, or unrelated files.
-- [ ] Original assignment PDFs not included.
-- [ ] Clean extraction can install and run tests plus the synthetic offline demo; archive manifests report Git revision unavailable explicitly.
+- [x] Package includes source, tests, canonical docs, reproducibility guide, all permitted Binance source archives/checksums, evaluation artifacts, offline HTML dashboard, one-page outlook and demo script.
+- [x] Package excludes `.git`, `.env`, secrets, private databases, caches, virtual environments and unrelated files.
+- [x] Assessment PDFs are not copied into the package.
+- [x] Package path: `outputs/x-sentiment-price-predictor-submission.zip` in this Codex task.
+- [x] SHA-256 and archive entry count are recorded in the adjacent `.sha256` file and final handoff.
 
-## External blockers disclosed
+## External blockers and submission
 
-- [x] Approved, licensed 180-day X dataset / Actor is unavailable.
-- [x] No paid Apify run was launched; no live Tavily, Exa, or Coinbase call was made during this audit.
-- [x] Exa is not integrated; local Exa configuration is blank.
-- [x] No live sentiment result can be produced without accepted X data.
-- [x] Employer decisions are listed in `REMAINING_BLOCKERS.md`.
-- [x] Email draft uses the source-specified `gilad@crowdwisdomtrading.com`; address is not independently mailbox-verified.
-- [x] No email was sent and no assignment was submitted on the user's behalf.
-
-## Verdict
-
-**READY WITH DISCLOSED EXTERNAL BLOCKERS**, subject to replacing pending verification rows above with final measured results and a CI run for the exact pushed commit before calling the package verified.
+- [x] Remaining decisions and exact employer actions are listed in `REMAINING_BLOCKERS.md`.
+- [x] Email draft is prepared but unsent; no credentials are included.
+- [x] Final verdict: **SUBMISSION READY WITH EXTERNAL BLOCKERS**. Real X sentiment and exact BTC-USD acceptance remain external dependencies.

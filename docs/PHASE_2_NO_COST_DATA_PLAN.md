@@ -4,13 +4,13 @@
 
 ## Goal
 
-Keep the data workstream moving without requiring the project owner to purchase a scraper. The BTC-USD price path already uses Coinbase Exchange's public candles. X data must remain a separate, evidence-backed gate.
+Keep the data workstream moving without requiring the project owner to purchase a scraper. The current price-only evaluation uses checksum-verified Binance Vision BTCUSDT archives under non-commercial CC BY-NC-SA 4.0 terms. X data remains a separate, evidence-backed gate.
 
 ## Current status
 
-- **Price history:** user-run profile verified 180/180 complete daily BTC-USD bars for 2026-04-29 through 2026-10-25 UTC (half-open end 2026-10-26), with no missing or duplicate timestamps in that checked range.
+- **Price history:** current evaluation verifies 180 Binance Vision BTCUSDT daily bars for 2026-05-05 through 2026-10-31 UTC, with 36 matching published archive checksums and no missing or duplicate dates. Quote is USDT, not USD; exact BTC-USD requires employer approval or another licensed source.
 - **Provider-neutral contracts, profiler and point-in-time alignment:** implemented and covered by unit tests. The profiler supports deterministic `--as-of` windows, daily coverage gaps, retrieval-column coverage, schema drift and invalid engagement counts.
-- **Apify adapter:** implemented and mocked in tests, including the documented `data` envelope and dataset offset/limit paging; no Actor is selected or run. Do not assume its free allowance will cover an Actor or 180-day search.
+- **Apify adapter:** implemented and mocked in tests, including the documented `data` envelope and dataset offset/limit paging. The candidate Actor is identified but not employer-approved; current account Free plan prohibits API use. No Actor was run.
 - **Storage:** a versioned price/post schema, idempotent repositories, descriptive and leakage-safe cutoff joins, and `xsentiment persist` plus `run --database-url` are implemented and fixture-verified end-to-end. This verifies the offline persisted-input path for R15; no accepted real X rows are available to populate it.
 - **Historical X collection:** not complete. The assessment-linked Google Doc was retrieved on 2026-10-29 and is a 12-entry dataset-link compilation, not a tweet corpus. Three public candidate listing/card metadata were checked, but no candidate dataset has been downloaded, row-profiled, or accepted for use. No raw candidate corpus is present in this checkout.
 
@@ -28,9 +28,9 @@ The repository's dataset registry includes historical Bitcoin/X candidates. Most
 
 AWS Marketplace has listed a free-of-charge Twitter cryptocurrency dataset covering approximately the last 30 days of English-language posts from verified accounts. It is a rolling one-month source, not a 180-day archive; AWS infrastructure charges may apply, and access requires accepting the vendor terms. Treat it only as a possible recent-window supplement, not a substitute for the 180-day requirement. Re-check current listing and terms before subscribing.
 
-### Option D — Apify Free plan credits
+### Option D — Apify Free plan
 
-Apify advertises a Free plan with monthly platform usage credits and no credit card requirement, but Actor-specific charges and resource usage vary. This is not guaranteed to make any chosen X Actor free. Do not start a run until its current pricing, schema, limits and terms are reviewed; never exceed a user-approved zero-spend preference.
+The inspected account's current Free plan is demo-only: 5 runs/month, maximum 10 items/run, and no Actor API use. It cannot collect the required recent corpus through the configured API path. Do not use a browser workaround or purchase a paid plan; ask the employer for a permitted export or explicit approval of an Actor, plan and spend cap.
 
 ## Point-in-time rule for downloaded historical data
 

@@ -23,7 +23,7 @@ complete merely because its interface or a mock test exists.
 ## Phase 1 — Requirements lock
 Status: complete as a documented baseline, with external data/provider and deadline items still open.
 - Parse the assessment into traceable requirements with unique IDs (`R1`–`R15`, `NFR1`–`NFR6`, `A1`–`A7`).
-- Set working choices BTC-USD, daily UTC, n+0..n+5 close targets and Coinbase default.
+- Set working choices Bitcoin, daily UTC and n+0..n+5 close targets. BTC-USD was the initial price default; D-031 supersedes it for current evaluation because of source restrictions.
 - Separate required, optional/ambiguous and out-of-scope items.
 - Record conservative news and RL interpretations.
 - Give every requirement an acceptance criterion, a verification method, an evidence pointer, a status, a gap and a blocker.
@@ -52,10 +52,12 @@ explicit; implementation status is honest; links/commands are checked; reviewed 
 merge and CI passes. No semantic implementation change without synchronized docs/tests.
 
 ## Phase 3 — Data access and ingestion
-Status: in progress; X data externally blocked. Price ingestion is complete and verified.
-- Price: 180/180 real public Coinbase `BTC-USD` daily bars for 2026-04-29 through
-  2026-10-25 UTC, refetched 2026-10-26 with no missing or duplicate timestamps and the
-  unfinished current day excluded. Reproduced with `python -m xsentiment fetch-prices`.
+Status: partially complete; X data externally blocked. Current price evaluation is independently rebuilt from Binance Vision archives.
+- Price: 180/180 Binance Spot `BTCUSDT` daily bars for 2026-05-05 through
+  2026-10-31 UTC; all 36 archive checksums matched and there are no gaps or duplicate
+  dates. Rebuild with `python scripts/build_binance_snapshot.py` and the checked-in
+  archives under `reports/btcusdt-180d/source/`. Data and derivatives are CC BY-NC-SA
+  4.0, non-commercial only. Exact BTC-USD remains open.
 - X: no accepted dataset and no live Actor run. Local CSV/JSONL profiling exists and
   refuses to call an old download point-in-time ready. Earlier repository notes record
   inspection of uploaded files on 2026-10-26 (tweet IDs/date-count summaries, unrelated
@@ -108,12 +110,11 @@ Status: implemented and verified on real price data; the sentiment comparison is
 - Naive persistence, price-only ridge and sentiment-plus-price ridge run on identical
   folds and eligible rows, one model per horizon, predicting a close ratio.
 - 5 folds, 100 out-of-sample days per model and horizon, 1800 stored predictions.
-- Measured: price-only mean MAE $2,264.62 versus naive $1,828.36 (23.86% worse).
+- Current measured result: price-only mean MAE 2,378.50 USDT versus naive 1,824.23 USDT (30.38% worse); no sentiment was scored.
   No claim that any model beats the baseline is made.
-- Independently reproduced on 2026-10-27 from a refetch of the same public window:
-  every metric matched to the cent (5 folds, 1800 predictions, 100 out-of-sample
-  days per model and horizon) and the snapshot SHA-256 identically equals the
-  committed report's input hash.
+  Fresh run is reproduced from the checked-in Binance Vision archive ZIPs and
+  checksum sidecars using the documented snapshot builder. Binance-derived figures
+  remain non-commercial under CC BY-NC-SA 4.0.
 Acceptance: met for prices; unmet for the sentiment-vs-price comparison, which requires
 an accepted X source.
 
@@ -140,8 +141,9 @@ Status: implemented; the sentiment panel is empty until an accepted X source exi
   normalized JSONL snapshot from one bounded Tavily request using `TAVILY_API_KEY`;
   the offline `run --news-file` step then consumes it. The adapter, CLI gate, bounds,
   redaction, single-request behaviour and prediction/metric invariance are covered by
-  mocked-transport tests only — no Tavily or Exa call has been made and no news
-  feature exists.
+  mock transport tests plus one bounded live Tavily finance search. Tavily returned
+  five results without publication dates. Exa remains mock-only because no key is
+  configured; news remains outside predictive features.
 - The R10 sentiment-change series is implemented as a third chart panel:
   `sentiment_change_points` draws the day-over-day change
   `mean_sentiment_24h(T) - mean_sentiment_24h(T-1 UTC day)` for consecutive scored
@@ -172,4 +174,4 @@ Status: in progress; offline reproducibility verified on a fresh clone.
 - Remaining (external only): the licence/registration audit of the eventual X source,
   the secure credential route, employer confirmation of the submission deadline, an
   accepted real X corpus, and the email submission packet required by the brief (A7).
-- Deliverable checklist: repository link and reproducible package — **partially verified** (fresh-clone evidence is historical); evaluation report with per-horizon MAE/RMSE, sample counts and risk metrics — **available** (`reports/btc-usd-180d/evaluation-report.md`, historical real-price artifact); chart and outlook with honest unavailable states — **available**; local Apify/Tavily credentials and a candidate Actor ID exist, but approved provider identifiers/credentials and any authorized live run remain **blocked** on employer authorization, licensing, spend cap and private transfer route; sentiment-backed evaluation and email packet — **blocked**; exact calendar deadline — **needs employer clarification** (A1, A7).
+- Deliverable checklist: repository link and reproducible package — **partially verified** (fresh-clone evidence is historical); evaluation report with per-horizon MAE/RMSE, sample counts and risk metrics — **available** (`reports/btcusdt-180d/evaluation-report.md`, historical real-price artifact); chart and outlook with honest unavailable states — **available**; local Apify/Tavily credentials and a candidate Actor ID exist, but approved provider identifiers/credentials and any authorized live run remain **blocked** on employer authorization, licensing, spend cap and private transfer route; sentiment-backed evaluation and email packet — **blocked**; exact calendar deadline — **needs employer clarification** (A1, A7).

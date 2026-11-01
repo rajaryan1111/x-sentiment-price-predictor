@@ -2,19 +2,19 @@
 A code default is not employer confirmation. Material changes need rationale, impact analysis, updated tests and synchronized canonical documents.
 
 ## D-001 Asset
-Status: selected working choice. BTC-USD Bitcoin spot reference. The verified brief says "an asset" and "the chosen asset" and does not mandate Bitcoin; BTC-USD is this project's choice. Do not expand assets without approval.
+Status: Bitcoin remains the chosen asset; the original direct-USD reference is not currently evidenced. The fresh evaluation uses BTCUSDT (USDT quote) as a disclosed proxy, pending employer acceptance or approved BTC-USD access. See D-031.
 
 ## D-002 Interval/timezone
 Status: working default. Daily bars, UTC boundaries, timezone-aware timestamps normalized to UTC. The brief asks for UTC/EST alignment; source offsets are preserved where supplied and converted to UTC for calculations. EST is an input/display offset, not a second internal clock.
 
 ## D-003 Price source
-Status: working default; verified again on 2026-10-26. Coinbase Exchange public BTC-USD daily candles. A read-only 7-bar smoke test passed and a 180-day profile returned 180/180 bars from 2026-04-29 through 2026-10-25 UTC with no missing or duplicate timestamps, no out-of-range rows and no incomplete current day. This does not prove future API behaviour or X coverage.
+Status: superseded on 2026-11-01 after review of Coinbase Market Data Terms. Earlier read-only Coinbase profile evidence is historical and its derived metrics are removed from the current tree. No Coinbase data was fetched or reused in this execution. Current evaluation uses checksum-verified Binance Vision BTCUSDT under CC BY-NC-SA 4.0, non-commercial only; exact USD source remains open. See D-031 and DATA_POLICY.md.
 
 ## D-004 Forecast cutoff and targets
 Status: working default, not employer-confirmed. The verified brief requires n+0 through n+5 and says n is the current period, but does not define whether n+0 is a completed close. Issue at 00:00 UTC at the start of day n; predict closes of bars n through n+5. n+0 is the not-yet-completed close. Use completed prior bars as features and omit incomplete or gap-crossing labels. Employer clarification overrides before evaluation.
 
 ## D-005 News role
-Status: conservative interpretation, based on the verified brief. The brief says to ingest "most recent and relevant news on the asset to complement the X sentiment (use tavily.com)" while also saying the predictive model uses "X sentiment and price only." News is therefore context for the current outlook, not a model feature. Tavily is the named news source. The implementation enforces two separate steps: `xsentiment fetch-news --confirm-live-call` may make one bounded provider request using `TAVILY_API_KEY` and writes normalized JSONL; `xsentiment run --news-file` consumes that file offline and records its hash and context-only policy. Tests prove that predictions and metrics are unchanged by news context. No live call has been made. Reopen only with employer clarification and synchronized feature-policy changes.
+Status: conservative interpretation. News remains context-only because the model input requirement says sentiment and price only. The bounded Tavily adapter/CLI supports topic and publication-date filters; one bounded live finance search was made on 2026-11-01 and returned no provider publication dates. Exa has an optional implementation but no configured key or live call. Tests prove news context does not alter predictions or metrics. Reopen only with employer clarification and synchronized feature-policy changes.
 
 ## D-006 ML versus RL
 Status: documented interpretation, based on the verified brief. The brief says "a Python-based machine learning / reinforcement learning pipeline"; the slash offers either option and no explicit RL deliverable, action space, reward or execution model is defined. Supervised multi-horizon forecasting plus baselines satisfies the ML option. RL is not implemented and is not treated as required unless the employer explicitly reopens it.
@@ -38,13 +38,22 @@ Status: rule. StockTwits is not X. Do not merge platforms without explicit label
 Status: rule. Never commit credentials. The brief asks for provider tokens and Actor IDs at submission; share secrets only through a verified employer-approved private channel, never in the repository or a public report.
 
 ## D-013 Exa
-Status: optional by default. The main news requirement names Tavily. Exa appears only in the submission line ("including apify/tavily/exa") and in the request for tokens and Actor IDs used for scraping. Use Exa only if actually needed or employer-required, and submit credentials only for providers actually used.
+Status: implementation added, requirement remains unconfirmed. Tavily is named for the main news requirement; Exa also appears in the submission line. A bounded Exa `/search` adapter and CLI selector are present and mocked-tested. No key is configured, so live verification and any credential handoff remain unavailable. Confirm with employer whether Exa is mandatory.
 
 ## D-014 Deadline
 Status: open. The verified brief says both "submit it within 1 week" (page 1) and "You will have 5 - 7 days" (Timeline). It gives no calendar date. Confirm the actual due date from employer communication; do not infer a date from repository timestamps.
 
 ## D-015 Canonical governance
 Status: agreed. Nine root-level files govern scope, contracts, data policy, model/evaluation, testing, rules, roadmap and decisions. Update affected documents/tests before merging material changes.
+
+## D-031 Current price source and licensing
+Status: current bounded evaluation source. Coinbase's 2026 Market Data Terms prohibit use of Coinbase Market Data to train, validate, benchmark or improve AI/ML models and prohibit redistribution of derived analytics without prior written consent. To avoid reuse of that source, the current evaluation uses official Binance Vision Spot BTCUSDT daily klines for 2026-05-05 through 2026-10-31 UTC. Binance Vision terms license the data and derivatives under CC BY-NC-SA 4.0, require attribution and share-alike, and exclude commercial use. Exact BTC-USD and employer acceptance of USDT remain unresolved. No history rewrite was made; the old derived artifacts remain reachable in earlier Git commits.
+
+## D-032 Provider collection gate
+Status: no Apify collection. The configured actor resolves to `apidojo/tweet-scraper`; the current Apify Free plan is demo-only and does not permit Actor API use. The task required no spend; no purchase or Actor run was made. An employer-provided permitted export or an explicitly approved paid plan/Actor and spend cap is required.
+
+## D-033 News provider implementation
+Status: bounded. Tavily supports news/finance topic, date range, and a request for publication metadata; the live 2026-11-01 response omitted publication dates, so dates stay null. Exa implements the official `/search` contract with date bounds, typed response models, response size/timeout bounds, normalization and no automatic retry. Exa has mock-only verification because no key is configured. Both remain outlook context only.
 
 ## D-016 Sentiment scorer
 Status: working default with documented limits. VADER (`vaderSentiment` 3.3.x, MIT) is the versioned, deterministic, offline scorer; blank text stays null and is never treated as neutral. It is English-oriented and not finance-specific, so it is a reproducible baseline rather than a claim of understanding. Replacing it means implementing another `SentimentScorer`; the scorer name and installed version are recorded in every run manifest.

@@ -264,6 +264,14 @@ def test_report_contains_measured_tables_and_withheld_metric_reasons() -> None:
     assert "synthetic fixture" in report
 
 
+def test_price_units_follow_the_asset_quote_currency() -> None:
+    from xsentiment.reporting.units import quote_currency
+
+    assert quote_currency("BTC-USD") == "USD"
+    assert quote_currency("BTCUSDT") == "USDT"
+    assert quote_currency("UNKNOWN") == "quote units"
+
+
 def test_report_explains_why_no_metrics_exist_when_history_is_short() -> None:
     candles = synthetic_candles(40)
     rows = build_supervised_dataset(candles, [])

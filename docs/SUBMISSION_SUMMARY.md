@@ -1,29 +1,31 @@
 # Current submission summary — 2026-11-01
 
 **Repository:** https://github.com/rajaryan1111/x-sentiment-price-predictor
-**Current branch:** `feat/availability-basis-and-preflight`
-**Current verdict:** READY WITH DISCLOSED EXTERNAL BLOCKERS; no email or external submission has been made.
+**Final branch:** `feat/availability-basis-and-preflight`
+**Status:** SUBMISSION READY WITH EXTERNAL BLOCKERS; no email or external assignment submission has been made.
 
-The current handoff is [submission/FINAL_HANDOFF.md](../submission/FINAL_HANDOFF.md). The exhaustive 28-ID matrix is [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md); measured checks and blockers are in the `submission/` packet. Older branch/CI details in dated engineering logs describe only their stated historical revisions.
+See [FINAL_EXECUTION_STATUS](FINAL_EXECUTION_STATUS_2026-11-01.md), the current
+[evaluation report](../submission/FINAL_EVALUATION_REPORT.md), and the
+[28-ID requirement matrix](REQUIREMENTS_TRACEABILITY.md).
 
-## Implementation
+The Python project has bounded Apify preflight/ingestion, Tavily and Exa news
+adapters, point-in-time joins, sentiment/price feature generation, six horizons,
+naive and ridge baselines, purged walk-forward evaluation, risk metrics, SQL
+persistence, chart/outlook/report generation, and offline tests. Exa uses official
+`/search` semantics but has mock-only verification because no key is configured.
+Tavily has one bounded live search recorded; returned publication times were null.
 
-The Python CLI includes BTC-USD daily price ingestion, a configurable Apify adapter and safe preflight, UTC point-in-time alignment, sentiment and price feature generation, six forecast horizons, naive/price-only/sentiment-plus-price models, purged expanding walk-forward evaluation, strategy risk metrics, SQL persistence/joins, an SVG chart, a one-page outlook, Markdown reports, dataset profiling, and offline tests. Tavily is an optional, explicitly gated, context-only integration. Exa is not implemented.
+The fresh real-price evaluation uses 180 Binance Vision BTCUSDT daily bars from
+2026-05-05 through 2026-10-31 UTC, with source ZIPs/checksums and per-row predictions
+packaged. Values are USDT. Binance Vision data and derived artifacts are
+CC BY-NC-SA 4.0, with attribution/share-alike and non-commercial restrictions.
+Naive mean MAE is 1,824.23 USDT and price-only MAE is 2,378.50 USDT; there are no X
+posts, so no sentiment result can be inferred. Coinbase-derived artifacts were
+removed from the current tree after the legal-terms review; Git history remains
+unchanged.
 
-## Assignment evidence
-
-The original assignment PDF and companion dataset-reference PDF were re-opened and read in full on 2026-11-01 from user-provided copies outside the repository. Page counts and verified hashes are in the traceability matrix. They are not committed and are excluded from the ZIP.
-
-The committed historical run records 180 BTC-USD candles and zero X posts / zero scored sentiment observations. Its aggregate metrics say naive persistence has mean MAE $1,828.36 and price-only ridge $2,264.62; sentiment-plus-price matches price-only because sentiment is absent. The raw price snapshot and per-row prediction file are not in this checkout, so these values were cross-checked against committed aggregate metrics, not freshly recomputed from raw rows.
-
-The offline demo and mock-backed provider tests verify software behavior only. No live Apify, Tavily, Exa, or Coinbase call was made during this audit, and no paid Actor ran. No model-quality or profitability claim is made.
-
-## Current external blockers
-
-- Employer-approved X source/Actor, terms, query coverage, and real 180-day data.
-- Explicit item/USD spend ceiling and secure private credential-transfer route.
-- Employer clarification of `n+0`, absolute deadline, Tavily/Exa expectations, and any additional demo format.
-- The recipient printed in the assignment PDF is `gilad@crowdwisdomtrading.com`; it is not independently mailbox-verified.
-- The historical aggregate evaluation cannot be retrained from this checkout without its raw input and prediction rows.
-
-See [submission/REMAINING_BLOCKERS.md](../submission/REMAINING_BLOCKERS.md) for owners and exact actions.
+The largest blockers are an approved rights-cleared 180-day X source and Actor or
+employer-provided export; employer approval of BTCUSDT versus exact BTC-USD;
+optional Exa key/requirement clarification; the conflicting deadline; and a private
+credential channel. No live Apify run, Exa call, Coinbase request, email or merge
+was made. The unsent email draft asks the employer only for those unresolved inputs.

@@ -1,5 +1,11 @@
 # Apify X ingestion setup
 
+**Current account gate (2026-11-01):** the configured candidate resolves to
+`apidojo/tweet-scraper`. Its current Free plan is demo-only and prohibits Actor API
+use. Do not run the API commands below on the current plan. No paid plan or Actor
+run has been authorized. Use this guide only after the employer approves a permitted
+source/plan and a maximum spend, or supplies a licensed export.
+
 ## Before any run
 
 1. Choose an Actor in your Apify account and verify its current terms, pricing model, input schema, data retention rules and ability to collect the target BTC-related posts over the requested 180-day window using **ticker, cashtag and keyword searches**.
@@ -36,8 +42,9 @@ days, that `maxItems` is bounded, and that no credential-shaped key is present.
 It reports only boolean credential presence, never a value, and prints
 `network_call_made: false`. It does not prove the Actor's current schema, recall
 or price. Replace the example dates and confirm the reviewed Actor's exact input
-schema first. The operator sequence is: review `ACTOR_REVIEW.md` -> `--validate-only`
--> a 10-item paid smoke test -> a 7-day pilot -> the full bounded run.
+schema first. The operator sequence after external approval is: review
+`ACTOR_REVIEW.md` -> `--validate-only` -> a bounded, approved pilot -> the full
+bounded run. The Free plan makes no API Actor run possible at present.
 
 ## Bounded ingestion command
 

@@ -1,6 +1,6 @@
 # Phase 1 — Requirements and Scope Lock
 
-**Status:** Phase 1 requirements and scope are closed as a documented baseline. The original assignment and companion dataset-reference PDFs were re-opened and read in full on 2026-11-01 from user-provided copies in Downloads; SHA-256 values are recorded in [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md). They are not committed to Git or included in the submission ZIP. BTC-USD/daily, forecast cutoff, working target convention, price-source default, and conservative news/RL interpretations are transcribed here. External data/provider checks and the exact deadline remain open gates.
+**Status:** Phase 1 requirements and scope are closed as a documented baseline. The original assignment and companion dataset-reference PDFs were re-opened and read in full on 2026-11-01 from user-provided copies in Downloads; SHA-256 values are recorded in [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md). They are not committed to Git or included in the submission ZIP. Bitcoin/daily, forecast cutoff, working target convention, original source choices, and conservative news/RL interpretations are transcribed here. D-031 supersedes Coinbase BTC-USD as the current evaluation source; the current run uses Binance Vision BTCUSDT under CC BY-NC-SA 4.0, non-commercial only. External data/provider checks and the exact deadline remain open gates.
 
 **Primary sources:** `CWT X sentiment Agent - intern task.pdf` and `Historical Twitter_X Datasets_ Verified Download Links.pdf`, re-opened and read in full 2026-11-01 from user-provided copies in Downloads. Page counts and verified SHA-256 hashes are in [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md). The originals remain outside Git and are excluded from the submission ZIP.
 
@@ -47,7 +47,7 @@ All downstream query examples and test fixtures must use the selected asset and 
 
 ### Operational forecasting convention (default for implementation)
 
-- **Market data source:** Coinbase Exchange public market-data endpoint for product `BTC-USD`, using daily candles (`granularity=86400` seconds). This is the selected implementation default because it provides a direct USD spot pair and does not require a price API key. The public price path was verified on 2026-10-26 with 180/180 daily bars; re-verify the live endpoint at submission time. Source documentation: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles (legacy Exchange endpoint reference); current public-candle API reference is linked from https://coinbase.github.io/coinbase-advanced-py/coinbase.rest.html.
+- **Original market-data choice (superseded):** Coinbase Exchange `BTC-USD` was the initial implementation default. On 2026-11-01 its current terms were reviewed and found to restrict ML training/validation/benchmarking and redistribution of derived analytics without written consent. No Coinbase data was fetched in this run. Current evaluation uses Binance Vision Spot `BTCUSDT`, USDT quote; see D-031 and `reports/btcusdt-180d/ATTRIBUTION.md`. Source documentation: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles (legacy Exchange endpoint reference); current public-candle API reference is linked from https://coinbase.github.io/coinbase-advanced-py/coinbase.rest.html.
 - **Daily boundary:** UTC midnight-to-midnight. Every bar is labelled by its UTC start timestamp. Treat the close as available only after the daily bar has completed; do not use an unfinished current-day close as an observed input.
 - **Forecast cutoff:** at the start of UTC day `n` (00:00:00 UTC), using only previously completed price bars and posts published by the cutoff. The model may use sentiment from posts whose event time is at or before the cutoff and whose availability is supported by the dataset/provenance. If historical availability cannot be established, document the limitation and exclude suspect records rather than backdating them.
 - **Targets:** predict the close of daily bar `n`, `n+1`, `n+2`, `n+3`, `n+4`, and `n+5`. Thus `n+0` is a forecast of the current day's not-yet-completed close made at that day's UTC start, not the already-known close. This resolves the otherwise ambiguous wording for the working implementation. Any employer clarification overrides this default and must be recorded before model evaluation.
@@ -131,11 +131,11 @@ Phase 1 is ready for implementation planning when:
 
 | ID | Decision required | Why it matters | Current status |
 |---|---|---|---|
-| O1 | Chosen asset, ticker/cashtag, asset class and exchange/market | Defines collection query, price feed, trading calendar and report | **Resolved working assumption:** Bitcoin spot reference `BTC-USD`; use Coinbase Exchange public candles by default. The public price path was verified on 2026-10-26; re-verify at submission time |
+| O1 | Chosen asset, ticker/cashtag, asset class and exchange/market | Defines collection query, price feed, trading calendar and report | **Working asset:** Bitcoin spot. The initial Coinbase BTC-USD pair is superseded; current run uses Binance Vision BTCUSDT (USDT quote) pending employer acceptance or an approved USD source |
 | O2 | Price bar interval | Defines period, aggregation, feature windows and horizon | **Resolved working assumption:** daily (`1d`), UTC midnight boundaries |
 | O3 | Exact meaning of `n+0` | Prevents target leakage and impossible prediction claims | **Resolved working assumption:** forecast the not-yet-completed close of day `n`, issued at 00:00 UTC at the start of that day |
 | O4 | Target convention at each horizon | Determines labels, loss and metric interpretation | **Resolved working assumption:** close of daily bars `n` through `n+5`; employer clarification, if received, overrides before evaluation |
-| O5 | Price data provider and adjustment policy | Reproducibility and comparable targets | **Resolved default:** Coinbase Exchange BTC-USD spot candles, USD quote, UTC bars; no equity corporate-action adjustments. Verified 2026-10-26 with no gaps or duplicates; re-verify availability and limits at submission time |
+| O5 | Price data provider and adjustment policy | Reproducibility and comparable targets | **Current evaluation:** Binance Vision BTCUSDT spot candles, USDT quote, UTC bars, 180 complete days, checksums verified. This is not exact USD; employer decision or rights-cleared USD source required |
 | O6 | Access, terms, schema and suitability of the linked historical dataset resource | Determines training feasibility and rights | **Resource retrieved 2026-10-26:** the Google Doc is a 12-entry dataset-link compilation matching the companion PDF, not a tweet corpus. **Still open:** select a candidate, verify its terms/schema/text/180-day coverage, and profile it before use |
 | O7 | Whether Tavily news is context-only or a model feature | PDF contains potentially conflicting directions | **Default resolved conservatively:** context for the one-page outlook only; no news features in forecast model unless employer clarifies otherwise |
 | O8 | Whether RL is expected | RL needs action/reward and execution design not specified | **Default resolved conservatively:** the verified brief says "machine learning / reinforcement learning"; the slash permits either. Supervised multi-horizon forecasting satisfies the ML option; RL excluded unless the employer explicitly requires it and scope is amended |
@@ -162,7 +162,7 @@ Phase 1 is ready for implementation planning when:
 
 ## 9. Proposed end-to-end workflow
 
-1. Use the selected BTC-USD and daily-bar assumptions together with the operational defaults in Section 3; check for employer clarification and re-verify the live Coinbase API/product behavior at submission time before relying on collected prices.
+1. Use the selected BTC-USD and daily-bar assumptions together with the operational defaults in Section 3; check for employer clarification and use the current checksum-verified Binance Vision BTCUSDT archive only under its non-commercial share-alike terms; do not use Coinbase-derived results without written permission.
 2. Verify candidate historical dataset(s) and provider access/terms; select the smallest suitable reproducible sample for schema/prototype checks.
 3. Define canonical schemas and timestamp/availability rules.
 4. Ingest the 180-day X window and matching price window through bounded, logged provider adapters.
@@ -186,12 +186,12 @@ same IDs and must always be updated together.
 
 ## 11. Phase 1 exit decision
 
-**Phase 1 status: CLOSED — requirements and scope baseline documented and verified against the supplied PDFs on 2026-10-26.** The selected BTC-USD/daily assumptions, operational forecast cutoff, horizon targets, data rules, baseline/evaluation methodology, scope decisions, acceptance criteria, and traceability are now explicit. The assessment's stated deliverables are mapped to planned evidence.
+**Phase 1 status: CLOSED — requirements and scope baseline documented and verified against the supplied PDFs on 2026-10-26.** The Bitcoin/daily assumptions, operational forecast cutoff, horizon targets, data rules, baseline/evaluation methodology, scope decisions, acceptance criteria, and traceability are explicit; the original Coinbase source choice is superseded by D-031. The assessment's stated deliverables are mapped to planned evidence.
 
 **Readiness gates (must pass before live X ingestion or X-based training):**
 
 1. Retrieve and review the linked historical dataset resource and its terms — **partially satisfied**: the Google Doc was retrieved and is a 12-entry dataset-link compilation matching the companion PDF; no candidate dataset has been downloaded, licensed or profiled.
-2. Verify the current Coinbase BTC-USD daily candle response and data quality — **satisfied**: a 7-bar smoke test passed and 180/180 bars for 2026-04-29 to 2026-10-25 UTC were re-profiled on 2026-10-26 with no missing or duplicate timestamps, no out-of-range rows and the unfinished current day excluded.
+2. Rebuild current price data — **satisfied for BTCUSDT proxy**: 180 Binance Vision daily bars for 2026-05-05 to 2026-10-31 UTC, with 36 published archive checksums verified and no gaps/duplicates. Exact BTC-USD remains open.
 3. Choose and inspect an Apify Actor, verify its current terms, fields, ticker/cashtag/keyword support, 180-day capability and cost, and set a spend cap — **open**, no paid run may start before this.
 4. Verify provider credentials privately without committing them — **partially satisfied**: the price path needs no credentials; no X credential route is agreed yet.
 5. Record actual data snapshots, schema profiles and provenance — **partially satisfied**: the price snapshot, its SHA-256 and the run provenance are recorded; no X profile exists.

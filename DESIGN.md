@@ -12,7 +12,7 @@ Audit fields: source_created_at_raw preserves the provider timestamp string, sou
 Reject/quarantine invalid core timestamps, malformed IDs and negative counts with explicit reasons. Deduplicate by stable ID; conflicting duplicate payloads fail closed. Do not print text in profiler summaries.
 
 ## Price bar
-product_id currently BTC-USD; timestamp is UTC candle start; OHLC are positive Decimal values and volume is non-negative. Validate low <= open/close <= high. Requests use half-open [start,end) bounds. Report duplicate, malformed, out-of-range and missing dates; never fabricate candles. Exclude unfinished current UTC day from observed-close inputs.
+`product_id` is explicit and quote currency is preserved from snapshot metadata. The current evaluation uses Binance Spot `BTCUSDT` (USDT quote), not BTC-USD. Timestamps are UTC candle starts; OHLC are positive Decimal values and volume is non-negative. Validate low <= open/close <= high. Requests use half-open [start,end) bounds. Report duplicate, malformed, out-of-range and missing dates; never fabricate candles. Exclude unfinished current UTC day from observed-close inputs. Evaluation labels use the quote currency rather than hard-coded USD.
 
 ## Feature row
 Key by asset and cutoff. Include cutoff, feature-window bounds, source/run references, price features derived only from completed prior candles, sentiment aggregates over (cutoff-24h, cutoff], coverage/missingness flags and provenance. If no eligible scored posts exist, sentiment is null, not neutral zero. Targets remain separate from feature columns.

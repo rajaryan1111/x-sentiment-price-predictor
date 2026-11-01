@@ -52,8 +52,10 @@ from xsentiment.models.evaluation import (
 )
 from xsentiment.models.forecasting import DEFAULT_RIDGE_LAMBDA
 from xsentiment.reporting.charts import render_sentiment_price_chart
+from xsentiment.reporting.dashboard import render_dashboard_html
 from xsentiment.reporting.outlook import build_outlook, render_outlook_markdown
 from xsentiment.reporting.report import render_evaluation_report
+from xsentiment.reporting.units import quote_currency
 
 PROJECT_NAME = "x-sentiment-price-predictor"
 
@@ -66,6 +68,7 @@ class RunArtifacts:
     report_path: Path
     outlook_path: Path
     chart_path: Path
+    dashboard_path: Path
     manifest_path: Path
     predictions_path: Path
     metrics_path: Path
@@ -120,6 +123,12 @@ _SAFE_PRICE_METADATA_KEYS = (
     "generated_at",
     "recommended_now",
     "fetch_mode",
+    "venue",
+    "quote_currency",
+    "timestamp_unit",
+    "source_license",
+    "source_license_url",
+    "source_archive_count",
     "synthetic",
     "generator",
     "generator_seed",
@@ -140,6 +149,21 @@ def load_price_snapshot_metadata(path: str | Path) -> dict[str, object]:
             continue
         if len(str(value)) <= 500:
             metadata[key] = value
+    archive_hashes = payload.get("source_archive_sha256")
+    if isinstance(archive_hashes, dict) and len(archive_hashes) <= 50:
+        safe_hashes = {
+            name: digest
+            for name, digest in archive_hashes.items()
+            if isinstance(name, str)
+            and len(name) <= 120
+            and "/" not in name
+            and "\\" not in name
+            and isinstance(digest, str)
+            and len(digest) == 64
+            and all(character in "0123456789abcdefABCDEF" for character in digest)
+        }
+        if safe_hashes:
+            metadata["source_archive_sha256"] = dict(sorted(safe_hashes.items()))
     return metadata
 
 
@@ -387,8 +411,22 @@ def run_forecast_pipeline(
         rows,
         output / "sentiment-vs-price.svg",
         title=f"{asset} close and X sentiment",
+        quote_currency=quote_currency(asset, run_provenance),
         subtitle=f"Forecast cutoff {_iso(outlook.cutoff) or 'unavailable'}",
         now=now,
+    )
+    dashboard_path = output / "dashboard.html"
+    dashboard_path.write_text(
+        render_dashboard_html(
+            asset=asset,
+            generated_at=as_of,
+            dataset_summary=summary,
+            evaluation=evaluation,
+            outlook=outlook,
+            provenance=run_provenance,
+            chart_svg=chart_path.read_text(encoding="utf-8"),
+        ),
+        encoding="utf-8",
     )
     report_path = output / "evaluation-report.md"
     report_path.write_text(
@@ -436,6 +474,7 @@ def run_forecast_pipeline(
         report_path=report_path,
         outlook_path=outlook_path,
         chart_path=chart_path,
+        dashboard_path=dashboard_path,
         manifest_path=manifest_path,
         predictions_path=predictions_path,
         metrics_path=metrics_path,

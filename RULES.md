@@ -21,6 +21,8 @@ Never fabricate rows, labels, scores, timestamps, counts, metrics or approvals. 
 ## Security and cost
 Never commit tokens, cookies, .env, private exports, raw large datasets or unapproved post text. Use placeholders in .env.example and ignore secret/data paths. Never paste credentials into chat or public PRs. Share credentials only through verified employer-approved private channels. No paid collection without explicit budget approval. Honor source terms and retention/deletion requirements.
 
+Market-data restriction: do not use Coinbase Market Data for model training, validation, benchmarking or improvement, or distribute Coinbase-derived analytics, unless prior express written consent is obtained. The current Binance Vision BTCUSDT evaluation and all its redistributed derivatives must retain Binance Vision attribution and CC BY-NC-SA 4.0 licensing and remain non-commercial. Do not silently label USDT values as USD.
+
 ## Git/review
 Use focused branches and reviewable commits; avoid direct main commits unless agreed. Behavior changes require tests. Schema/target changes update canonical docs and decisions. Run lint, registry validation and tests before review. Do not merge or mark a PR ready while material data/license/security gates remain open. Avoid destructive history changes without explicit coordination.
 

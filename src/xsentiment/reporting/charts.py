@@ -111,6 +111,7 @@ def render_sentiment_price_chart(
     path: str | Path,
     *,
     title: str = "BTC-USD close and X sentiment",
+    quote_currency: str = "USD",
     subtitle: str = "",
     now: datetime | None = None,
 ) -> Path:
@@ -118,7 +119,7 @@ def render_sentiment_price_chart(
     panels = (
         ChartPanel(
             title="Observed daily close (UTC bars)",
-            y_label="USD close",
+            y_label=f"{quote_currency} close",
             color=PRICE_COLOR,
             points=price_points(candles, now),
             empty_message="No completed price bars are available for this window.",

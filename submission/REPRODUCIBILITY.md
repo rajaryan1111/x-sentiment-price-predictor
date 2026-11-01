@@ -49,7 +49,7 @@ python -m xsentiment run \
   --input-note "synthetic offline demo from scripts/make_offline_demo.py"
 ```
 
-The output includes a manifest, metrics, per-row predictions, evaluation report, outlook and SVG chart. Run the pipeline twice into separate output directories and compare those six files byte-for-byte. The generated values are synthetic and must not be presented as historical market or sentiment results.
+The output includes a manifest, metrics, per-row predictions, evaluation report, outlook, SVG chart and standalone offline `dashboard.html`. The integration suite repeats the pipeline and compares deterministic outputs. The generated values are synthetic and must not be presented as historical market or sentiment results.
 
 ## 4. Safe Apify preflight (no request and no spend)
 
@@ -62,10 +62,35 @@ Expected: `valid: true`, query modes `ticker`, `cashtag`, `keyword`, `network_ca
 
 A paid Actor run is blocked until an Actor and license are approved, actual billing is reviewed, item/USD caps are agreed, a secure credential channel is supplied, and the user explicitly authorizes the operation. See [APIFY_X_SETUP.md](../docs/APIFY_X_SETUP.md) and [REMAINING_BLOCKERS.md](REMAINING_BLOCKERS.md).
 
-## 5. Historical real-price artifacts
+## 5. Reproduce the licensed BTCUSDT evaluation
 
-The historical run under `reports/btc-usd-180d/` records 180 Coinbase BTC-USD daily bars and aggregate metrics from 2026-10-26. The raw price snapshot and `predictions.jsonl` are not in the repository or ZIP. The recorded MAE and strategy metrics can be inspected in the committed `metrics.json`; this is not enough to independently retrain or recompute those results from raw rows. A new price retrieval and evaluation would be a new run, not a reproduction of the committed raw snapshot.
+The directory `reports/btcusdt-180d/source/` includes the 36 official Binance
+Vision archive ZIPs and their published `.CHECKSUM` sidecars. These data and all
+derived files are CC BY-NC-SA 4.0, attributed to Binance Vision and non-commercial
+only; see `reports/btcusdt-180d/ATTRIBUTION.md`.
+
+```bash
+python scripts/build_binance_snapshot.py \
+  --archives-dir reports/btcusdt-180d/source \
+  --start 2026-05-05 --end 2026-11-01 \
+  --out /tmp/btcusdt-180d-snapshot.json
+
+python -m xsentiment run \
+  --prices /tmp/btcusdt-180d-snapshot.json \
+  --asset BTCUSDT \
+  --out /tmp/btcusdt-180d-run \
+  --min-train 60 --test-size 20 --embargo 5
+```
+
+This is BTCUSDT (USDT quote), not exact BTC-USD. It contains no X posts and cannot
+measure sentiment contribution. The exact generated input and outputs, including the offline HTML dashboard, from the
+verified run are also included under `reports/btcusdt-180d/`.
 
 ## 6. Optional provider calls
 
-`fetch-news` is the only Tavily live-capable path and requires an explicit confirmation flag. It was not called in this verification. Exa is not integrated. Apify live ingestion is also not performed. Do not configure a real key or run a paid command without employer approval, an agreed cost ceiling, and explicit user authorization.
+`fetch-news` selects Tavily or Exa and requires an explicit `--confirm-live-call`
+flag. One dated Tavily finance request was performed using existing free allowance;
+it returned five results without publication dates. Exa has no configured key and
+is only mock-verified. No Apify Actor run was performed; the current account Free
+plan forbids API use. Do not run a paid collection without employer approval and an
+explicit cap.

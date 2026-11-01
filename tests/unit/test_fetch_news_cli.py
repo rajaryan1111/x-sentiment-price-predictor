@@ -120,10 +120,10 @@ def install_mock_adapter(
             finally:
                 await self.client.aclose()
 
-        async def search(self, query: str):
+        async def search(self, query: str, **search_kwargs):
             if self.search_error is not None:
                 raise self.search_error
-            return await self.inner.search(query, retrieved_at=RETRIEVED)
+            return await self.inner.search(query, retrieved_at=RETRIEVED, **search_kwargs)
 
     monkeypatch.setattr(cli, "TavilyNewsAdapter", MockedAdapter)
     return requests, constructed
@@ -202,7 +202,16 @@ def test_fetch_news_is_a_registered_cli_command() -> None:
     )
 
     assert completed.returncode == 0
-    for flag in ("--query", "--max-results", "--out", "--confirm-live-call"):
+    for flag in (
+        "--query",
+        "--provider",
+        "--topic",
+        "--start-date",
+        "--end-date",
+        "--max-results",
+        "--out",
+        "--confirm-live-call",
+    ):
         assert flag in completed.stdout
     assert "--api-key" not in completed.stdout
 
@@ -238,6 +247,61 @@ def test_fetch_news_reports_missing_credentials_without_constructing_a_client(
     assert "TAVILY_API_KEY" in captured.err
     assert "Traceback" not in captured.err
     assert not (tmp_path / "news.jsonl").exists()
+
+
+def test_fetch_news_routes_exa_provider_and_date_bounds(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from xsentiment.ingestion.tavily_news import NewsResult
+
+    monkeypatch.setenv("TAVILY_API_KEY", "")
+    monkeypatch.setenv("EXA_API_KEY", "exa-mock-key")
+    get_settings.cache_clear()
+    captured: dict[str, object] = {}
+
+    class FakeExaAdapter:
+        def __init__(self, *, api_key: str, max_results: int) -> None:
+            captured["api_key"] = api_key
+            captured["max_results"] = max_results
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return None
+
+        async def search(self, query: str, **kwargs):
+            captured["query"] = query
+            captured.update(kwargs)
+            now = datetime.now(UTC)
+            return NewsResult(query=query, retrieved_at=now, items=(), excluded=())
+
+    monkeypatch.setattr(cli, "ExaNewsAdapter", FakeExaAdapter)
+    out = tmp_path / "exa-news.jsonl"
+    result = cli.main(
+        [
+            "fetch-news",
+            "--provider",
+            "exa",
+            "--query",
+            "BTC market",
+            "--start-date",
+            "2026-10-01",
+            "--end-date",
+            "2026-10-31",
+            "--out",
+            str(out),
+            "--confirm-live-call",
+        ]
+    )
+
+    assert result == 0
+    assert captured["api_key"] == "exa-mock-key"
+    assert captured["query"] == "BTC market"
+    assert captured["start_date"].isoformat() == "2026-10-01"
+    assert captured["end_date"].isoformat() == "2026-10-31"
+    assert out.read_text(encoding="utf-8") == ""
+    get_settings.cache_clear()
 
 
 def test_fetch_news_enforces_query_and_result_bounds(

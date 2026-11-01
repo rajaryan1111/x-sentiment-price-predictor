@@ -1,19 +1,22 @@
 # Test Plan
 A passing suite proves only the cases it actually exercises. Current collection on
-2026-11-01 is **209 offline tests** using Python 3.11.15 and the existing
-`.[dev,storage,analysis]` environment. The current verification adds 22 collected
-cases over the previous 187-case checkpoint: five for the explicit availability
+2026-11-01 is **220 offline tests** using Python 3.11.15 and the existing
+`.[dev,storage,analysis]` environment. The current verification adds 10 collected
+cases over the earlier 209-case checkpoint: two Tavily date-filter cases, three
+Exa adapter cases, one Exa CLI-routing case, three Binance archive/checksum/coverage
+cases, one quote-unit case and one dashboard empty-sentiment integration case. Earlier verification had added 22 collected
+cases over the prior 187-case checkpoint: five for the explicit availability
 basis (default exclusion, opt-in archive inclusion, mandatory disclosure note,
 unknown-basis failure, manifest/report disclosure), one storage-join archive case,
 one persisted-pipeline disclosure case, ten Apify input-preflight cases and five
 bounded-ingestion cases (confirmation gate, credential gate, query-mode gate,
 sanitized manifest and JSONL output). The full
-rerun for this exact working tree is recorded in
+rerun for this execution is recorded in
 [FINAL_VERIFICATION_REPORT.md](docs/FINAL_VERIFICATION_REPORT.md). CI supports
 Python 3.11 and installs `.[dev,storage]`.
 CI runs lint, registry validation, documentation validation and pytest.
 
-The previous checkpoint suite collected 167 cases from 165 test functions across
+The older checkpoint suite collected 167 cases from 165 test functions across
 22 modules in `tests/unit/` and `tests/integration/`. Its history included nine
 news CLI cases, four offline demo integration cases, a streaming response-ceiling
 case and an offline network-isolation case. The security pass adds 18 collected

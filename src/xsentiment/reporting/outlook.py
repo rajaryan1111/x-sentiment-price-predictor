@@ -18,6 +18,7 @@ from xsentiment.models.forecasting import (
     DEFAULT_RIDGE_LAMBDA,
     HorizonLinearModel,
 )
+from xsentiment.reporting.units import quote_currency
 
 _NOT_ADVICE = (
     "This outlook is a research artefact for an engineering assessment. It is not "
@@ -202,12 +203,13 @@ def build_outlook(
 
 def render_outlook_markdown(outlook: OutlookReport) -> str:
     """Render the outlook as a short, evidence-labelled Markdown page."""
+    currency = quote_currency(outlook.asset)
     lines: list[str] = [
         f"# {outlook.asset} — current sentiment outlook",
         "",
         f"**As of:** {outlook.as_of.isoformat()}  ",
         f"**Forecast cutoff:** {_iso(outlook.cutoff)}  ",
-        f"**Last completed daily close (USD):** "
+        f"**Last completed daily close ({currency}):** "
         f"{_money(outlook.latest_completed_close)}  ",
         f"**Sentiment scorer:** {outlook.scorer.get('scorer', 'unknown')} "
         f"`{outlook.scorer.get('version', 'unknown')}`",
@@ -225,7 +227,8 @@ def render_outlook_markdown(outlook: OutlookReport) -> str:
     if outlook.predictions:
         lines.extend(
             [
-                "| Model | Horizon | Predicted close (USD) | Change vs last completed close |",
+                f"| Model | Horizon | Predicted close ({currency}) | "
+                "Change vs last completed close |",
                 "| --- | --- | --- | --- |",
             ]
         )
