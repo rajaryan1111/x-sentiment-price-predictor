@@ -100,7 +100,7 @@ From the committed historical run
 | `scripts/validate_docs.py` | OK — all links, 28 matrix rows valid |
 | `scripts/validate_dataset_registry.py` | OK — 12 records |
 | `git diff --check` | clean |
-| GitHub Actions CI | success: run `41266701917` tested branch tip `71f234de69d9f8b94e4665f11e7c95f91cca001a` on 2026-11-01, verified directly against `git ls-remote` and `gh run list`; re-check the live tip with `git rev-parse origin/feat/availability-basis-and-preflight` |
+| GitHub Actions CI | success: [run `41267305862`](https://github.com/rajaryan1111/x-sentiment-price-predictor/actions/runs/41267305862) checked out exact branch tip `33c24dcb7d9d6664bd456f00ae9f477278cdb8cf` (confirmed in checkout logs); lint, dataset-registry validation, documentation validation and pytest all succeeded; **209 passed** |
 
 Clean-environment reproduction (fresh venv, install from committed
 `pyproject.toml` only, all offline):
